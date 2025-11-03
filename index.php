@@ -223,39 +223,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="features-section" style="padding: 80px 0;">
-      <div class="container">
-        <div class="section-header" data-aos="fade-up">
-          <div class="section-badge">
-            <i class="bi bi-stars"></i>
-            <?php echo ($lang == 'ar') ? 'لماذا تختارنا' : 'Why Choose Us'; ?>
-          </div>
-          <h2 class="section-title"><?php echo ($lang == 'ar') ? 'مميزاتنا الاستثنائية' : 'Our Exceptional Features'; ?></h2>
-          <p class="section-subtitle"><?php echo ($lang == 'ar') ? 'اكتشف ما يجعلنا مختلفين وأفضل' : 'Discover what makes us different and better'; ?></p>
-        </div>
-
-        <div class="row">
-          <?php if (!empty($features)): ?>
-            <?php foreach ($features as $index => $feature): ?>
-              <div class="col-xl-4 col-lg-6 mb-4" data-aos="fade-up" data-aos-delay="<?php echo $index * 100; ?>">
-                <div class="feature-card">
-                  <div class="feature-icon">
-                    <i class="<?php echo htmlspecialchars($feature['icon']); ?>"></i>
-                  </div>
-                  <h4><?php echo htmlspecialchars($feature['title']); ?></h4>
-                  <p><?php echo htmlspecialchars($feature['description']); ?></p>
-                </div>
-              </div>
-            <?php endforeach; ?>
-          <?php else: ?>
-            <div class="col-12 text-center">
-              <p class="text-muted"><?php echo ($lang == 'ar') ? 'لا توجد مميزات متاحة' : 'No features available'; ?></p>
-            </div>
-          <?php endif; ?>
-        </div>
-      </div>
-    </section>
+  
 
     <!-- About Section -->
     <section class="simple-about-section" style="padding: 80px 0; background: #f8f9fa;">
