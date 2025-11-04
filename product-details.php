@@ -23,7 +23,7 @@ if (!$product) {
 $category = isset($product['category_id']) ? $query->getById('category', $product['category_id']) : null;
 $category_name = $category ? $category['category_name'] : 'غير مصنف';
 
-$product_images = $query->executeQuery("SELECT image_url FROM product_images WHERE product_id = $id")->fetch_all(MYSQLI_ASSOC);
+$product_images = $query->executeQuery("SELECT image_url FROM product_images WHERE product_id = $id");
 $product_images = !empty($product_images) ? array_column($product_images, 'image_url') : ['default-product.jpg'];
 
 // تحديد اللغة
