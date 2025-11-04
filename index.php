@@ -223,7 +223,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       </div>
     </section>
 
-    ئتمنتيمبنتسمنيتبمسنتيبمنستيمبنتسمينتبمسنتيبم
 
     <!-- Features Section -->
     <section class="features-section" style="padding: 80px 0;">
