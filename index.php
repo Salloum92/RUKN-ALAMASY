@@ -260,7 +260,6 @@ fdxgdfgdfgdfgdfg dfg sdrgfdfg dfg
 
 
 
-    فثسفكمينبتلكيمنتبكلمنيكبمنلكي بليكمبنل يكمبنلك يبلكمن
     <!-- About Section -->
     <section class="simple-about-section" style="padding: 80px 0; background: #f8f9fa;">
       <div class="container">
