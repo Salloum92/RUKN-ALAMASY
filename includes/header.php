@@ -229,9 +229,7 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
         transition: var(--transition);
     }
 
-    .logo:hover {
-        transform: translateY(-2px);
-    }
+   
 
     .logo-image img {
         width: 50px;

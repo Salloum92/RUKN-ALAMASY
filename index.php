@@ -222,7 +222,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
         </div>
       </div>
     </section>
-
     <!-- Features Section -->
     <section class="features-section" style="padding: 80px 0;">
       <div class="container">
@@ -283,7 +282,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
           <div class="col-lg-6" style="padding-<?php echo ($lang == 'ar') ? 'right' : 'left'; ?>: 40px;">
             <div data-aos="fade-left" data-aos-delay="100">
               <h2 style="font-size: 2.2rem; font-weight: 800; color: #2c3e50; line-height: 1.2; margin-bottom: 20px;">
-                <?php echo ($lang == 'ar') ? 'ركن السلامة<br>شركتك الموثوقة للأمن والسلامة' : 'Rukn Al-Amasy<br>Your Trusted Safety & Security Partner'; ?>
+                <?php echo ($lang == 'ar') ? 'ركن الأماسي<br>شركتك الموثوقة للأمن والسلامة' : 'Rukn Al-Amasy<br>Your Trusted Safety & Security Partner'; ?>
               </h2>
               
               <p style="font-size: 1.1rem; color: #6c757d; line-height: 1.8; margin-bottom: 30px;">
