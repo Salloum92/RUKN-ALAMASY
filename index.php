@@ -794,8 +794,8 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
 
     .service-number {
       position: absolute;
-      top: -10px;
-      right: -10px;
+      top: -5px;
+      right: -5px;
       width: 40px;
       height: 40px;
       background: var(--dark-color);
