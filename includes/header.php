@@ -1402,32 +1402,37 @@ body.nav-fixed-active {
 
                 <!-- Social Links -->
                 <div class="social-links">
-                    <?php if (isset($contactData[0]['twitter']) && !empty($contactData[0]['twitter'])): ?>
-                        <a href="https://x.com/<?= $contactData[0]['twitter'] ?>" class="social-link" target="_blank">
-                            <i class="bi bi-twitter-x"></i>
-                        </a>
-                    <?php endif; ?>
-                    <?php if (isset($contactData[0]['facebook']) && !empty($contactData[0]['facebook'])): ?>
-                        <a href="https://facebook.com/<?= $contactData[0]['facebook'] ?>" class="social-link" target="_blank">
-                            <i class="bi bi-facebook"></i>
-                        </a>
-                    <?php endif; ?>
-                    <?php if (isset($contactData[0]['instagram']) && !empty($contactData[0]['instagram'])): ?>
-                        <a href="https://instagram.com/<?= $contactData[0]['instagram'] ?>" class="social-link" target="_blank">
-                            <i class="bi bi-instagram"></i>
-                        </a>
-                    <?php endif; ?>
-                    <?php if (isset($contactData[0]['linkedin']) && !empty($contactData[0]['linkedin'])): ?>
-                        <a href="https://linkedin.com/in/<?= $contactData[0]['linkedin'] ?>" class="social-link" target="_blank">
-                            <i class="bi bi-linkedin"></i>
-                        </a>
-                    <?php endif; ?>
-                    <?php if (isset($contactData[0]['youtube']) && !empty($contactData[0]['youtube'])): ?>
-                        <a href="https://www.youtube.com/<?= $contactData[0]['youtube'] ?>" class="social-link" target="_blank">
-                            <i class="bi bi-youtube"></i>
-                        </a>
-                    <?php endif; ?>
-                </div>
+                            <?php if (isset($contactData[0]['twitter']) && !empty($contactData[0]['twitter'])): ?>
+                                <a href="https://x.com/<?= $contactData[0]['twitter'] ?>" class="twitter" target="_blank" title="Twitter">
+                                    <i class="bi bi-twitter-x"></i>
+                                </a>
+                            <?php endif; ?>
+                            <?php if (isset($contactData[0]['facebook']) && !empty($contactData[0]['facebook'])): ?>
+                                <a href="https://facebook.com/<?= $contactData[0]['facebook'] ?>" class="facebook" target="_blank" title="Facebook">
+                                    <i class="bi bi-facebook"></i>
+                                </a>
+                            <?php endif; ?>
+                            <?php if (isset($contactData[0]['instagram']) && !empty($contactData[0]['instagram'])): ?>
+                                <a href="https://instagram.com/<?= $contactData[0]['instagram'] ?>" class="instagram" target="_blank" title="Instagram">
+                                    <i class="bi bi-instagram"></i>
+                                </a>
+                            <?php endif; ?>
+                            <?php if (isset($contactData[0]['linkedin']) && !empty($contactData[0]['linkedin'])): ?>
+                                <a href="https://linkedin.com/in/<?= $contactData[0]['linkedin'] ?>" class="linkedin" target="_blank" title="LinkedIn">
+                                    <i class="bi bi-linkedin"></i>
+                                </a>
+                            <?php endif; ?>
+                            <?php if (isset($contactData[0]['youtube']) && !empty($contactData[0]['youtube'])): ?>
+                                <a href="https://www.youtube.com/<?= $contactData[0]['youtube'] ?>" class="youtube" target="_blank" title="YouTube">
+                                    <i class="bi bi-youtube"></i>
+                                </a>
+                            <?php endif; ?>
+                            <?php if (isset($contactData[0]['whatsapp']) && !empty($contactData[0]['whatsapp'])): ?>
+                                <a href="https://wa.me/<?= $contactData[0]['whatsapp'] ?>" class="whatsapp" target="_blank" title="WhatsApp">
+                                    <i class="bi bi-whatsapp"></i>
+                                </a>
+                            <?php endif; ?>
+                        </div>
             </div>
         </div>
     </div>
