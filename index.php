@@ -2269,7 +2269,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
         particlesJS('particles-js', {
           particles: {
             number: {
-              value: 60,
+              value: 40,
               density: {
                 enable: true,
                 value_area: 1000
