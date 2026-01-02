@@ -51,7 +51,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
   <title><?php echo ($lang == 'ar') ? 'ركن الأماسي - منتجات وخدمات متميزة' : 'Rukn Alamasy - Premium Products & Services'; ?></title>
   <meta name="description" content="<?php echo ($lang == 'ar') ? 'اكتشف منتجات وخدمات استثنائية مع ركن الأماسي' : 'Discover exceptional products and services with Rukn Alamasy'; ?>">
   <meta name="keywords" content="<?php echo ($lang == 'ar') ? 'منتجات متميزة، خدمات عالية الجودة، حلول أعمال' : 'premium products, quality services, business solutions'; ?>">
-  <link href="favicon.ico" rel="icon">
+  <link href="assets/img/logo.png" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
   <link href="https://fonts.googleapis.com" rel="preconnect">
   <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
