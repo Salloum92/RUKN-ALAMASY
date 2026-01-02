@@ -2111,7 +2111,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
                   </div>
                   <div class="review-author">
                     <div class="author-avatar">
-                      <img src="assets/img/clients/client1.jpg" alt="<?php echo ($lang == 'ar') ? 'أحمد محمد' : 'Ahmed Mohammed'; ?>">
+                      <img src="assets/img/6952312cc0531-1766994220.jpg" alt="<?php echo ($lang == 'ar') ? 'أحمد محمد' : 'Ahmed Mohammed'; ?>">
                     </div>
                     <div class="author-info">
                       <h4><?php echo ($lang == 'ar') ? 'أحمد محمد' : 'Ahmed Mohammed'; ?></h4>
@@ -2138,7 +2138,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
                   </div>
                   <div class="review-author">
                     <div class="author-avatar">
-                      <img src="assets/img/clients/client2.jpg" alt="<?php echo ($lang == 'ar') ? 'فاطمة عبدالله' : 'Fatima Abdullah'; ?>">
+                      <img src="assets/img/6952312cc0531-1766994220.jpg" alt="<?php echo ($lang == 'ar') ? 'فاطمة عبدالله' : 'Fatima Abdullah'; ?>">
                     </div>
                     <div class="author-info">
                       <h4><?php echo ($lang == 'ar') ? 'فاطمة عبدالله' : 'Fatima Abdullah'; ?></h4>
@@ -2165,7 +2165,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
                   </div>
                   <div class="review-author">
                     <div class="author-avatar">
-                      <img src="assets/img/clients/client3.jpg" alt="<?php echo ($lang == 'ar') ? 'خالد إبراهيم' : 'Khaled Ibrahim'; ?>">
+                      <img src="assets/img/6952312cc0531-1766994220.jpg" alt="<?php echo ($lang == 'ar') ? 'خالد إبراهيم' : 'Khaled Ibrahim'; ?>">
                     </div>
                     <div class="author-info">
                       <h4><?php echo ($lang == 'ar') ? 'خالد إبراهيم' : 'Khaled Ibrahim'; ?></h4>
@@ -2192,7 +2192,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
                   </div>
                   <div class="review-author">
                     <div class="author-avatar">
-                      <img src="assets/img/clients/client4.jpg" alt="<?php echo ($lang == 'ar') ? 'سارة القحطاني' : 'Sara Al-Qahtani'; ?>">
+                      <img src="assets/img/6952312cc0531-1766994220.jpg" alt="<?php echo ($lang == 'ar') ? 'سارة القحطاني' : 'Sara Al-Qahtani'; ?>">
                     </div>
                     <div class="author-info">
                       <h4><?php echo ($lang == 'ar') ? 'سارة القحطاني' : 'Sara Al-Qahtani'; ?></h4>
@@ -2211,12 +2211,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
 
         <div class="slider-pagination"></div>
 
-        <div class="text-center mt-5" data-aos="fade-up" data-aos-delay="500">
-          <a href="contact.php" class="btn-view-all pulse">
-            <i class="bi bi-chat-left-text"></i>
-            <?php echo ($lang == 'ar') ? 'شاركنا رأيك' : 'Share Your Opinion'; ?>
-          </a>
-        </div>
+       
       </div>
     </section>
 
