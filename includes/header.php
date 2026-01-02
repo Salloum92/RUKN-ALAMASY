@@ -1443,7 +1443,7 @@ body.nav-fixed-active {
             <div class="nav-container">
                 <!-- Logo -->
                 <div class="logo-section">
-                    <a href="./" class="logo">
+                    <a href="index.php" class="logo">
                         <div class="logo-image">
                             <img src="assets/img/logo.png" alt="Rukn Alamasy" 
                                  onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHZpZXdCb3g9IjAgMCA1MCA1MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiByeD0iMTAiIGZpbGw9IiNlNzZhMDQiLz4KPHN2ZyB4PSIxMiIgeT0iMTIiIHdpZHRoPSIyNiIgaGVpZ2h0PSIyNiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiPgo8cGF0aCBkPSJNMTIgMkM2LjQ4IDIgMiA2LjQ4IDIgMTJzNC40OCAxMCAxMCAxMCAxMC00LjQ4IDEwLTEwUzE3LjUyIDIgMTIgMnpNMTIgMjBsLTMtMyAyLTcgNyA1LTIgN3oiLz4KPC9zdmc+Cjwvc3ZnPg=='">
@@ -1482,7 +1482,7 @@ body.nav-fixed-active {
                     <!-- Main Navigation -->
                     <ul class="nav-menu">
                         <li class="nav-item">
-                            <a href="./" class="nav-link <?= ($current_page == 'index.php' || $current_page == '' || $current_page == '/') ? 'active' : '' ?>">
+                            <a href="index.php" class="nav-link <?= ($current_page == 'index.php' || $current_page == '' || $current_page == '/') ? 'active' : '' ?>">
                                 <i class="bi bi-house"></i>
                                 <span><?= $t['home'] ?></span>
                             </a>
@@ -1613,8 +1613,10 @@ body.nav-fixed-active {
     <div class="mobile-menu">
         <div class="mobile-menu-header">
             <div class="mobile-logo">
+                <a href="index.php">
                 <img src="assets/img/logo.png" alt="Rukn Alamasy" class="mobile-logo-img">
                 <span class="mobile-brand">Rukn Alamasy</span>
+                </a>
             </div>
             <button class="mobile-menu-close">
                 <i class="bi bi-x-lg"></i>
