@@ -80,22 +80,17 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
     /* ===== VARIABLES ===== */
     :root {
         --primary-color: #e76a04;
-        --primary-dark: #c55a03;
-        --primary-light: #f8a145;
-        --secondary-color: #2c3e50;
-        --accent-color: #3498db;
-        --text-dark: #2c3e50;
-        --text-light: #6c757d;
-        --bg-light: #f8f9fa;
-        --bg-white: #ffffff;
-        --border-color: #e9ecef;
-        --shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
-        --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.15);
-        --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.2);
-        --border-radius: 12px;
-        --border-radius-lg: 20px;
-        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        --transition-fast: all 0.2s ease;
+      --primary-dark: #d45f00;
+      --secondary-color: rgb(243, 212, 23);
+      --secondary-dark: rgb(223, 192, 3);
+      --dark-color: #144734ff;
+      --dark-light: rgb(30, 91, 72);
+      --light-color: #f8f9fa;
+      --text-dark: #2c3e50;
+      --text-light: #6c757d;
+      --white: #ffffff;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
     /* ===== RESET & BASE ===== */
@@ -117,15 +112,29 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
         max-width: 1200px;
         margin: 0 auto;
         padding: 0 20px;
+         position: relative;
+    z-index: 5; /* فوق الجسيمات */
     }
 
     /* ===== TOP BAR ===== */
     .top-bar {
-        background: #1a1a1a;
+        background: linear-gradient(135deg, var(--dark-color), var(--dark-light));
+        color: var(--light-color);
         padding: 10px 0;
         border-bottom: 1px solid rgba(255,255,255,0.1);
+        position: relative; 
+        overflow: hidden;
+        z-index: 100;
+        
     }
 
+
+/* ضمان أن الروابط قابلة للتفاعل */
+.top-bar a {
+    position: relative;
+    z-index: 10;
+    pointer-events: auto; /* التأكيد على أنها تستقبل النقرات */
+}
     .top-bar-content {
         display: flex;
         justify-content: space-between;
@@ -162,11 +171,11 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
     }
 
     .contact-item a:hover {
-        color: var(--primary-light);
+        color: var(--primary-color);
     }
 
     .contact-item:hover {
-        color: #ecf0f1;
+        color: var(--primary-color);
         transform: translateY(-1px);
     }
 
@@ -198,24 +207,115 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
     }
 
     /* ===== MAIN NAVIGATION ===== */
-    .main-nav {
-        background: var(--bg-white);
-        box-shadow: var(--shadow);
-        position: sticky;
-        top: 0;
-        z-index: 1000;
-        backdrop-filter: blur(10px);
-        background: rgba(255, 255, 255, 0.95);
-    }
 
-    .nav-container {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 15px 0;
-        gap: 30px;
-    }
 
+    
+
+/* أضف هذه الأنماط لملف CSS الخاص بك */
+.main-nav {
+    position: relative;
+    width: 100%;
+    height : 100px;
+    z-index: 1000;
+    background: #ffffff;
+    padding: 15px 0; /* مساحة واسعة في البداية */
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+}
+
+/* النسخة المخففة عند التمرير */
+.main-nav.scrolled {
+    position: fixed !important;
+    top: 0;
+    padding: 8px 0; /* تصغير الارتفاع لإعطاء مساحة للمحتوى */
+    background: rgba(255, 255, 255, 0.9); /* شفافية بسيطة */
+    backdrop-filter: blur(15px) saturate(180%); /* تأثير الزجاج الضبابي الرهيب */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); /* ظل ناعم جداً */
+    border-bottom: 1px solid rgba(20, 71, 52, 0.1); /* تأثير دخول ناعم */
+}
+.main-nav.scrolled::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, #144734, #e76a04); /* تدرج بين الأخضر والبرتقالي الخاص بك */
+}
+
+
+.main-nav.scrolled .nav-link {
+    font-size: 0.95rem; /* تصغير الخط قليلاً */
+    color: var(--dark-color);
+}
+@keyframes slideInDown {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(0); }
+}
+
+/* لمنع القفزة في المحتوى عند التثبيت */
+body.nav-fixed-active {
+    padding-top: 80px; /* نفس ارتفاع الناف بار تقريباً */
+}
+
+.main-nav.scrolled .nav-container {
+    padding: 10px 0;
+}
+
+/* يمكنك إضافة تأثيرات إضافية */
+.main-nav.scrolled .logo-text .brand-tagline {
+    opacity: 0;
+    height: 0;
+    overflow: hidden;
+    transition: opacity 0.3s ease;
+}
+
+.main-nav:not(.scrolled) .logo-text .brand-tagline {
+    opacity: 1;
+    height: auto;
+    transition: opacity 0.3s ease;
+}
+
+.nav-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 0;
+    gap: 30px;
+    transition: padding 0.3s ease;
+}
+
+
+.main-nav.nav-hidden {
+    transform: translateY(-100%);
+    transition: transform 0.3s ease;
+}
+
+.main-nav.scrolling-up {
+    transform: translateY(0);
+    transition: transform 0.3s ease;
+}
+
+/* تأثيرات للعناصر الداخلية */
+.main-nav.scrolled .logo-image img {
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.main-nav.scrolled .search-input {
+    padding: 8px 15px;
+    transition: padding 0.3s ease;
+}
+
+/* تأثيرات للقوائم المنسدلة */
+.main-nav.scrolled .dropdown-menu {
+    margin-top: 10px;
+}
+
+/* تحسين الظل عند التمرير */
+.main-nav.scrolled {
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.08);
+}
     /* Logo Section */
     .logo-section {
         flex-shrink: 0;
@@ -253,7 +353,7 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
 
     .brand-name {
         color: var(--secondary-color);
-        font-size: 1.4rem;
+        font-size: 1rem;
         font-weight: 800;
         line-height: 1.2;
         background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
@@ -264,9 +364,10 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
 
     .brand-tagline {
         color: var(--text-light);
-        font-size: 0.75rem;
-        font-weight: 500;
-        margin-top: 2px;
+        font-size: 0.6rem;
+        font-weight: 400;
+        margin-top: 1px;
+        text-align: center;
     }
 
     /* Search Section */
@@ -283,9 +384,9 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
 
     .search-box {
         position: relative;
-        background: var(--bg-light);
+        background: white;
         border-radius: 50px;
-        border: 2px solid transparent;
+        border: 2px solid var(--primary-color);
         transition: var(--transition);
         overflow: hidden;
         box-shadow: 0 2px 10px rgba(0,0,0,0.05);
@@ -370,6 +471,7 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
         margin: 0;
         padding: 0;
         gap: 8px;
+        
     }
 
     .nav-item {
@@ -483,7 +585,7 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
         align-items: center;
         gap: 8px;
         padding: 10px 16px;
-        background: var(--bg-light);
+        background: var(--primary-color);
         border: 2px solid transparent;
         border-radius: 25px;
         color: var(--text-dark);
@@ -509,7 +611,7 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
         position: absolute;
         top: 100%;
         right: 0;
-        background: var(--bg-white);
+        background: var(--primary-color);
         border-radius: var(--border-radius);
         box-shadow: var(--shadow-xl);
         padding: 8px;
@@ -532,7 +634,7 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
         align-items: center;
         gap: 10px;
         padding: 12px 16px;
-        color: var(--text-dark);
+        color: white;
         text-decoration: none;
         border-radius: 8px;
         transition: var(--transition-fast);
@@ -541,11 +643,11 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
 
     .lang-option:hover {
         background: rgba(231, 106, 4, 0.1);
-        color: var(--primary-color);
+        color: var(--dark-color);
     }
 
     .lang-option.active {
-        background: rgba(231, 106, 4, 0.15);
+        background: var(--dark-color);
         color: var(--primary-color);
     }
 
@@ -559,7 +661,7 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
         display: none;
         flex-direction: column;
         gap: 4px;
-        background: none;
+        background: white;
         border: none;
         padding: 8px;
         cursor: pointer;
@@ -703,6 +805,7 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
 
     .mobile-menu.active {
         left: 0;
+        background-color : #144734ff;
     }
 
     .mobile-menu-header {
@@ -778,10 +881,11 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
     .mobile-nav-search-input {
         flex: 1;
         border: none;
-        background: none;
+        background: white;
         padding: 12px 16px;
         font-size: 0.9rem;
         outline: none;
+        border: 1px solid var(--primary-color)
     }
 
     .mobile-nav-search-btn {
@@ -809,7 +913,7 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
         align-items: center;
         gap: 12px;
         padding: 15px 20px;
-        color: var(--text-dark);
+        color: white;
         text-decoration: none;
         border-radius: 12px;
         transition: var(--transition);
@@ -833,6 +937,12 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
         font-size: 1.2rem;
         width: 24px;
         text-align: center;
+    }
+    .mobile-contact-item span {
+        color : white ;
+    }
+    .mobile-contact-item a {
+        color : white ;
     }
 
     /* Mobile Contact Section */
@@ -862,7 +972,7 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
     }
 
     .mobile-contact-item a {
-        color: var(--text-dark);
+        color: white;
         text-decoration: none;
         transition: var(--transition-fast);
     }
@@ -871,38 +981,64 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
         color: var(--primary-color);
     }
 
-    /* Mobile Language Selector */
-    .mobile-language-selector {
-        display: flex;
-        gap: 10px;
-    }
+    /* Mobile Language Selector Container */
+.mobile-language-selector {
+    display: flex;
+    gap: 10px;
+    padding: 10px 0;
+}
 
-    .mobile-lang-option {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        padding: 12px;
-        border: 2px solid var(--border-color);
-        border-radius: 8px;
-        text-decoration: none;
-        color: var(--text-dark);
-        font-weight: 500;
-        transition: var(--transition);
-    }
+/* الحالة العادية: الزر غير مفعل (نص وأيقونة باللون الأبيض) */
+.mobile-lang-option {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.3); /* حدود بيضاء شفافة قليلاً */
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    background: transparent;
+    transition: all 0.3s ease;
+}
 
-    .mobile-lang-option.active {
-        border-color: var(--primary-color);
-        background: rgba(231, 106, 4, 0.1);
-        color: var(--primary-color);
-    }
+/* ضمان أن النص والأيقونة باللون الأبيض في الحالة العادية */
+.mobile-lang-option span,
+.mobile-lang-option i,
+.mobile-lang-option svg {
+    color: white !important;
+    fill: white;
+}
 
-    .mobile-lang-option:hover {
-        border-color: var(--primary-color);
-        transform: translateY(-2px);
-    }
+/* الحالة المفعلة: عند ضغط الزر (خلفية بيضاء، نص وأيقونة باللون الأخضر الغامق) */
+.mobile-lang-option.active {
+    background: white !important;
+    border-color: white !important; /* لجعل الزر يبدو كقطعة واحدة بيضاء */
+}
 
+/* تغيير لون النص والأيقونة للأخضر عند التفعيل */
+.mobile-lang-option.active span,
+.mobile-lang-option.active i,
+.mobile-lang-option.active svg {
+    color: #144734ff !important;
+    fill: #144734ff;
+}
+
+/* تأثير التمرير (Hover) */
+.mobile-lang-option:hover {
+    transform: translateY(-2px);
+    border-color: white;
+    background: rgba(255, 255, 255, 0.1); /* تعتيم بسيط عند التمرير */
+}
+
+/* منع تداخل ألوان الروابط الافتراضية */
+.mobile-lang-option:focus, 
+.mobile-lang-option:active {
+    text-decoration: none;
+    outline: none;
+}
     /* ===== FLOATING BUTTONS ===== */
     .floating-whatsapp {
         position: fixed;
@@ -936,7 +1072,7 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
     .scroll-to-top {
         position: fixed;
         bottom: 25px;
-        right: 25px;
+        left : 25px;
         z-index: 1000;
     }
 
@@ -1104,7 +1240,7 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
         
         .scroll-to-top {
             bottom: 20px;
-            right: 20px;
+            left : 20px;
         }
         
         .whatsapp-float {
@@ -1121,8 +1257,14 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
     }
 
     @media (max-width: 576px) {
+        .main-nav{
+            height: 75px;
+            
+        }
         .nav-container {
             padding: 10px 0;
+            display : flex;
+            align-items : center;
         }
         
         .logo-image img {
@@ -1149,9 +1291,7 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
     }
 
     @media (max-width: 480px) {
-        .logo-text {
-            display: none;
-        }
+        
         
         .mobile-search-toggle,
         .mobile-menu-toggle {
@@ -1329,9 +1469,7 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
                     </div>
 
                     <!-- Mobile Search Icon -->
-                    <button class="mobile-search-toggle" type="button">
-                        <i class="bi bi-search"></i>
-                    </button>
+                    
                 </div>
 
                 <!-- Navigation & Actions -->
@@ -1579,11 +1717,7 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
 </div>
 
 <!-- Scroll to Top Button -->
-<div class="scroll-to-top">
-    <button class="scroll-top-btn">
-        <i class="bi bi-chevron-up"></i>
-    </button>
-</div>
+
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -1738,6 +1872,23 @@ document.addEventListener('DOMContentLoaded', function() {
         item.style.animation = 'slideIn 0.3s ease forwards';
     });
 });
+
+window.addEventListener('scroll', function() {
+    const nav = document.querySelector('.main-nav');
+    const scrollPosition = window.scrollY;
+    
+    if (scrollPosition > 80) { // يبدأ التأثير بعد 80 بكسل
+        nav.classList.add('scrolled');
+        // إضافة أنيميشن بسيط للعناصر الداخلية
+        document.querySelectorAll('.nav-item').forEach((el, index) => {
+            el.style.transitionDelay = `${index * 0.05}s`;
+        });
+    } else {
+        nav.classList.remove('scrolled');
+    }
+});
+
+
 </script>
 </body>
 </html>

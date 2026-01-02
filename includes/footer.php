@@ -37,10 +37,10 @@ $translations = [
 $t = $translations[$lang];
 ?>
 
-<footer id="footer" class="footer position-relative">
+<footer id="footer" class="footer">
     <div class="footer-main">
         <div class="container">
-            <div class="row gy-5">
+            <div class="footer-container">
                 <!-- Company Info -->
                 <div class="col-lg-4 col-md-6" data-aos="fade-up">
                     <div class="footer-company">
@@ -50,7 +50,6 @@ $t = $translations[$lang];
                             </div>
                             <div class="logo-text">
                                 <h3>Rukn Alamasy</h3>
-                                <span><?= $t['follow_desc'] ?></span>
                             </div>
                         </a>
                         <div class="footer-contact mt-4">
@@ -127,34 +126,7 @@ $t = $translations[$lang];
                     </div>
                 </div>
 
-                <!-- Services Links -->
-                <div class="col-lg-2 col-md-6" data-aos="fade-up" data-aos-delay="200">
-                    <div class="footer-links">
-                        <h4><?= $t['services'] ?></h4>
-                        <ul>
-                            <li>
-                                <i class="bi bi-chevron-<?= ($lang == 'ar') ? 'left' : 'right' ?>"></i>
-                                <a href="services.php#web">تطوير الويب</a>
-                            </li>
-                            <li>
-                                <i class="bi bi-chevron-<?= ($lang == 'ar') ? 'left' : 'right' ?>"></i>
-                                <a href="services.php#mobile">تطبيقات الجوال</a>
-                            </li>
-                            <li>
-                                <i class="bi bi-chevron-<?= ($lang == 'ar') ? 'left' : 'right' ?>"></i>
-                                <a href="services.php#seo">تحسين محركات البحث</a>
-                            </li>
-                            <li>
-                                <i class="bi bi-chevron-<?= ($lang == 'ar') ? 'left' : 'right' ?>"></i>
-                                <a href="services.php#marketing">التسويق الرقمي</a>
-                            </li>
-                            <li>
-                                <i class="bi bi-chevron-<?= ($lang == 'ar') ? 'left' : 'right' ?>"></i>
-                                <a href="services.php#consulting">الاستشارات التقنية</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+                
 
                 <!-- Social Media -->
                 <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
@@ -196,17 +168,7 @@ $t = $translations[$lang];
                         </div>
 
                         <!-- Newsletter Subscription -->
-                        <div class="newsletter mt-4">
-                            <h5>النشرة البريدية</h5>
-                            <form class="newsletter-form">
-                                <div class="input-group">
-                                    <input type="email" class="form-control" placeholder="بريدك الإلكتروني" required>
-                                    <button class="btn btn-newsletter" type="submit">
-                                        <i class="bi bi-send"></i>
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+                        
                     </div>
                 </div>
             </div>
@@ -217,18 +179,12 @@ $t = $translations[$lang];
     <div class="footer-copyright">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-md-6 text-center text-md-start">
+                <div class="text-center">
                     <p class="mb-0">
-                        © <?= date('Y') ?> <strong>Rukn Alamasy</strong>. <?= $t['all_rights_reserved'] ?>
+                        © <?= date('Y') ?> <strong> <a href="">Ahmad Salloum</a></strong>. <?= $t['all_rights_reserved'] ?>
                     </p>
                 </div>
-                <div class="col-md-6 text-center text-md-end">
-                    <div class="footer-extra-links">
-                        <a href="privacy.php">سياسة الخصوصية</a>
-                        <span class="separator">|</span>
-                        <a href="terms.php">الشروط والأحكام</a>
-                    </div>
-                </div>
+                
             </div>
         </div>
     </div>
@@ -237,18 +193,26 @@ $t = $translations[$lang];
 <style>
 /* Footer Variables */
 :root {
-    --footer-bg: #1a1a1a;
-    --footer-copyright-bg: #0d0d0d;
-    --footer-text: #adb5bd;
-    --footer-heading: #ffffff;
-    --footer-accent: #e76a04;
-    --footer-border: #2d2d2d;
+   
+      --primary-color: #e76a04;
+      --primary-dark: #d45f00;
+      --secondary-color: rgb(243, 212, 23);
+      --secondary-dark: rgb(223, 192, 3);
+      --dark-color: rgb(20, 71, 52);
+      --dark-light: rgb(30, 91, 72);
+      --light-color: #f8f9fa;
+      --text-dark: #2c3e50;
+      --text-light: #6c757d;
+      --white: #ffffff;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    
 }
 
 /* Footer Main */
 .footer {
-    background: var(--footer-bg);
-    color: var(--footer-text);
+    background: linear-gradient(135deg, var(--dark-color), var(--dark-light));
+    color: var(--light-color);
     margin-top: auto;
 }
 
@@ -256,7 +220,10 @@ $t = $translations[$lang];
     padding: 80px 0 40px;
     background: linear-gradient(135deg, var(--footer-bg) 0%, #2d2d2d 100%);
 }
-
+.footer-container {
+    display : flex;
+    justify-content : space-between;
+}
 /* Footer Logo */
 .footer-logo {
     text-decoration: none;
@@ -282,19 +249,7 @@ $t = $translations[$lang];
     margin-left: 15px;
 }
 
-.logo-text h3 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin: 0;
-    color: var(--footer-heading);
-}
 
-.logo-text span {
-    font-size: 0.9rem;
-    color: var(--footer-text);
-    display: block;
-    margin-top: 5px;
-}
 
 /* Contact Info */
 .footer-contact {
@@ -349,7 +304,7 @@ $t = $translations[$lang];
 
 /* Footer Links */
 .footer-links h4 {
-    color: var(--footer-heading);
+    color: var(--primary-color);
     font-size: 1.2rem;
     font-weight: 700;
     margin-bottom: 1.5rem;
@@ -383,14 +338,18 @@ $t = $translations[$lang];
     margin-bottom: 0.8rem;
     display: flex;
     align-items: center;
+    transition: all 0.3s ease;
+}
+.footer-links li:hover{
+    color: var(--primary-color); 
 }
 
 .footer-links i {
     color: var(--footer-accent);
     font-size: 0.8rem;
     margin-right: 8px;
-    transition: all 0.3s ease;
 }
+
 
 [dir="rtl"] .footer-links i {
     margin-right: 0;
@@ -415,7 +374,7 @@ $t = $translations[$lang];
 
 /* Social Links */
 .footer-social h4 {
-    color: var(--footer-heading);
+    color: var(--primary-color);
     font-size: 1.2rem;
     font-weight: 700;
     margin-bottom: 1rem;
@@ -448,70 +407,25 @@ $t = $translations[$lang];
 }
 
 .social-links a:hover {
-    background: var(--footer-accent);
+    background: var(--primary-color);
     color: white;
     transform: translateY(-3px);
     border-color: var(--footer-accent);
 }
 
-/* Newsletter */
-.newsletter h5 {
-    color: var(--footer-heading);
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
-}
 
-.newsletter-form .input-group {
-    border-radius: 25px;
-    overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-}
-
-.newsletter-form .form-control {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--footer-border);
-    border-right: none;
-    color: var(--footer-text);
-    padding: 12px 20px;
-    font-size: 0.9rem;
-}
-
-[dir="rtl"] .newsletter-form .form-control {
-    border-right: 1px solid var(--footer-border);
-    border-left: none;
-}
-
-.newsletter-form .form-control:focus {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: var(--footer-accent);
-    color: white;
-    box-shadow: none;
-}
-
-.newsletter-form .form-control::placeholder {
-    color: var(--footer-text);
-}
-
-.btn-newsletter {
-    background: var(--footer-accent);
-    border: 1px solid var(--footer-accent);
-    color: white;
-    padding: 0 20px;
-    transition: all 0.3s ease;
-}
-
-.btn-newsletter:hover {
-    background: #d45a04;
-    border-color: #d45a04;
-}
 
 /* Copyright */
 .footer-copyright {
     background: var(--footer-copyright-bg);
     padding: 20px 0;
+    text-align: center;
     border-top: 1px solid var(--footer-border);
 }
-
+.footer-copyright a{
+    color :var(--primary-color);
+    text-decoration : none ;
+}
 .footer-copyright p {
     margin: 0;
     color: var(--footer-text);
@@ -551,8 +465,9 @@ $t = $translations[$lang];
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .footer-main {
-        padding: 60px 0 30px;
+    .footer-container {
+        padding: 20px 30px;
+        flex-direction : column;
     }
     
     .footer-links,

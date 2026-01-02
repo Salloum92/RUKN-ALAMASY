@@ -89,11 +89,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       --gradient-primary: linear-gradient(135deg, #e76a04, #f3d417);
       --gradient-dark: linear-gradient(135deg, #144734, #1e5b48);
-      --gradient-cinematic: linear-gradient(45deg, #0a1929, #144734, #1a3a5f);
-      --gradient-gold: linear-gradient(135deg, #f3d417, #ffd700, #daa520);
-      --glow-primary: 0 0 30px rgba(231, 106, 4, 0.7);
-      --glow-gold: 0 0 40px rgba(243, 212, 23, 0.5);
-      --glow-white: 0 0 25px rgba(255, 255, 255, 0.8);
     }
 
     * {
@@ -107,398 +102,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       overflow-x: hidden;
       background: #fefefe;
     }
-
-    /* ======================== */
-    /* الهيرو سكشن السينمائي فقط */
-    /* ======================== */
-    
-    .hero-section {
-      height: 100vh;
-      min-height: 700px;
-      position: relative;
-      overflow: hidden;
-      background: var(--gradient-cinematic);
-      perspective: 1000px;
-    }
-
-    #particles-js {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-      pointer-events: none;
-    }
-
-    .hero-slider {
-      position: relative;
-      height: 100%;
-      width: 100%;
-    }
-
-    .hero-slide {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      opacity: 0;
-      transition: opacity 1.5s ease-in-out;
-      display: flex;
-      align-items: center;
-      background-size: cover;
-      background-position: center;
-      transform-style: preserve-3d;
-    }
-
-    .hero-slide::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, 
-        rgba(10, 25, 41, 0.92) 0%,
-        rgba(20, 71, 52, 0.88) 50%,
-        rgba(26, 58, 95, 0.85) 100%);
-      z-index: 1;
-    }
-
-    .hero-slide::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle at 20% 50%, 
-        rgba(231, 106, 4, 0.25) 0%,
-        transparent 50%),
-        radial-gradient(circle at 80% 20%, 
-        rgba(243, 212, 23, 0.2) 0%,
-        transparent 50%);
-      z-index: 2;
-      animation: gradient-move 15s infinite alternate;
-    }
-
-    @keyframes gradient-move {
-      0% { transform: translateX(0) translateY(0); }
-      100% { transform: translateX(-50px) translateY(50px); }
-    }
-
-    .hero-slide.active {
-      opacity: 1;
-      z-index: 3;
-    }
-
-    .hero-content {
-      position: relative;
-      z-index: 5;
-      text-align: center;
-      color: var(--white);
-      padding: 0 20px;
-      width: 100%;
-      max-width: 1200px;
-      margin: 0 auto;
-      transform: translateZ(50px);
-    }
-
-    .hero-badge {
-      display: inline-block;
-      padding: 12px 30px;
-      background: var(--gradient-gold);
-      color: #000;
-      font-size: 0.9rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      border-radius: 30px;
-      margin-bottom: 30px;
-      position: relative;
-      overflow: hidden;
-      animation: badge-float 3s infinite ease-in-out;
-      box-shadow: 0 10px 30px rgba(243, 212, 23, 0.3);
-    }
-
-    .hero-badge::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-      animation: shine 3s infinite;
-    }
-
-    @keyframes badge-float {
-      0%, 100% { transform: translateY(0) rotateX(0); }
-      50% { transform: translateY(-15px) rotateX(10deg); }
-    }
-
-    @keyframes shine {
-      0% { left: -100%; }
-      100% { left: 100%; }
-    }
-
-    .hero-title {
-      font-size: 4.5rem;
-      font-weight: 900;
-      margin-bottom: 25px;
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      background: linear-gradient(135deg, 
-        #ffffff 0%,
-        #f3d417 50%,
-        #e76a04 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-      animation: title-glow 3s infinite alternate;
-      line-height: 1.1;
-      position: relative;
-    }
-
-    .hero-title::after {
-      content: '';
-      position: absolute;
-      bottom: -20px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 300px;
-      height: 4px;
-      background: var(--gradient-gold);
-      border-radius: 2px;
-      filter: var(--glow-gold);
-      animation: line-expand 3s infinite alternate;
-    }
-
-    @keyframes title-glow {
-      0% { filter: drop-shadow(0 5px 15px rgba(231, 106, 4, 0.3)); }
-      100% { filter: drop-shadow(0 10px 30px rgba(243, 212, 23, 0.5)); }
-    }
-
-    @keyframes line-expand {
-      0% { width: 200px; opacity: 0.7; }
-      100% { width: 400px; opacity: 1; }
-    }
-
-    .hero-subtitle {
-      font-size: 1.5rem;
-      margin-bottom: 40px;
-      max-width: 800px;
-      margin-left: auto;
-      margin-right: auto;
-      line-height: 1.8;
-      color: rgba(255, 255, 255, 0.9);
-      font-weight: 300;
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-      position: relative;
-      padding: 0 20px;
-    }
-
-    .hero-subtitle::before,
-    .hero-subtitle::after {
-      content: '✦';
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--secondary-color);
-      font-size: 1.5rem;
-      animation: star-twinkle 2s infinite;
-    }
-
-    .hero-subtitle::before {
-      left: -10px;
-    }
-
-    .hero-subtitle::after {
-      right: -10px;
-    }
-
-    @keyframes star-twinkle {
-      0%, 100% { opacity: 0.5; transform: translateY(-50%) scale(1); }
-      50% { opacity: 1; transform: translateY(-50%) scale(1.2); }
-    }
-
-    .hero-buttons {
-      display: flex;
-      gap: 25px;
-      justify-content: center;
-      margin-top: 50px;
-      flex-wrap: wrap;
-    }
-
-    .btn-hero {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      padding: 18px 40px;
-      border-radius: 60px;
-      font-weight: 700;
-      text-decoration: none;
-      transition: var(--transition);
-      border: none;
-      font-size: 1.2rem;
-      position: relative;
-      overflow: hidden;
-      z-index: 1;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      transform-style: preserve-3d;
-      transform: translateZ(20px);
-    }
-
-    .btn-primary-hero {
-      background: var(--gradient-gold);
-      color: #000;
-      box-shadow: 0 15px 40px rgba(243, 212, 23, 0.3);
-    }
-
-    .btn-primary-hero::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
-      transition: 0.8s;
-      z-index: -1;
-    }
-
-    .btn-outline-hero {
-      background: transparent;
-      color: var(--white);
-      border: 3px solid var(--primary-color);
-      backdrop-filter: blur(10px);
-      box-shadow: inset 0 0 20px rgba(231, 106, 4, 0.2),
-                  0 0 30px rgba(231, 106, 4, 0.3);
-    }
-
-    .btn-hero:hover {
-      transform: translateY(-8px) translateZ(30px) scale(1.05);
-      box-shadow: 0 25px 60px rgba(231, 106, 4, 0.6);
-    }
-
-    .btn-hero:hover::before {
-      left: 100%;
-    }
-
-    .hero-nav {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.1);
-      border: 2px solid rgba(243, 212, 23, 0.3);
-      color: var(--secondary-color);
-      font-size: 1.8rem;
-      cursor: pointer;
-      z-index: 10;
-      transition: var(--transition);
-      backdrop-filter: blur(10px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      animation: nav-pulse 3s infinite;
-    }
-
-    @keyframes nav-pulse {
-      0%, 100% { 
-        box-shadow: 0 0 20px rgba(243, 212, 23, 0.2);
-        transform: translateY(-50%) scale(1);
-      }
-      50% { 
-        box-shadow: 0 0 40px rgba(243, 212, 23, 0.4);
-        transform: translateY(-50%) scale(1.1);
-      }
-    }
-
-    .hero-prev {
-      left: 30px;
-    }
-
-    .hero-next {
-      right: 30px;
-    }
-
-    .hero-nav:hover {
-      background: var(--gradient-gold);
-      color: #000;
-      transform: translateY(-50%) scale(1.2);
-      box-shadow: 0 0 60px rgba(243, 212, 23, 0.6);
-      border-color: transparent;
-    }
-
-    .hero-controls {
-      position: absolute;
-      bottom: 40px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 15px;
-      z-index: 10;
-    }
-
-    .hero-dot {
-      width: 15px;
-      height: 15px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.3);
-      cursor: pointer;
-      transition: var(--transition);
-      position: relative;
-    }
-
-    .hero-dot.active {
-      background: var(--gradient-gold);
-      transform: scale(1.4);
-      box-shadow: var(--glow-gold);
-      animation: dot-pulse 2s infinite;
-    }
-
-    .hero-dot::before {
-      content: '';
-      position: absolute;
-      top: -5px;
-      left: -5px;
-      right: -5px;
-      bottom: -5px;
-      border-radius: 50%;
-      border: 2px solid var(--primary-color);
-      opacity: 0;
-      animation: dot-border 2s infinite;
-    }
-
-    .hero-dot.active::before {
-      opacity: 1;
-    }
-
-    @keyframes dot-pulse {
-      0%, 100% { transform: scale(1.4); }
-      50% { transform: scale(1.6); }
-    }
-
-    @keyframes dot-border {
-      0%, 100% { 
-        transform: scale(1);
-        opacity: 0.5;
-      }
-      50% { 
-        transform: scale(1.2);
-        opacity: 1;
-      }
-    }
-
-    /* ======================== */
-    /* نهاية الهيرو سكشن */
-    /* ======================== */
 
     /* Loading Animation */
     .loading-screen {
@@ -610,6 +213,239 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       }
     }
 
+    .hero-section {
+      height: 100vh;
+      min-height: 800px;
+      position: relative;
+      overflow: hidden;
+      background: var(--gradient-dark);
+    }
+
+    #particles-js {
+      position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1; /* خلف المحتوى */
+    pointer-events: none; /* يسمح بمرور النقرات للروابط */
+    }
+
+    .hero-slider {
+      position: relative;
+      height: 100%;
+    }
+
+    .hero-slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: opacity 1s ease;
+      display: flex;
+      align-items: center;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .hero-slide::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(20, 71, 52, 0.9), rgba(30, 91, 72, 0.8));
+    }
+
+    .hero-slide.active {
+      opacity: 1;
+      z-index: 2;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 3;
+      text-align: center;
+      color: var(--white);
+      padding: 0 20px;
+    }
+
+    .hero-title {
+      font-size: 4rem;
+      font-weight: 900;
+      margin-bottom: 25px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(2px 2px 8px rgba(0, 0, 0, 0.3));
+      animation: titleGlow 3s infinite alternate;
+    }
+
+    @keyframes titleGlow {
+      0% {
+        filter: drop-shadow(2px 2px 8px rgba(0, 0, 0, 0.3));
+      }
+      100% {
+        filter: drop-shadow(0 0 20px rgba(231, 106, 4, 0.5));
+      }
+    }
+
+    .hero-subtitle {
+      font-size: 1.5rem;
+      margin-bottom: 40px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+      opacity: 0.9;
+      line-height: 1.8;
+    }
+
+    .btn-hero {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 45px;
+      border-radius: 60px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: var(--transition);
+      border: none;
+      font-size: 1.2rem;
+      margin: 0 15px;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .btn-primary-hero {
+      background: var(--gradient-primary);
+      color: var(--white);
+      box-shadow: 0 10px 30px rgba(231, 106, 4, 0.4);
+    }
+
+    .btn-outline-hero {
+      background: transparent;
+      color: var(--white);
+      border: 3px solid var(--primary-color);
+      backdrop-filter: blur(10px);
+    }
+
+    .btn-hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: 0.8s;
+      z-index: -1;
+    }
+
+    .btn-hero:hover::before {
+      left: 100%;
+    }
+
+    .btn-hero:hover {
+      transform: translateY(-8px) scale(1.05);
+      box-shadow: 0 20px 40px rgba(231, 106, 4, 0.6);
+    }
+
+    .hero-prev, .hero-next {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      z-index: 10;
+      transition: var(--transition);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-prev:hover, .hero-next:hover {
+      background: var(--primary-color);
+      transform: translateY(-50%) scale(1.1);
+      box-shadow: 0 0 30px rgba(231, 106, 4, 0.5);
+    }
+
+    .hero-prev {
+      left: 30px;
+    }
+
+    .hero-next {
+      right: 30px;
+    }
+
+    .hero-controls {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 15px;
+      z-index: 10;
+    }
+
+    .hero-dot {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .hero-dot.active {
+      background: var(--primary-color);
+      transform: scale(1.4);
+      box-shadow: 0 0 20px var(--primary-color);
+    }
+
+    .hero-dot::before {
+      content: '';
+      position: absolute;
+      top: -5px;
+      left: -5px;
+      right: -5px;
+      bottom: -5px;
+      border-radius: 50%;
+      border: 2px solid var(--primary-color);
+      opacity: 0;
+      animation: pulseDot 2s infinite;
+    }
+
+    .hero-dot.active::before {
+      opacity: 1;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.2);
+        opacity: 0.5;
+      }
+    }
+
     .section-header {
       text-align: center;
       margin-bottom: 100px;
@@ -695,6 +531,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       position: relative !important;
       overflow: hidden;
       z-index: 1;
+      
     }
     .services-section .container {
     position: relative;
@@ -1434,128 +1271,12 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       text-align: right;
     }
 
-    /* Responsive Design - الهيرو سكشن فقط */
+    /* Responsive Design */
     @media (max-width: 1200px) {
-      .hero-title {
-        font-size: 3.8rem;
-      }
-      
-      .hero-subtitle {
-        font-size: 1.4rem;
-      }
-      
-      .hero-nav {
-        width: 60px;
-        height: 60px;
-        font-size: 1.5rem;
-      }
-      
-      .hero-prev {
-        left: 20px;
-      }
-      
-      .hero-next {
-        right: 20px;
-      }
-    }
-
-    @media (max-width: 992px) {
       .hero-title {
         font-size: 3.2rem;
       }
       
-      .hero-subtitle {
-        font-size: 1.3rem;
-      }
-      
-      .hero-buttons {
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
-      }
-      
-      .btn-hero {
-        width: 100%;
-        max-width: 300px;
-        justify-content: center;
-      }
-      
-      .hero-nav {
-        width: 50px;
-        height: 50px;
-        font-size: 1.2rem;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .hero-title {
-        font-size: 2.5rem;
-      }
-      
-      .hero-subtitle {
-        font-size: 1.1rem;
-        padding: 0 10px;
-      }
-      
-      .hero-subtitle::before,
-      .hero-subtitle::after {
-        display: none;
-      }
-      
-      .hero-badge {
-        font-size: 0.8rem;
-        padding: 10px 20px;
-      }
-      
-      .btn-hero {
-        padding: 16px 30px;
-        font-size: 1rem;
-      }
-      
-      .hero-controls {
-        bottom: 30px;
-      }
-      
-      .hero-dot {
-        width: 12px;
-        height: 12px;
-      }
-    }
-
-    @media (max-width: 576px) {
-      .hero-title {
-        font-size: 2.2rem;
-      }
-      
-      .hero-subtitle {
-        font-size: 1rem;
-      }
-      
-      .hero-title::after {
-        width: 200px;
-      }
-      
-      .hero-nav {
-        width: 40px;
-        height: 40px;
-        font-size: 1rem;
-      }
-      
-      .hero-prev {
-        left: 15px;
-      }
-      
-      .hero-next {
-        right: 15px;
-      }
-      
-      .hero-controls {
-        gap: 10px;
-      }
-    }
-
-    /* باقي الريسبونسف للأقسام الأخرى */
-    @media (max-width: 1200px) {
       .section-title {
         font-size: 3rem;
       }
@@ -1570,6 +1291,14 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
     }
 
     @media (max-width: 992px) {
+      .hero-title {
+        font-size: 2.8rem;
+      }
+      
+      .hero-subtitle {
+        font-size: 1.3rem;
+      }
+      
       .section-title {
         font-size: 2.5rem;
       }
@@ -1587,12 +1316,34 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
     }
 
     @media (max-width: 768px) {
+      .hero-title {
+        font-size: 2.2rem;
+      }
+      
+      .hero-subtitle {
+        font-size: 1.1rem;
+      }
+      
       .section-title {
         font-size: 2rem;
       }
       
       .section-subtitle {
         font-size: 1.1rem;
+      }
+      
+      .btn-hero {
+        padding: 15px 30px;
+        font-size: 1rem;
+        margin: 10px 0;
+        display: block;
+      }
+      
+      .hero-prev,
+      .hero-next {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
       }
     }
 
@@ -1650,6 +1401,8 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
         radial-gradient(circle at 80% 80%, rgba(243, 212, 23, 0.1) 0%, transparent 50%);
       z-index: -1;
     }
+
+
 
     #particles-js-2 {
       position: absolute;
@@ -1734,9 +1487,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
   <?php include 'includes/header.php'; ?>
 
   <main class="main">
-    <!-- ========================== -->
-    <!-- Hero Section - السينمائي -->
-    <!-- ========================== -->
+    <!-- Hero Section -->
     <section class="hero-section">
       <div class="hero-slider">
         <?php if (!empty($banners)): ?>
@@ -1746,25 +1497,12 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
               <div class="container">
                 <div class="hero-content">
                   <div class="hero-text fade-in-up">
-                    <div class="hero-badge floating-element">
-                      <?php echo ($lang == 'ar') ? 'متميزون في الجودة' : 'Excellence in Quality'; ?>
-                    </div>
-                    <h1 class="hero-title animate__animated animate__fadeInDown">
-                      <?php echo htmlspecialchars($banner['title']); ?>
-                    </h1>
-                    <p class="hero-subtitle animate__animated animate__fadeInUp animate__delay-1s">
-                      <?php echo htmlspecialchars($banner['description']); ?>
-                    </p>
+                    <h1 class="hero-title animate__animated animate__fadeInDown"><?php echo htmlspecialchars($banner['title']); ?></h1>
+                    <p class="hero-subtitle animate__animated animate__fadeInUp animate__delay-1s"><?php echo htmlspecialchars($banner['description']); ?></p>
                     <div class="hero-buttons animate__animated animate__fadeInUp animate__delay-2s">
-                      <a href="<?php echo htmlspecialchars($banner['button_link']); ?>" 
-                         class="btn-hero btn-primary-hero floating-element">
+                      <a href="<?php echo htmlspecialchars($banner['button_link']); ?>" class="btn-hero btn-primary-hero pulse">
                         <i class="bi bi-arrow-<?php echo ($lang == 'ar') ? 'left' : 'right'; ?> me-2"></i>
                         <?php echo htmlspecialchars($banner['button_text']); ?>
-                      </a>
-                      <a href="about.php" class="btn-hero btn-outline-hero floating-element" 
-                         style="animation-delay: 0.2s">
-                        <i class="bi bi-info-circle me-2"></i>
-                        <?php echo ($lang == 'ar') ? 'اعرف المزيد' : 'Learn More'; ?>
                       </a>
                     </div>
                   </div>
@@ -1777,24 +1515,14 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
             <div class="container">
               <div class="hero-content">
                 <div class="hero-text fade-in-up">
-                  <div class="hero-badge floating-element">
-                    <?php echo ($lang == 'ar') ? 'الريادة في الأمن والسلامة' : 'Leadership in Safety & Security'; ?>
-                  </div>
-                  <h1 class="hero-title animate__animated animate__fadeInDown">
-                    <?php echo ($lang == 'ar') ? 'ركن الأماسي<br>حماية استثنائية' : 'Rukn Alamasy<br>Exceptional Protection'; ?>
-                  </h1>
-                  <p class="hero-subtitle animate__animated animate__fadeInUp animate__delay-1s">
-                    <?php echo ($lang == 'ar') ? 'نقدم حلولاً متكاملة في مجال معدات الأمن والسلامة بمهنية واحترافية عالية.<br>نحن نضمن لك بيئة عمل آمنة ومنتجات عالية الجودة.' : 'We provide integrated solutions in safety and security equipment with high professionalism.<br>We ensure you a safe work environment with high-quality products.'; ?>
-                  </p>
+                  <h1 class="hero-title animate__animated animate__fadeInDown"><?php echo ($lang == 'ar') ? 'مرحباً بكم في ركن الأماسي' : 'Welcome to Rukn Alamasy'; ?></h1>
+                  <p class="hero-subtitle animate__animated animate__fadeInUp animate__delay-1s"><?php echo ($lang == 'ar') ? 'اكتشف منتجات وخدمات استثنائية' : 'Discover Exceptional Products & Services'; ?></p>
                   <div class="hero-buttons animate__animated animate__fadeInUp animate__delay-2s">
-                    <a href="products.php" class="btn-hero btn-primary-hero floating-element">
-                      <i class="bi bi-shield-check me-2"></i>
-                      <?php echo ($lang == 'ar') ? 'اكتشف منتجاتنا' : 'Discover Our Products'; ?>
+                    <a href="products.php" class="btn-hero btn-primary-hero pulse">
+                      <i class="bi bi-cart3"></i><?php echo ($lang == 'ar') ? 'ابدأ الآن' : 'Get Started'; ?>
                     </a>
-                    <a href="contact.php" class="btn-hero btn-outline-hero floating-element" 
-                       style="animation-delay: 0.2s">
-                      <i class="bi bi-chat-dots me-2"></i>
-                      <?php echo ($lang == 'ar') ? 'احصل على استشارة' : 'Get a Consultation'; ?>
+                    <a href="about.php" class="btn-hero btn-outline-hero">
+                      <i class="bi bi-info-circle"></i><?php echo ($lang == 'ar') ? 'اعرف المزيد' : 'Learn More'; ?>
                     </a>
                   </div>
                 </div>
@@ -1802,32 +1530,25 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
             </div>
           </div>
         <?php endif; ?>
-        
+
         <button class="hero-nav hero-prev">
           <i class="bi bi-chevron-<?php echo ($lang == 'ar') ? 'right' : 'left'; ?>"></i>
         </button>
         <button class="hero-nav hero-next">
           <i class="bi bi-chevron-<?php echo ($lang == 'ar') ? 'left' : 'right'; ?>"></i>
         </button>
-        
+
         <div class="hero-controls">
           <?php if (!empty($banners)): ?>
             <?php foreach ($banners as $index => $banner): ?>
-              <div class="hero-dot <?php echo $index === 0 ? 'active' : ''; ?>" 
-                   data-slide="<?php echo $index; ?>"></div>
+              <div class="hero-dot <?php echo $index === 0 ? 'active' : ''; ?>" data-slide="<?php echo $index; ?>"></div>
             <?php endforeach; ?>
           <?php else: ?>
             <div class="hero-dot active" data-slide="0"></div>
-            <div class="hero-dot" data-slide="1"></div>
-            <div class="hero-dot" data-slide="2"></div>
           <?php endif; ?>
         </div>
       </div>
     </section>
-
-    <!-- ========================== -->
-    <!-- باقي الأقسام كما هي -->
-    <!-- ========================== -->
 
     <!-- Services Section with Cards -->
     <section class="services-section bg-pattern" id="services">
@@ -2264,29 +1985,29 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
         new PureCounter();
       }
 
-      // تأثيرات الجسيمات للهيرو سكشن
+      // تأثيرات الجسيمات
       if (typeof particlesJS !== 'undefined') {
         particlesJS('particles-js', {
           particles: {
             number: {
-              value: 120,
+              value: 100,
               density: {
                 enable: true,
-                value_area: 1000
+                value_area: 800
               }
             },
             color: {
-              value: ["#e76a04", "#f3d417", "#ffffff", "#144734"]
+              value: ["#e76a04", "#f3d417", "#144734"]
             },
             shape: {
-              type: ["circle", "triangle", "star"],
+              type: ["circle", "triangle", "polygon"],
               stroke: {
                 width: 0,
                 color: "#000000"
               }
             },
             opacity: {
-              value: 0.8,
+              value: 0.6,
               random: true,
               anim: {
                 enable: true,
@@ -2296,20 +2017,20 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
               }
             },
             size: {
-              value: 3,
+              value: 4,
               random: true,
               anim: {
                 enable: true,
-                speed: 3,
+                speed: 2,
                 size_min: 0.1,
                 sync: false
               }
             },
             line_linked: {
-              enable: true,
+              enable: false,
               distance: 150,
-              color: "#f3d417",
-              opacity: 0.3,
+              color: "#e76a04",
+              opacity: 0.4,
               width: 1
             },
             move: {
@@ -2332,7 +2053,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
             events: {
               onhover: {
                 enable: true,
-                mode: "repulse"
+                mode: "grab"
               },
               onclick: {
                 enable: true,
@@ -2341,12 +2062,14 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
               resize: true
             },
             modes: {
-              repulse: {
-                distance: 100,
-                duration: 0.4
+              grab: {
+                distance: 140,
+                line_linked: {
+                  opacity: 1
+                }
               },
               push: {
-                particles_nb: 6
+                particles_nb: 4
               }
             }
           },
@@ -2354,8 +2077,28 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
         });
       }
 
-      // Hero Slider with Cinematic Transitions
-      class CinematicHeroSlider {
+      // تأثيرات المؤشر
+      const cursor = document.querySelector('.cursor-effect');
+      if (cursor) {
+        document.addEventListener('mousemove', (e) => {
+          cursor.style.left = e.clientX + 'px';
+          cursor.style.top = e.clientY + 'px';
+        });
+
+        document.querySelectorAll('a, button, .btn, .service-card, .product-card-home, .feature-card, .stats-card, .review-card').forEach(el => {
+          el.addEventListener('mouseenter', () => {
+            cursor.style.transform = 'scale(2)';
+            cursor.style.background = 'radial-gradient(circle, rgba(231,106,4,0.5), transparent)';
+          });
+          el.addEventListener('mouseleave', () => {
+            cursor.style.transform = 'scale(1)';
+            cursor.style.background = 'radial-gradient(circle, var(--primary-color), transparent)';
+          });
+        });
+      }
+
+      // Hero Slider
+      class HeroSlider {
         constructor() {
           this.slides = document.querySelectorAll('.hero-slide');
           this.dots = document.querySelectorAll('.hero-dot');
@@ -2363,12 +2106,11 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
           this.nextBtn = document.querySelector('.hero-next');
           this.currentSlide = 0;
           this.slideInterval = null;
-          this.slideDuration = 7000;
-          this.isTransitioning = false;
-          
+          this.slideDuration = 6000;
+
           this.init();
         }
-        
+
         init() {
           this.prevBtn.addEventListener('click', () => this.prevSlide());
           this.nextBtn.addEventListener('click', () => this.nextSlide());
@@ -2376,122 +2118,83 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
           this.dots.forEach((dot, index) => {
             dot.addEventListener('click', () => this.goToSlide(index));
           });
-          
+
           this.startAutoSlide();
-          
+
           const slider = document.querySelector('.hero-slider');
           slider.addEventListener('mouseenter', () => this.stopAutoSlide());
           slider.addEventListener('mouseleave', () => this.startAutoSlide());
-          
+
           this.addTouchSupport();
-          this.addKeyboardSupport();
         }
-        
+
         showSlide(index) {
-          if (this.isTransitioning) return;
-          this.isTransitioning = true;
-          
-          // Hide current slide with cinematic effect
-          this.slides[this.currentSlide].style.opacity = '0';
-          this.slides[this.currentSlide].style.transform = 'scale(1.1)';
-          this.dots[this.currentSlide].classList.remove('active');
-          
-          setTimeout(() => {
-            // Show new slide with cinematic effect
-            this.slides[index].style.opacity = '1';
-            this.slides[index].style.transform = 'scale(1)';
-            this.dots[index].classList.add('active');
-            this.currentSlide = index;
-            
-            // Add entry animation to content
-            const content = this.slides[index].querySelector('.hero-content');
-            content.style.animation = 'none';
-            setTimeout(() => {
-              content.style.animation = 'fadeInUp 1.5s ease forwards';
-            }, 50);
-            
-            this.isTransitioning = false;
-          }, 600);
+          this.slides.forEach(slide => slide.classList.remove('active'));
+          this.dots.forEach(dot => dot.classList.remove('active'));
+
+          this.slides[index].classList.add('active');
+          this.dots[index].classList.add('active');
+          this.currentSlide = index;
         }
-        
+
         nextSlide() {
           let next = this.currentSlide + 1;
           if (next >= this.slides.length) next = 0;
           this.showSlide(next);
         }
-        
+
         prevSlide() {
           let prev = this.currentSlide - 1;
           if (prev < 0) prev = this.slides.length - 1;
           this.showSlide(prev);
         }
-        
+
         goToSlide(index) {
-          if (index !== this.currentSlide) {
-            this.showSlide(index);
-          }
+          this.showSlide(index);
         }
-        
+
         startAutoSlide() {
           this.stopAutoSlide();
           this.slideInterval = setInterval(() => this.nextSlide(), this.slideDuration);
         }
-        
+
         stopAutoSlide() {
           if (this.slideInterval) {
             clearInterval(this.slideInterval);
             this.slideInterval = null;
           }
         }
-        
+
         addTouchSupport() {
           const slider = document.querySelector('.hero-slider');
           let startX = 0;
-          let startY = 0;
           let endX = 0;
-          let endY = 0;
-          
+
           slider.addEventListener('touchstart', (e) => {
             startX = e.touches[0].clientX;
-            startY = e.touches[0].clientY;
-            this.stopAutoSlide();
           });
-          
+
           slider.addEventListener('touchmove', (e) => {
             endX = e.touches[0].clientX;
-            endY = e.touches[0].clientY;
           });
-          
+
           slider.addEventListener('touchend', () => {
-            const diffX = startX - endX;
-            const diffY = startY - endY;
-            
-            // Only horizontal swipe with minimal vertical movement
-            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
-              if (diffX > 0) {
+            const diff = startX - endX;
+            const threshold = 50;
+
+            if (Math.abs(diff) > threshold) {
+              if (diff > 0) {
                 this.nextSlide();
               } else {
                 this.prevSlide();
               }
             }
-            
-            this.startAutoSlide();
-          });
-        }
-        
-        addKeyboardSupport() {
-          document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft') {
-              this.prevSlide();
-            } else if (e.key === 'ArrowRight') {
-              this.nextSlide();
-            }
           });
         }
       }
-      
+
       if (document.querySelector('.hero-slider')) {
-        new CinematicHeroSlider();
+        new HeroSlider();
       }
 
       // Reviews Slider
@@ -2623,22 +2326,22 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       });
     });
 
-// تأثيرات الجسيمات للأقسام الأخرى
-particlesJS('particles-js-2', {
+// تأكد من وضع الكود في نهاية الصفحة قبل إغلاق وسم </body>
+  particlesJS('particles-js-2', {
     "particles": {
       "number": {
         "value": 80,
         "density": { "enable": true, "value_area": 800 }
       },
       "color": {
-        "value": "#144734"
+        "value": "#144734" // تم حذف ff لضمان التوافق
       },
       "shape": {
         "type": "circle",
         "stroke": { "width": 0, "color": "#144734" }
       },
       "opacity": {
-        "value": 0.8,
+        "value": 0.8, // خففتها قليلاً لتكون أرقى
         "random": true,
         "anim": { "enable": false }
       },
@@ -2651,7 +2354,7 @@ particlesJS('particles-js-2', {
         "enable": false,
         "distance": 150,
         "color": "#144734",
-        "opacity": 0.2,
+        "opacity": 0.2, // رفعت الشفافية قليلاً لتظهر الخطوط بوضوح
         "width": 1
       },
       "move": {
@@ -2680,7 +2383,7 @@ particlesJS('particles-js-2', {
         "density": { "enable": true, "value_area": 800 }
       },
       "color": {
-        "value": "#ffffff"
+        "value": "#ffffff" /* لون أبيض ليناسب النص الأبيض */
       },
       "shape": { "type": "circle" },
       "opacity": {
@@ -2728,7 +2431,7 @@ particlesJS('particles-js-2', {
         "density": { "enable": true, "value_area": 800 }
       },
       "color": {
-        "value": "#ffffff"
+        "value": "#ffffff" /* لون أبيض ليناسب النص الأبيض */
       },
       "shape": { "type": "circle" },
       "opacity": {
@@ -2775,14 +2478,14 @@ particlesJS('particles-js-2', {
         "density": { "enable": true, "value_area": 800 }
       },
       "color": {
-        "value": "#144734"
+        "value": "#144734" // تم حذف ff لضمان التوافق
       },
       "shape": {
         "type": "circle",
         "stroke": { "width": 0, "color": "#144734" }
       },
       "opacity": {
-        "value": 0.8,
+        "value": 0.8, // خففتها قليلاً لتكون أرقى
         "random": true,
         "anim": { "enable": false }
       },
@@ -2795,7 +2498,7 @@ particlesJS('particles-js-2', {
         "enable": false,
         "distance": 150,
         "color": "#144734",
-        "opacity": 0.2,
+        "opacity": 0.2, // رفعت الشفافية قليلاً لتظهر الخطوط بوضوح
         "width": 1
       },
       "move": {
