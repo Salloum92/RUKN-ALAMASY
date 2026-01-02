@@ -1613,10 +1613,8 @@ body.nav-fixed-active {
     <div class="mobile-menu">
         <div class="mobile-menu-header">
             <div class="mobile-logo">
-                <a href="index.php">
                 <img src="assets/img/logo.png" alt="Rukn Alamasy" class="mobile-logo-img">
                 <span class="mobile-brand">Rukn Alamasy</span>
-                </a>
             </div>
             <button class="mobile-menu-close">
                 <i class="bi bi-x-lg"></i>
