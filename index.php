@@ -2622,7 +2622,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
 particlesJS('particles-js-2', {
     "particles": {
       "number": {
-        "value": 80,
+        "value": 50,
         "density": { "enable": true, "value_area": 800 }
       },
       "color": {
@@ -2671,7 +2671,7 @@ particlesJS('particles-js-2', {
   particlesJS('particles-js-3', {
     "particles": {
       "number": {
-        "value": 80,
+        "value": 50,
         "density": { "enable": true, "value_area": 800 }
       },
       "color": {
@@ -2719,7 +2719,7 @@ particlesJS('particles-js-2', {
   particlesJS('particles-js-4', {
     "particles": {
       "number": {
-        "value": 80,
+        "value": 60,
         "density": { "enable": true, "value_area": 800 }
       },
       "color": {
@@ -2766,7 +2766,7 @@ particlesJS('particles-js-2', {
   particlesJS('particles-js-5', {
     "particles": {
       "number": {
-        "value": 80,
+        "value": 50,
         "density": { "enable": true, "value_area": 800 }
       },
       "color": {
