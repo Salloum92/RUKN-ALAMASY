@@ -1,124 +1,125 @@
 <?php
 include 'check.php';
 
-// جلب البنرات
-$banners = $query->select('banners', '*');
+// جلب الإحصائيات
+$statistics = $query->select('statistics', '*', 'ORDER BY id DESC');
 
-// معالجة حذف البانر
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    if ($_POST['action'] === 'delete' && isset($_POST['delete_id'])) {
-        $delete_id = intval($_POST['delete_id']);
-        $banner = $query->select('banners', '*', "WHERE id = {$delete_id}")[0] ?? null;
-
-        if ($banner) {
-            $imagePath = "../assets/img/banners/" . $banner['image'];
-            
-            try {
-                // حذف الصورة من نظام الملفات
-                if (file_exists($imagePath) && is_file($imagePath)) {
-                    if (!unlink($imagePath)) {
-                        error_log("فشل في حذف الصورة: " . $imagePath);
-                    }
-                }
-                
-                // حذف البانر من قاعدة البيانات
-                $deleteResult = $query->eQuery('DELETE FROM banners WHERE id = ?', [$delete_id]);
-                
-                if ($deleteResult) {
-                    echo json_encode(['success' => true, 'message' => 'تم حذف البانر بنجاح']);
-                } else {
-                    echo json_encode(['success' => false, 'message' => 'فشل في حذف البانر']);
-                }
-                
-            } catch (Exception $e) {
-                echo json_encode(['success' => false, 'message' => 'حدث خطأ: ' . $e->getMessage()]);
-            }
-            exit;
-        }
-    }
-}
-
-// معالجة إضافة البانر
+// معالجة إضافة إحصائية
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add'])) {
-    if (isset($_FILES['image']) && $_FILES['image']['name']) {
-        $originalImage = $_FILES['image']['name'];
-        $extension = pathinfo($originalImage, PATHINFO_EXTENSION);
-        $timestamp = date('YmdHis');
-        $newImageName = uniqid('banner_', true) . '_' . $timestamp . '.' . $extension;
+    $icon = trim($_POST['icon']);
+    $title = trim($_POST['title']);
+    $description = trim($_POST['description']);
+    $count = intval($_POST['count']);
 
-        $target = "../assets/img/banners/" . basename($newImageName);
+    try {
+        $data = [
+            'icon' => $icon,
+            'title' => $title,
+            'description' => $description,
+            'count' => $count
+        ];
 
-        if (move_uploaded_file($_FILES['image']['tmp_name'], $target)) {
-            $title = $_POST['title'];
-            $description = $_POST['description'];
-            $button_text = $_POST['button_text'];
-            $button_link = $_POST['button_link'];
-
-            $data = [
-                'image' => $newImageName,
-                'title' => $title,
-                'description' => $description,
-                'button_text' => $button_text,
-                'button_link' => $button_link
-            ];
-
-            $query->insert('banners', $data);
-            header("Location: {$_SERVER['PHP_SELF']}?added=true");
-            exit;
-        } else {
-            $error = "حدث خطأ أثناء رفع الصورة.";
-        }
-    } else {
-        $error = "يرجى اختيار صورة.";
+        $query->insert('statistics', $data);
+        header("Location: {$_SERVER['PHP_SELF']}?added=true");
+        exit;
+        
+    } catch (Exception $e) {
+        $error = "حدث خطأ أثناء إضافة الإحصائية: " . $e->getMessage();
     }
 }
 
-// معالجة تعديل البانر
+// معالجة تعديل إحصائية
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update'])) {
-    $id = $_POST['id'];
-    $title = $_POST['title'];
-    $description = $_POST['description'];
-    $button_text = $_POST['button_text'];
-    $button_link = $_POST['button_link'];
+    $id = intval($_POST['id']);
+    $icon = trim($_POST['icon']);
+    $title = trim($_POST['title']);
+    $description = trim($_POST['description']);
+    $count = intval($_POST['count']);
 
-    $data = [
-        'title' => $title,
-        'description' => $description,
-        'button_text' => $button_text,
-        'button_link' => $button_link
-    ];
+    try {
+        $data = [
+            'icon' => $icon,
+            'title' => $title,
+            'description' => $description,
+            'count' => $count
+        ];
 
-    // إذا تم رفع صورة جديدة
-    if (isset($_FILES['image']) && $_FILES['image']['name']) {
-        $originalImage = $_FILES['image']['name'];
-        $extension = pathinfo($originalImage, PATHINFO_EXTENSION);
-        $timestamp = date('YmdHis');
-        $newImageName = uniqid('banner_', true) . '_' . $timestamp . '.' . $extension;
-        $target = "../assets/img/banners/" . basename($newImageName);
-
-        if (move_uploaded_file($_FILES['image']['tmp_name'], $target)) {
-            // حذف الصورة القديمة
-            $old_banner = $query->select('banners', '*', "WHERE id = {$id}")[0];
-            $oldImagePath = "../assets/img/banners/" . $old_banner['image'];
-            if (file_exists($oldImagePath)) {
-                unlink($oldImagePath);
-            }
-            
-            $data['image'] = $newImageName;
-        }
+        $query->update('statistics', $data, "WHERE id = {$id}");
+        header("Location: {$_SERVER['PHP_SELF']}?updated=true");
+        exit;
+        
+    } catch (Exception $e) {
+        $error = "حدث خطأ أثناء تحديث الإحصائية: " . $e->getMessage();
     }
+}
 
-    $query->update('banners', $data, "WHERE id = {$id}");
-    header("Location: {$_SERVER['PHP_SELF']}?updated=true");
+// معالجة حذف إحصائية
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete' && isset($_POST['delete_id'])) {
+    $delete_id = intval($_POST['delete_id']);
+    
+    try {
+        $deleteResult = $query->eQuery('DELETE FROM statistics WHERE id = ?', [$delete_id]);
+        
+        if ($deleteResult) {
+            echo json_encode(['success' => true, 'message' => 'تم حذف الإحصائية بنجاح']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'فشل في حذف الإحصائية']);
+        }
+        
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => 'حدث خطأ: ' . $e->getMessage()]);
+    }
     exit;
 }
 
-// جلب بيانات البانر للتعديل
-$edit_banner = null;
+// جلب بيانات الإحصائية للتعديل
+$edit_statistic = null;
 if (isset($_GET['edit'])) {
     $edit_id = intval($_GET['edit']);
-    $edit_banner = $query->select('banners', '*', "WHERE id = {$edit_id}")[0] ?? null;
+    $edit_statistic = $query->select('statistics', '*', "WHERE id = {$edit_id}")[0] ?? null;
 }
+
+// أيقونات Bootstrap المتاحة
+$available_icons = [
+    'bi bi-emoji-smile',
+    'bi bi-journal-richtext',
+    'bi bi-headset',
+    'bi bi-people',
+    'bi bi-award',
+    'bi bi-clock',
+    'bi bi-geo-alt',
+    'bi bi-star',
+    'bi bi-heart',
+    'bi bi-check-circle',
+    'bi bi-graph-up',
+    'bi bi-trophy',
+    'bi bi-shield-check',
+    'bi bi-lightning',
+    'bi bi-briefcase',
+    'bi bi-building',
+    'bi bi-calculator',
+    'bi bi-calendar-check',
+    'bi bi-cash',
+    'bi bi-chat-dots',
+    'bi bi-cloud-check',
+    'bi bi-code-slash',
+    'bi bi-cup',
+    'bi bi-display',
+    'bi bi-flag',
+    'bi bi-globe',
+    'bi bi-hand-thumbs-up',
+    'bi bi-laptop',
+    'bi bi-megaphone',
+    'bi bi-patch-check',
+    'bi bi-person-check',
+    'bi bi-phone',
+    'bi bi-rocket',
+    'bi bi-shield-lock',
+    'bi bi-speedometer',
+    'bi bi-tools',
+    'bi bi-truck',
+    'bi bi-wallet'
+];
 ?>
 
 <!DOCTYPE html>
@@ -127,7 +128,7 @@ if (isset($_GET['edit'])) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>إدارة البنرات - ركن الأماسي</title>
+    <title>إدارة الإحصائيات - ركن الأماسي</title>
     <link href="../favicon.ico" rel="icon">
     
     <!-- مكتبات CSS -->
@@ -147,6 +148,7 @@ if (isset($_GET['edit'])) {
             --warning-color: #ffc107;
             --danger-color: #dc3545;
             --info-color: #17a2b8;
+            --purple-color: #6f42c1;
         }
         
         * {
@@ -206,8 +208,8 @@ if (isset($_GET['edit'])) {
             transition: margin-right 0.3s ease;
         }
         
-        /* بطاقة البانر */
-        .banner-card {
+        /* بطاقة الإحصائية */
+        .statistic-card {
             background: white;
             border-radius: 15px;
             padding: 20px;
@@ -217,65 +219,78 @@ if (isset($_GET['edit'])) {
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
             overflow: hidden;
+            text-align: center;
         }
         
-        .banner-card::before {
+        .statistic-card::before {
             content: '';
             position: absolute;
             top: 0;
             right: 0;
             width: 100%;
             height: 4px;
-            background: linear-gradient(90deg, var(--info-color), var(--primary-color));
+            background: linear-gradient(90deg, var(--purple-color), var(--secondary-color));
             transform: scaleX(0);
             transform-origin: right;
             transition: transform 0.5s ease;
         }
         
-        .banner-card:hover::before {
+        .statistic-card:hover::before {
             transform: scaleX(1);
         }
         
-        .banner-card:hover {
+        .statistic-card:hover {
             transform: translateY(-10px) scale(1.02);
-            box-shadow: 0 15px 40px rgba(23, 162, 184, 0.15);
+            box-shadow: 0 15px 40px rgba(111, 66, 193, 0.15);
         }
         
-        .banner-image-container {
+        .statistic-icon-container {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, var(--purple-color), #8b5cf6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             position: relative;
-            width: 100%;
-            height: 200px;
-            border-radius: 12px;
-            overflow: hidden;
-            margin-bottom: 15px;
+            z-index: 1;
         }
         
-        .banner-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-        
-        .banner-card:hover .banner-image {
-            transform: scale(1.1);
-        }
-        
-        .banner-badge {
+        .statistic-icon-container::after {
+            content: '';
             position: absolute;
-            top: 15px;
-            right: 15px;
-            background: linear-gradient(135deg, var(--info-color), var(--primary-color));
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, var(--purple-color), #8b5cf6);
+            border-radius: 50%;
+            opacity: 0.2;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.2; }
+            50% { transform: scale(1.1); opacity: 0.1; }
+            100% { transform: scale(1); opacity: 0.2; }
+        }
+        
+        .statistic-icon {
+            font-size: 2rem;
             color: white;
-            padding: 6px 15px;
-            border-radius: 25px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
             z-index: 2;
         }
         
-        .banner-title {
+        .statistic-count {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--dark-color);
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--purple-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .statistic-title {
             color: var(--dark-color);
             font-size: 1.3rem;
             font-weight: 700;
@@ -283,36 +298,27 @@ if (isset($_GET['edit'])) {
             line-height: 1.4;
         }
         
-        .banner-description {
+        .statistic-description {
             color: #666;
             font-size: 0.95rem;
             line-height: 1.6;
             margin-bottom: 15px;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
         }
         
-        .banner-button-info {
-            color: var(--info-color);
-            font-size: 1.1rem;
+        .statistic-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, var(--purple-color), #8b5cf6);
+            color: white;
+            padding: 6px 15px;
+            border-radius: 25px;
+            font-size: 0.85rem;
             font-weight: 600;
-            margin-bottom: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
         
-        .banner-link {
-            color: var(--primary-color);
-            font-size: 0.9rem;
-            text-decoration: none;
-            word-break: break-all;
-        }
-        
-        .banner-link:hover {
-            text-decoration: underline;
-        }
-        
-        .banner-actions {
+        .statistic-actions {
             display: flex;
             gap: 10px;
             margin-top: 15px;
@@ -333,13 +339,13 @@ if (isset($_GET['edit'])) {
         }
         
         .btn-edit {
-            background: linear-gradient(135deg, var(--info-color), #138496);
+            background: linear-gradient(135deg, var(--purple-color), #8b5cf6);
             color: white;
         }
         
         .btn-edit:hover {
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(23, 162, 184, 0.3);
+            box-shadow: 0 5px 15px rgba(111, 66, 193, 0.3);
         }
         
         .btn-delete {
@@ -354,13 +360,13 @@ if (isset($_GET['edit'])) {
         
         /* بطاقات الإحصائيات */
         .stats-card {
-            background: linear-gradient(135deg, var(--info-color), #138496);
+            background: linear-gradient(135deg, var(--purple-color), #8b5cf6);
             color: white;
             border-radius: 15px;
             padding: 25px;
             margin-bottom: 25px;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(23, 162, 184, 0.2);
+            box-shadow: 0 10px 30px rgba(111, 66, 193, 0.2);
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
@@ -385,7 +391,7 @@ if (isset($_GET['edit'])) {
         
         .stats-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(23, 162, 184, 0.3);
+            box-shadow: 0 15px 40px rgba(111, 66, 193, 0.3);
         }
         
         .stats-number {
@@ -400,21 +406,21 @@ if (isset($_GET['edit'])) {
             opacity: 0.9;
         }
         
-        /* زر إضافة بانر */
-        .btn-add-banner {
+        /* زر إضافة إحصائية */
+        .btn-add-statistic {
             position: fixed;
             bottom: 30px;
             left: 30px;
             width: 70px;
             height: 70px;
-            background: linear-gradient(135deg, var(--info-color), var(--primary-color));
+            background: linear-gradient(135deg, var(--purple-color), var(--secondary-color));
             color: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 2rem;
-            box-shadow: 0 10px 30px rgba(23, 162, 184, 0.4);
+            box-shadow: 0 10px 30px rgba(111, 66, 193, 0.4);
             z-index: 100;
             transition: all 0.3s ease;
             animation: float 3s ease-in-out infinite;
@@ -427,9 +433,9 @@ if (isset($_GET['edit'])) {
             50% { transform: translateY(-15px) rotate(5deg); }
         }
         
-        .btn-add-banner:hover {
+        .btn-add-statistic:hover {
             transform: scale(1.1) rotate(180deg);
-            box-shadow: 0 15px 40px rgba(23, 162, 184, 0.6);
+            box-shadow: 0 15px 40px rgba(111, 66, 193, 0.6);
         }
         
         /* التصميم المتجاوب */
@@ -461,7 +467,7 @@ if (isset($_GET['edit'])) {
                 margin-right: 0;
             }
             
-            .btn-add-banner {
+            .btn-add-statistic {
                 left: 20px;
                 bottom: 20px;
                 width: 60px;
@@ -479,15 +485,24 @@ if (isset($_GET['edit'])) {
                 font-size: 2.2rem;
             }
             
-            .banner-card {
+            .statistic-card {
                 padding: 15px;
             }
             
-            .banner-image-container {
-                height: 180px;
+            .statistic-icon-container {
+                width: 70px;
+                height: 70px;
             }
             
-            .banner-actions {
+            .statistic-icon {
+                font-size: 1.8rem;
+            }
+            
+            .statistic-count {
+                font-size: 2.2rem;
+            }
+            
+            .statistic-actions {
                 flex-direction: column;
             }
             
@@ -510,11 +525,15 @@ if (isset($_GET['edit'])) {
                 font-size: 2rem;
             }
             
-            .banner-title {
+            .statistic-title {
                 font-size: 1.2rem;
             }
             
-            .btn-add-banner {
+            .statistic-count {
+                font-size: 2rem;
+            }
+            
+            .btn-add-statistic {
                 width: 55px;
                 height: 55px;
                 font-size: 1.6rem;
@@ -524,11 +543,16 @@ if (isset($_GET['edit'])) {
         }
         
         @media (max-width: 400px) {
-            .banner-image-container {
-                height: 150px;
+            .statistic-icon-container {
+                width: 60px;
+                height: 60px;
             }
             
-            .banner-badge {
+            .statistic-icon {
+                font-size: 1.5rem;
+            }
+            
+            .statistic-badge {
                 font-size: 0.75rem;
                 padding: 4px 10px;
             }
@@ -542,7 +566,7 @@ if (isset($_GET['edit'])) {
             }
         }
         
-        /* حالة عدم وجود بنرات */
+        /* حالة عدم وجود إحصائيات */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -554,15 +578,10 @@ if (isset($_GET['edit'])) {
         
         .empty-state-icon {
             font-size: 5rem;
-            color: var(--info-color);
+            color: var(--purple-color);
             margin-bottom: 20px;
             opacity: 0.7;
             animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 0.7; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.1); }
         }
         
         .empty-state-title {
@@ -635,7 +654,7 @@ if (isset($_GET['edit'])) {
             right: 20px;
             width: 50px;
             height: 50px;
-            background: linear-gradient(135deg, var(--info-color), var(--primary-color));
+            background: linear-gradient(135deg, var(--purple-color), var(--secondary-color));
             border-radius: 12px;
             display: none;
             align-items: center;
@@ -643,7 +662,7 @@ if (isset($_GET['edit'])) {
             color: white;
             font-size: 1.5rem;
             z-index: 1001;
-            box-shadow: 0 5px 15px rgba(23, 162, 184, 0.3);
+            box-shadow: 0 5px 15px rgba(111, 66, 193, 0.3);
             cursor: pointer;
             transition: all 0.3s ease;
         }
@@ -664,16 +683,16 @@ if (isset($_GET['edit'])) {
                 background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
             }
             
-            .banner-card {
+            .statistic-card {
                 background: #2c3e50;
                 border-color: #34495e;
             }
             
-            .banner-title {
+            .statistic-title {
                 color: #ecf0f1;
             }
             
-            .banner-description {
+            .statistic-description {
                 color: #bdc3c7;
             }
             
@@ -722,19 +741,19 @@ if (isset($_GET['edit'])) {
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link active" href="banner.php">
+                <a class="nav-link" href="admin_banners.php">
                     <i class="bi bi-images"></i>
                     إدارة البنرات
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="admin_statistics.php">
+                <a class="nav-link active" href="admin_statistics.php">
                     <i class="bi bi-graph-up"></i>
                     إدارة الإحصائيات
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link " href="contact.php">
+                <a class="nav-link" href="contact.php">
                     <i class="bi bi-telephone"></i>
                     إدارة الاتصال
                 </a>
@@ -758,7 +777,7 @@ if (isset($_GET['edit'])) {
                     <i class="bi bi-check-circle-fill me-3" style="font-size: 1.5rem;"></i>
                     <div>
                         <h5 class="mb-1">تمت العملية بنجاح!</h5>
-                        <p class="mb-0">تم إضافة البانر بنجاح.</p>
+                        <p class="mb-0">تم إضافة الإحصائية بنجاح.</p>
                     </div>
                 </div>
             </div>
@@ -770,7 +789,7 @@ if (isset($_GET['edit'])) {
                     <i class="bi bi-check-circle-fill me-3" style="font-size: 1.5rem;"></i>
                     <div>
                         <h5 class="mb-1">تمت العملية بنجاح!</h5>
-                        <p class="mb-0">تم تحديث البانر بنجاح.</p>
+                        <p class="mb-0">تم تحديث الإحصائية بنجاح.</p>
                     </div>
                 </div>
             </div>
@@ -780,14 +799,14 @@ if (isset($_GET['edit'])) {
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h1 class="mb-2" style="color: var(--dark-color); font-weight: 800;">
-                    <i class="bi bi-images text-info me-3"></i>
-                    إدارة البنرات
+                    <i class="bi bi-graph-up text-purple me-3"></i>
+                    إدارة الإحصائيات
                 </h1>
-                <p class="text-muted mb-0">إدارة وإضافة وتعديل بنرات الموقع</p>
+                <p class="text-muted mb-0">إدارة وإضافة وتعديل إحصائيات الموقع</p>
             </div>
-            <button type="button" class="btn btn-info d-none d-md-flex" onclick="openAddBannerModal()">
+            <button type="button" class="btn btn-purple d-none d-md-flex" onclick="openAddStatisticModal()">
                 <i class="bi bi-plus-circle me-2"></i>
-                إضافة بانر جديد
+                إضافة إحصائية جديدة
             </button>
         </div>
 
@@ -795,9 +814,9 @@ if (isset($_GET['edit'])) {
         <div class="row stagger-animation">
             <div class="col-xl-3 col-lg-6 mb-4">
                 <div class="stats-card floating-element">
-                    <div class="stats-number"><?php echo count($banners); ?></div>
-                    <div class="stats-label">البانرات</div>
-                    <i class="bi bi-images display-4 opacity-25 position-absolute" style="bottom: 10px; left: 20px;"></i>
+                    <div class="stats-number"><?php echo count($statistics); ?></div>
+                    <div class="stats-label">الإحصائيات</div>
+                    <i class="bi bi-graph-up display-4 opacity-25 position-absolute" style="bottom: 10px; left: 20px;"></i>
                 </div>
             </div>
             
@@ -805,20 +824,21 @@ if (isset($_GET['edit'])) {
                 <div class="stats-card floating-element" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));">
                     <div class="stats-number">
                         <?php 
-                        $activeButtons = array_filter($banners, function($banner) {
-                            return !empty($banner['button_text']) && !empty($banner['button_link']);
-                        });
-                        echo count($activeButtons);
+                        $totalCount = 0;
+                        foreach ($statistics as $stat) {
+                            $totalCount += $stat['count'];
+                        }
+                        echo number_format($totalCount);
                         ?>
                     </div>
-                    <div class="stats-label">أزرار نشطة</div>
-                    <i class="bi bi-link display-4 opacity-25 position-absolute" style="bottom: 10px; left: 20px;"></i>
+                    <div class="stats-label">مجموع الأرقام</div>
+                    <i class="bi bi-calculator display-4 opacity-25 position-absolute" style="bottom: 10px; left: 20px;"></i>
                 </div>
             </div>
             
             <div class="col-xl-3 col-lg-6 mb-4">
                 <div class="stats-card floating-element" style="background: linear-gradient(135deg, var(--success-color), #1e7e34);">
-                    <div class="stats-number"><?php echo count($banners); ?></div>
+                    <div class="stats-number"><?php echo count($statistics); ?></div>
                     <div class="stats-label">نشطة</div>
                     <i class="bi bi-check-circle display-4 opacity-25 position-absolute" style="bottom: 10px; left: 20px;"></i>
                 </div>
@@ -828,70 +848,59 @@ if (isset($_GET['edit'])) {
                 <div class="stats-card floating-element" style="background: linear-gradient(135deg, var(--warning-color), #e0a800);">
                     <div class="stats-number">
                         <?php 
-                        $totalChars = 0;
-                        foreach ($banners as $banner) {
-                            $totalChars += strlen($banner['title'] . $banner['description']);
+                        $uniqueIcons = [];
+                        foreach ($statistics as $stat) {
+                            if (!in_array($stat['icon'], $uniqueIcons)) {
+                                $uniqueIcons[] = $stat['icon'];
+                            }
                         }
-                        echo number_format($totalChars);
+                        echo count($uniqueIcons);
                         ?>
                     </div>
-                    <div class="stats-label">مجموع الأحرف</div>
-                    <i class="bi bi-text-left display-4 opacity-25 position-absolute" style="bottom: 10px; left: 20px;"></i>
+                    <div class="stats-label">أيقونات مختلفة</div>
+                    <i class="bi bi-palette display-4 opacity-25 position-absolute" style="bottom: 10px; left: 20px;"></i>
                 </div>
             </div>
         </div>
 
-        <!-- قائمة البنرات -->
-        <?php if (empty($banners)): ?>
+        <!-- قائمة الإحصائيات -->
+        <?php if (empty($statistics)): ?>
             <div class="empty-state fade-in">
-                <i class="bi bi-images empty-state-icon"></i>
-                <h2 class="empty-state-title">لا توجد بنرات</h2>
-                <p class="empty-state-text">ابدأ بإضافة أول بانر إلى موقعك لتظهر هنا.</p>
-                <button type="button" class="btn btn-info btn-lg" onclick="openAddBannerModal()">
+                <i class="bi bi-graph-up empty-state-icon"></i>
+                <h2 class="empty-state-title">لا توجد إحصائيات</h2>
+                <p class="empty-state-text">ابدأ بإضافة أول إحصائية إلى موقعك لتظهر هنا.</p>
+                <button type="button" class="btn btn-purple btn-lg" onclick="openAddStatisticModal()">
                     <i class="bi bi-plus-circle me-2"></i>
-                    إضافة أول بانر
+                    إضافة أول إحصائية
                 </button>
             </div>
         <?php else: ?>
             <div class="row stagger-animation">
-                <?php foreach ($banners as $i => $banner): ?>
+                <?php foreach ($statistics as $i => $stat): ?>
                     <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
-                        <div class="banner-card">
-                            <div class="banner-badge">
-                                بانر <?php echo $i + 1; ?>
+                        <div class="statistic-card">
+                            <div class="statistic-badge">
+                                <?php echo $i + 1; ?>
                             </div>
                             
-                            <div class="banner-image-container">
-                                <img src="../assets/img/banners/<?php echo htmlspecialchars($banner['image']); ?>" 
-                                     alt="<?php echo htmlspecialchars($banner['title']); ?>"
-                                     class="banner-image"
-                                     onerror="this.src='../assets/img/default-banner.jpg'">
+                            <div class="statistic-icon-container">
+                                <i class="statistic-icon <?php echo htmlspecialchars($stat['icon']); ?>"></i>
                             </div>
                             
-                            <h3 class="banner-title"><?php echo htmlspecialchars($banner['title']); ?></h3>
+                            <div class="statistic-count"><?php echo number_format($stat['count']); ?></div>
                             
-                            <p class="banner-description">
-                                <?php echo htmlspecialchars($banner['description']); ?>
+                            <h3 class="statistic-title"><?php echo htmlspecialchars($stat['title']); ?></h3>
+                            
+                            <p class="statistic-description">
+                                <?php echo htmlspecialchars($stat['description']); ?>
                             </p>
                             
-                            <div class="banner-button-info">
-                                زر: <span class="text-dark"><?php echo htmlspecialchars($banner['button_text']); ?></span>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <a href="<?php echo htmlspecialchars($banner['button_link']); ?>" 
-                                   target="_blank" class="banner-link">
-                                    <i class="bi bi-link-45deg me-1"></i>
-                                    <?php echo htmlspecialchars($banner['button_link']); ?>
-                                </a>
-                            </div>
-                            
-                            <div class="banner-actions">
-                                <button type="button" class="btn-action btn-edit" onclick="editBanner(<?php echo $banner['id']; ?>)">
+                            <div class="statistic-actions">
+                                <button type="button" class="btn-action btn-edit" onclick="editStatistic(<?php echo $stat['id']; ?>)">
                                     <i class="bi bi-pencil"></i>
                                     تعديل
                                 </button>
-                                <button type="button" class="btn-action btn-delete" onclick="deleteBanner(<?php echo $banner['id']; ?>)">
+                                <button type="button" class="btn-action btn-delete" onclick="deleteStatistic(<?php echo $stat['id']; ?>)">
                                     <i class="bi bi-trash"></i>
                                     حذف
                                 </button>
@@ -903,8 +912,8 @@ if (isset($_GET['edit'])) {
         <?php endif; ?>
     </div>
 
-    <!-- زر إضافة بانر عائم -->
-    <button type="button" class="btn-add-banner" onclick="openAddBannerModal()">
+    <!-- زر إضافة إحصائية عائم -->
+    <button type="button" class="btn-add-statistic" onclick="openAddStatisticModal()">
         <i class="bi bi-plus-lg"></i>
     </button>
 
@@ -928,16 +937,16 @@ if (isset($_GET['edit'])) {
             }
         });
 
-        // حذف البانر
-        function deleteBanner(id) {
+        // حذف الإحصائية
+        function deleteStatistic(id) {
             Swal.fire({
                 title: 'هل أنت متأكد؟',
-                text: "لن تتمكن من استعادة هذا البانر!",
+                text: "لن تتمكن من استعادة هذه الإحصائية!",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#dc3545',
                 cancelButtonColor: '#6c757d',
-                confirmButtonText: 'نعم، احذفه!',
+                confirmButtonText: 'نعم، احذفها!',
                 cancelButtonText: 'إلغاء',
                 reverseButtons: true,
                 customClass: {
@@ -958,16 +967,16 @@ if (isset($_GET['edit'])) {
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            // إزالة البانر مع تأثير
-                            const bannerCard = document.querySelector(`[onclick="deleteBanner(${id})"]`).closest('.banner-card');
-                            bannerCard.style.opacity = '0';
-                            bannerCard.style.transform = 'translateY(-20px) scale(0.95)';
+                            // إزالة الإحصائية مع تأثير
+                            const statisticCard = document.querySelector(`[onclick="deleteStatistic(${id})"]`).closest('.statistic-card');
+                            statisticCard.style.opacity = '0';
+                            statisticCard.style.transform = 'translateY(-20px) scale(0.95)';
                             
                             setTimeout(() => {
-                                bannerCard.remove();
+                                statisticCard.remove();
                                 
-                                // التحقق إذا لم تعد هناك بنرات
-                                if (document.querySelectorAll('.banner-card').length === 0) {
+                                // التحقق إذا لم تعد هناك إحصائيات
+                                if (document.querySelectorAll('.statistic-card').length === 0) {
                                     location.reload();
                                 }
                                 
@@ -994,17 +1003,17 @@ if (isset($_GET['edit'])) {
             });
         }
 
-        // تعديل البانر
-        function editBanner(id) {
+        // تعديل الإحصائية
+        function editStatistic(id) {
             window.location.href = '?edit=' + id;
         }
 
         // تأثيرات عند التمرير
         window.addEventListener('scroll', function() {
-            const bannerCards = document.querySelectorAll('.banner-card');
+            const statisticCards = document.querySelectorAll('.statistic-card');
             const windowHeight = window.innerHeight;
             
-            bannerCards.forEach(card => {
+            statisticCards.forEach(card => {
                 const cardPosition = card.getBoundingClientRect().top;
                 
                 if (cardPosition < windowHeight - 100) {
@@ -1016,8 +1025,8 @@ if (isset($_GET['edit'])) {
         // تهيئة تأثيرات عند التحميل
         document.addEventListener('DOMContentLoaded', function() {
             // إضافة تأثيرات للبطاقات
-            const bannerCards = document.querySelectorAll('.banner-card');
-            bannerCards.forEach((card, index) => {
+            const statisticCards = document.querySelectorAll('.statistic-card');
+            statisticCards.forEach((card, index) => {
                 card.style.animationDelay = `${index * 0.1}s`;
             });
             
@@ -1050,7 +1059,7 @@ if (isset($_GET['edit'])) {
             
             // إضافة تأثيرات للوضع الداكن
             if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                document.querySelectorAll('.banner-card').forEach(card => {
+                document.querySelectorAll('.statistic-card').forEach(card => {
                     card.style.boxShadow = '0 8px 25px rgba(0,0,0,0.3)';
                 });
             }
@@ -1058,7 +1067,7 @@ if (isset($_GET['edit'])) {
             // فتح المودال تلقائياً إذا كان هناك edit
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.has('edit')) {
-                openBannerModal();
+                openStatisticModal();
             }
         });
 
@@ -1066,15 +1075,30 @@ if (isset($_GET['edit'])) {
         function updateStats() {
             const statsNumbers = document.querySelectorAll('.stats-number');
             
-            // تحديث عدد البنرات
-            const bannerCount = document.querySelectorAll('.banner-card').length;
-            statsNumbers[0].textContent = bannerCount;
+            // تحديث عدد الإحصائيات
+            const statisticCount = document.querySelectorAll('.statistic-card').length;
+            statsNumbers[0].textContent = statisticCount;
             
-            // تحديث عدد الأزرار النشطة (يحتاج إلى إعادة حساب)
-            statsNumbers[1].textContent = bannerCount; // يمكنك تعديل هذا ليكون أكثر دقة
+            // تحديث مجموع الأرقام
+            let totalCount = 0;
+            document.querySelectorAll('.statistic-count').forEach(countEl => {
+                const count = parseInt(countEl.textContent.replace(/,/g, ''));
+                totalCount += count;
+            });
+            statsNumbers[1].textContent = totalCount.toLocaleString();
             
-            // تحديث عدد البانرات النشطة
-            statsNumbers[2].textContent = bannerCount;
+            // تحديث عدد الإحصائيات النشطة
+            statsNumbers[2].textContent = statisticCount;
+            
+            // تحديث عدد الأيقونات المختلفة
+            const icons = new Set();
+            document.querySelectorAll('.statistic-icon').forEach(iconEl => {
+                const iconClass = Array.from(iconEl.classList).find(cls => cls.startsWith('bi-'));
+                if (iconClass) {
+                    icons.add(iconClass);
+                }
+            });
+            statsNumbers[3].textContent = icons.size;
             
             // إعادة تشغيل تأثيرات الرقم
             statsNumbers.forEach(stat => {
@@ -1092,20 +1116,20 @@ if (isset($_GET['edit'])) {
             });
         }
 
-        // فتح مودال إضافة/تعديل البانر
-        function openBannerModal() {
+        // فتح مودال إضافة/تعديل الإحصائية
+        function openStatisticModal() {
             // إنشاء المودال ديناميكياً إذا لم يكن موجوداً
-            if (!document.getElementById('bannerModal')) {
-                createBannerModal();
+            if (!document.getElementById('statisticModal')) {
+                createStatisticModal();
             }
             
             // فتح المودال
-            const modal = new bootstrap.Modal(document.getElementById('bannerModal'));
+            const modal = new bootstrap.Modal(document.getElementById('statisticModal'));
             modal.show();
         }
 
         // فتح مودال إضافة جديد
-        function openAddBannerModal() {
+        function openAddStatisticModal() {
             // تنظيف أي edit في الرابط
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.has('edit')) {
@@ -1114,96 +1138,81 @@ if (isset($_GET['edit'])) {
                 window.history.replaceState({}, '', newUrl);
             }
             
-            openBannerModal();
+            openStatisticModal();
         }
 
-        // إنشاء مودال البانر ديناميكياً
-        function createBannerModal() {
+        // إنشاء مودال الإحصائية ديناميكياً
+        function createStatisticModal() {
             const urlParams = new URLSearchParams(window.location.search);
             const isEditMode = urlParams.has('edit');
             const editId = isEditMode ? urlParams.get('edit') : null;
             
-            // الحصول على بيانات البانر للتعديل إذا كان في وضع التعديل
-            let bannerData = null;
-            if (isEditMode && editId) {
-                // في الواقع، البيانات يجب أن تأتي من PHP
-                // هنا نتركها فارغة وسيتم تعبئتها من PHP
-            }
+            // بيانات الأيقونات المتاحة من PHP
+            const availableIcons = <?php echo json_encode($available_icons); ?>;
             
             const modalHTML = `
-                <div class="modal fade" id="bannerModal" tabindex="-1" aria-labelledby="bannerModalLabel" aria-hidden="true">
+                <div class="modal fade" id="statisticModal" tabindex="-1" aria-labelledby="statisticModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="bannerModalLabel">
+                                <h5 class="modal-title" id="statisticModalLabel">
                                     <i class="bi ${isEditMode ? 'bi-pencil' : 'bi-plus-circle'} me-2"></i>
-                                    ${isEditMode ? 'تعديل البانر' : 'إضافة بانر جديد'}
+                                    ${isEditMode ? 'تعديل الإحصائية' : 'إضافة إحصائية جديدة'}
                                 </h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            <form method="POST" enctype="multipart/form-data" id="bannerForm">
+                            <form method="POST" id="statisticForm">
                                 ${isEditMode ? '<input type="hidden" name="update" value="1">' : '<input type="hidden" name="add" value="1">'}
                                 ${isEditMode && editId ? '<input type="hidden" name="id" value="' + editId + '">' : ''}
                                 
                                 <div class="modal-body">
-                                    <div class="mb-3">
-                                        <label for="image" class="form-label">صورة البانر ${!isEditMode ? '*' : ''}</label>
-                                        <input type="file" class="form-control" name="image" id="image"
-                                            accept="image/*" ${!isEditMode ? 'required' : ''}>
-                                        <small class="text-muted">
-                                            ${isEditMode ? 'اتركه فارغاً للحفاظ على الصورة الحالية.' : 'اختر صورة للبانر.'}
-                                            الصيغ المدعومة: JPG, PNG, GIF. الحد الأقصى: 5MB
-                                        </small>
-                                    </div>
-                                    
-                                    ${isEditMode && <?php echo isset($edit_banner) ? 'true' : 'false'; ?> ? `
-                                        <div class="mb-3">
-                                            <label class="form-label">الصورة الحالية</label>
-                                            <div class="d-flex justify-content-center">
-                                                <img src="../assets/img/banners/<?php echo isset($edit_banner) ? htmlspecialchars($edit_banner['image']) : ''; ?>" 
-                                                     alt="الصورة الحالية"
-                                                     class="img-fluid rounded"
-                                                     style="max-height: 200px;"
-                                                     onerror="this.src='../assets/img/default-banner.jpg'">
-                                            </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="icon" class="form-label">الأيقونة *</label>
+                                            <select class="form-select" name="icon" id="icon" required>
+                                                <option value="">اختر أيقونة</option>
+                                                ${availableIcons.map(icon => 
+                                                    `<option value="${icon}" ${isEditMode && <?php echo isset($edit_statistic) ? 'true' : 'false'; ?> && '<?php echo isset($edit_statistic) ? htmlspecialchars($edit_statistic["icon"]) : ""; ?>' === icon ? 'selected' : ''}>
+                                                        ${icon}
+                                                    </option>`
+                                                ).join('')}
+                                            </select>
                                         </div>
-                                    ` : ''}
+                                        
+                                        <div class="col-md-6 mb-3">
+                                            <label for="count" class="form-label">العدد *</label>
+                                            <input type="number" class="form-control" name="count" id="count"
+                                                value="${isEditMode && <?php echo isset($edit_statistic) ? 'true' : 'false'; ?> ? '<?php echo isset($edit_statistic) ? htmlspecialchars($edit_statistic["count"]) : ""; ?>' : ''}" 
+                                                min="0" required>
+                                        </div>
+                                    </div>
                                     
                                     <div class="mb-3">
                                         <label for="title" class="form-label">العنوان *</label>
-                                        <input type="text" class="form-control" name="title"
-                                            id="title"
-                                            value="${isEditMode && <?php echo isset($edit_banner) ? 'true' : 'false'; ?> ? '<?php echo isset($edit_banner) ? htmlspecialchars($edit_banner["title"]) : ""; ?>' : ''}" 
+                                        <input type="text" class="form-control" name="title" id="title"
+                                            value="${isEditMode && <?php echo isset($edit_statistic) ? 'true' : 'false'; ?> ? '<?php echo isset($edit_statistic) ? htmlspecialchars($edit_statistic["title"]) : ""; ?>' : ''}" 
                                             required maxlength="255">
                                     </div>
                                     
                                     <div class="mb-3">
                                         <label for="description" class="form-label">الوصف *</label>
                                         <textarea class="form-control" name="description" id="description" 
-                                                  rows="3" required maxlength="500">${isEditMode && <?php echo isset($edit_banner) ? 'true' : 'false'; ?> ? '<?php echo isset($edit_banner) ? htmlspecialchars($edit_banner["description"]) : ""; ?>' : ''}</textarea>
+                                                  rows="3" required maxlength="500">${isEditMode && <?php echo isset($edit_statistic) ? 'true' : 'false'; ?> ? '<?php echo isset($edit_statistic) ? htmlspecialchars($edit_statistic["description"]) : ""; ?>' : ''}</textarea>
                                     </div>
                                     
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label for="button_text" class="form-label">نص الزر *</label>
-                                            <input type="text" class="form-control" name="button_text"
-                                                id="button_text"
-                                                value="${isEditMode && <?php echo isset($edit_banner) ? 'true' : 'false'; ?> ? '<?php echo isset($edit_banner) ? htmlspecialchars($edit_banner["button_text"]) : ""; ?>' : ''}" 
-                                                required maxlength="100">
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="button_link" class="form-label">رابط الزر *</label>
-                                            <input type="url" class="form-control" name="button_link"
-                                                id="button_link"
-                                                value="${isEditMode && <?php echo isset($edit_banner) ? 'true' : 'false'; ?> ? '<?php echo isset($edit_banner) ? htmlspecialchars($edit_banner["button_link"]) : ""; ?>' : ''}" 
-                                                required maxlength="255">
+                                    <div class="mb-3">
+                                        <label class="form-label mb-2">معاينة الأيقونة</label>
+                                        <div class="d-flex justify-content-center">
+                                            <div class="statistic-icon-container-preview" style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--purple-color), #8b5cf6); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                                <i id="iconPreview" class="statistic-icon ${isEditMode && <?php echo isset($edit_statistic) ? 'true' : 'false'; ?> ? '<?php echo isset($edit_statistic) ? htmlspecialchars($edit_statistic["icon"]) : ""; ?>' : ''}"></i>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                                    <button type="submit" class="btn btn-info">
-                                        ${isEditMode ? 'تحديث البانر' : 'إضافة البانر'}
+                                    <button type="submit" class="btn btn-purple">
+                                        ${isEditMode ? 'تحديث الإحصائية' : 'إضافة الإحصائية'}
                                     </button>
                                 </div>
                             </form>
@@ -1214,8 +1223,27 @@ if (isset($_GET['edit'])) {
             
             document.body.insertAdjacentHTML('beforeend', modalHTML);
             
+            // إضافة معالج الحدث لتحديث معاينة الأيقونة
+            document.getElementById('icon')?.addEventListener('change', function(e) {
+                const iconPreview = document.getElementById('iconPreview');
+                if (iconPreview) {
+                    // إزالة جميع فئات الأيقونة الحالية
+                    Array.from(iconPreview.classList).forEach(cls => {
+                        if (cls.startsWith('bi-')) {
+                            iconPreview.classList.remove(cls);
+                        }
+                    });
+                    // إضافة الأيقونة الجديدة
+                    const iconValue = e.target.value;
+                    if (iconValue) {
+                        const iconClasses = iconValue.split(' ');
+                        iconClasses.forEach(cls => iconPreview.classList.add(cls));
+                    }
+                }
+            });
+            
             // إضافة معالج الحدث لإغلاق المودال
-            const modalElement = document.getElementById('bannerModal');
+            const modalElement = document.getElementById('statisticModal');
             modalElement.addEventListener('hidden.bs.modal', function () {
                 // تنظيف الرابط
                 const urlParams = new URLSearchParams(window.location.search);
@@ -1232,56 +1260,30 @@ if (isset($_GET['edit'])) {
                     }
                 }, 300);
             });
-            
-            // التحقق من الصور عند الإرسال
-            document.getElementById('bannerForm')?.addEventListener('submit', function(e) {
-                const imageInput = document.getElementById('image');
-                
-                // إذا لم يكن في وضع التعديل ولم يتم اختيار صورة
-                if (!isEditMode && imageInput.files.length === 0) {
-                    e.preventDefault();
-                    Swal.fire({
-                        title: 'خطأ',
-                        text: 'يرجى اختيار صورة للبانر',
-                        icon: 'error',
-                        confirmButtonText: 'حسناً'
-                    });
-                    return false;
-                }
-                
-                // التحقق من حجم الصورة (5MB كحد أقصى)
-                if (imageInput.files.length > 0) {
-                    const maxSize = 5 * 1024 * 1024; // 5MB
-                    const file = imageInput.files[0];
-                    
-                    if (file.size > maxSize) {
-                        e.preventDefault();
-                        Swal.fire({
-                            title: 'خطأ',
-                            text: 'حجم الصورة كبير جداً. الحد الأقصى 5MB',
-                            icon: 'error',
-                            confirmButtonText: 'حسناً'
-                        });
-                        return false;
-                    }
-                    
-                    // التحقق من نوع الملف
-                    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-                    if (!allowedTypes.includes(file.type)) {
-                        e.preventDefault();
-                        Swal.fire({
-                            title: 'خطأ',
-                            text: 'نوع الملف غير مدعوم. يرجى اختيار صورة (JPG, PNG, GIF, WebP)',
-                            icon: 'error',
-                            confirmButtonText: 'حسناً'
-                        });
-                        return false;
-                    }
-                }
-                
-                return true;
-            });
         }
+        
+        // إضافة لون أرجواني للزر
+        const style = document.createElement('style');
+        style.textContent = `
+            .btn-purple {
+                background: linear-gradient(135deg, var(--purple-color), #8b5cf6);
+                border-color: var(--purple-color);
+                color: white;
+            }
+            
+            .btn-purple:hover {
+                background: linear-gradient(135deg, #5c32a8, #7c3aed);
+                border-color: #5c32a8;
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(111, 66, 193, 0.3);
+            }
+            
+            .text-purple {
+                color: var(--purple-color) !important;
+            }
+        `;
+        document.head.appendChild(style);
         
         // تحديث الإحصائيات عند التحميل
         updateStats();

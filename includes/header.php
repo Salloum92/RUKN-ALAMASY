@@ -29,7 +29,7 @@ $translations = [
         'get_quote' => 'اطلب عرض سعر',
         'login' => 'تسجيل الدخول',
         'register' => 'إنشاء حساب',
-        'search' => 'ابحث هنا...',
+        'search' => 'ابحث عن منتج',
         'cart' => 'عربة التسوق',
         'profile' => 'الملف الشخصي',
         'logout' => 'تسجيل الخروج'
@@ -66,6 +66,127 @@ $t = $translations[$lang];
 $current_page = basename($_SERVER['PHP_SELF']);
 $is_logged_in = isset($_SESSION['user_id']);
 $user_name = $is_logged_in ? $_SESSION['username'] : '';
+
+// الحصول على عنوان الموقع من قاعدة البيانات
+$google_maps_url = '';
+$google_maps_label = ''; 
+// البحث عن رابط خرائط جوجل من صفحة معلومات الاتصال
+$google_maps_url = '';
+$google_maps_label = '';
+
+// البحث في جدول contact_box برقم id محدد (افترضنا id=1 للخرائط)
+$google_maps_item = $query->select('contact_box', '*', "WHERE id = 1")[0] ?? null;
+
+if ($google_maps_item && !empty($google_maps_item['value'])) {
+    $google_maps_url = $google_maps_item['value'];
+    $google_maps_label = $google_maps_item['label'] ?? 'الموقع على خرائط جوجل';
+} else {
+    // البحث عن أي سجل يحتوي على google_maps في النوع
+    foreach ($contact_boxData as $item) {
+        if (isset($item['type']) && $item['type'] === 'google_maps' && !empty($item['value'])) {
+            $google_maps_url = $item['value'];
+            $google_maps_label = $item['label'] ?? 'الموقع على خرائط جوجل';
+            break;
+        }
+    }
+}
+
+// إذا لم نجد رابط خرائط، ابحث عن العنوان العادي
+$location_address = '';
+$has_location = false;
+
+foreach ($contact_boxData as $item) {
+    if (isset($item['type']) && $item['type'] === 'location' && !empty($item['value'])) {
+        $location_address = $item['value'];
+        $has_location = true;
+        break;
+    }
+    // دعم الهياكل القديمة
+    if (isset($item['title']) && stripos($item['title'], 'موقع') !== false && !empty($item['value'])) {
+        $location_address = $item['value'];
+        $has_location = true;
+        break;
+    }
+}
+
+// إذا لم نجد رابط خرائط، استخدم العنوان لإنشاء رابط
+if (empty($google_maps_url) && $has_location && !empty($location_address)) {
+    $encoded_address = urlencode($location_address);
+    $google_maps_url = "https://www.google.com/maps/search/?api=1&query=" . $encoded_address;
+    $google_maps_label = 'الموقع على خرائط جوجل';
+}
+
+// الحصول على معلومات الاتصال الأخرى
+$phone_number = '';
+$email_address = '';
+
+foreach ($contact_boxData as $contact) {
+    if (isset($contact['type'])) {
+        if ($contact['type'] === 'phone' && !empty($contact['value'])) {
+            $phone_number = $contact['value'];
+        } elseif ($contact['type'] === 'email' && !empty($contact['value'])) {
+            $email_address = $contact['value'];
+        }
+    }
+}
+
+foreach ($contact_boxData as $contact) {
+    if (isset($contact['type']) && $contact['type'] === 'location' && !empty($contact['value'])) {
+        $location_address = $contact['value'];
+        $encoded_address = urlencode($location_address);
+        $google_maps_url = "https://www.google.com/maps/search/?api=1&query=" . $encoded_address;
+        break;
+    }
+    // دعم أعمدة العنوان المختلفة
+    if (isset($contact['title']) && stripos($contact['title'], 'موقع') !== false && !empty($contact['value'])) {
+        $location_address = $contact['value'];
+        $encoded_address = urlencode($location_address);
+        $google_maps_url = "https://www.google.com/maps/search/?api=1&query=" . $encoded_address;
+        break;
+    }
+}
+
+// إذا لم يتم العثور على عنوان في contact_box، ابحث في جدول contact
+if (empty($location_address) && isset($contactData[0]['location'])) {
+    $location_address = $contactData[0]['location'];
+    $encoded_address = urlencode($location_address);
+    $google_maps_url = "https://www.google.com/maps/search/?api=1&query=" . $encoded_address;
+}
+
+// الحصول على معلومات الاتصال الأخرى
+$phone_number = '';
+$email_address = '';
+
+foreach ($contact_boxData as $contact) {
+    if (isset($contact['type']) && $contact['type'] === 'phone' && !empty($contact['value'])) {
+        $phone_number = $contact['value'];
+    } elseif (isset($contact['title']) && stripos($contact['title'], 'هاتف') !== false && !empty($contact['value'])) {
+        $phone_number = $contact['value'];
+    }
+    
+    if (isset($contact['type']) && $contact['type'] === 'email' && !empty($contact['value'])) {
+        $email_address = $contact['value'];
+    } elseif (isset($contact['title']) && (stripos($contact['title'], 'بريد') !== false || stripos($contact['title'], 'email') !== false) && !empty($contact['value'])) {
+        $email_address = $contact['value'];
+    }
+}
+
+// إذا لم يتم العثور على البريد في contact_box، ابحث في جدول contact
+if (empty($email_address) && isset($contactData[0]['email'])) {
+    $email_address = $contactData[0]['email'];
+}
+
+// تنظيف رقم الهاتف من المسافات والرموز
+$clean_phone = preg_replace('/[^0-9]/', '', $phone_number);
+$whatsapp_number = '';
+
+// إذا كان هناك رقم واتساب في جدول contact
+if (isset($contactData[0]['whatsapp']) && !empty($contactData[0]['whatsapp'])) {
+    $whatsapp_number = $contactData[0]['whatsapp'];
+} elseif (!empty($clean_phone)) {
+    // استخدم رقم الهاتف الأساسي للواتساب
+    $whatsapp_number = $clean_phone;
+}
 ?>
 
 <!DOCTYPE html>
@@ -80,17 +201,25 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
     /* ===== VARIABLES ===== */
     :root {
         --primary-color: #e76a04;
-      --primary-dark: #d45f00;
-      --secondary-color: rgb(243, 212, 23);
-      --secondary-dark: rgb(223, 192, 3);
-      --dark-color: #144734ff;
-      --dark-light: rgb(30, 91, 72);
-      --light-color: #f8f9fa;
-      --text-dark: #2c3e50;
-      --text-light: #6c757d;
-      --white: #ffffff;
-      --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        --primary-dark: #e76a04;
+        --secondary-color: #e76a04;
+        --secondary-dark: #e76a04;
+        --dark-color: #144734ff;
+        --dark-light: rgb(30, 91, 72);
+        --light-color: #f8f9fa;
+        --text-dark: #2c3e50;
+        --text-light: #6c757d;
+        --white: #ffffff;
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        --transition-fast: all 0.3s ease;
+        --border-radius: 8px;
+        --border-radius-lg: 15px;
+        --border-color: #e9ecef;
+        --bg-light: #f8f9fa;
+        --bg-white: #ffffff;
+        --shadow-lg: 0 15px 40px rgba(0, 0, 0, 0.1);
+        --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.15);
     }
 
     /* ===== RESET & BASE ===== */
@@ -112,8 +241,8 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
         max-width: 1200px;
         margin: 0 auto;
         padding: 0 20px;
-         position: relative;
-    z-index: 5; /* فوق الجسيمات */
+        position: relative;
+        z-index: 5;
     }
 
     /* ===== TOP BAR ===== */
@@ -122,19 +251,15 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
         color: var(--light-color);
         padding: 10px 0;
         border-bottom: 1px solid rgba(255,255,255,0.1);
-        position: relative; 
+        position: relative;
         overflow: hidden;
         z-index: 100;
-        
+        display: flex;
+        align-items: center;
+        height : 60px !important;
+
     }
 
-
-/* ضمان أن الروابط قابلة للتفاعل */
-.top-bar a {
-    position: relative;
-    z-index: 10;
-    pointer-events: auto; /* التأكيد على أنها تستقبل النقرات */
-}
     .top-bar-content {
         display: flex;
         justify-content: space-between;
@@ -179,6 +304,19 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
         transform: translateY(-1px);
     }
 
+    /* تنسيق خاص لرابط الموقع */
+    .location-contact-item {
+        cursor: pointer;
+    }
+
+    .location-contact-item:hover {
+        color: var(--primary-color);
+    }
+
+    .location-contact-item:hover i {
+        transform: scale(1.1);
+    }
+
     .social-links {
         display: flex;
         gap: 12px;
@@ -207,115 +345,72 @@ $user_name = $is_logged_in ? $_SESSION['username'] : '';
     }
 
     /* ===== MAIN NAVIGATION ===== */
+    .main-nav {
+        position: relative;
+        width: 100%;
+        height : 80px !important;
+        min-height: 80px;
+        z-index: 1000;
+        background: #ffffff;
+        padding: 15px 0;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+    }
 
+    .main-nav.scrolled {
+        position: fixed !important;
+        top: 0;
+        padding: 8px 0;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(15px) saturate(180%);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        border-bottom: 1px solid rgba(20, 71, 52, 0.1);
+    }
 
-    
+    .main-nav.scrolled::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, #144734, #e76a04);
+    }
 
-/* أضف هذه الأنماط لملف CSS الخاص بك */
-.main-nav {
-    position: relative;
-    width: 100%;
-    height : 100px;
-    z-index: 1000;
-    background: #ffffff;
-    padding: 15px 0; /* مساحة واسعة في البداية */
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    .main-nav.scrolled .nav-link {
+        font-size: 0.95rem;
+        color: var(--dark-color);
+    }
 
-}
+    @keyframes slideInDown {
+        from { transform: translateY(-100%); }
+        to { transform: translateY(0); }
+    }
 
-/* النسخة المخففة عند التمرير */
-.main-nav.scrolled {
-    position: fixed !important;
-    top: 0;
-    padding: 8px 0; /* تصغير الارتفاع لإعطاء مساحة للمحتوى */
-    background: rgba(255, 255, 255, 0.9); /* شفافية بسيطة */
-    backdrop-filter: blur(15px) saturate(180%); /* تأثير الزجاج الضبابي الرهيب */
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); /* ظل ناعم جداً */
-    border-bottom: 1px solid rgba(20, 71, 52, 0.1); /* تأثير دخول ناعم */
-}
-.main-nav.scrolled::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    background: linear-gradient(90deg, #144734, #e76a04); /* تدرج بين الأخضر والبرتقالي الخاص بك */
-}
+    body.nav-fixed-active {
+        padding-top: 80px;
+    }
 
+    .main-nav.scrolled .nav-container {
+        padding: 10px 0;
+    }
 
-.main-nav.scrolled .nav-link {
-    font-size: 0.95rem; /* تصغير الخط قليلاً */
-    color: var(--dark-color);
-}
-@keyframes slideInDown {
-    from { transform: translateY(-100%); }
-    to { transform: translateY(0); }
-}
+    .main-nav:not(.scrolled) .logo-text .brand-tagline {
+        opacity: 1;
+        height: auto;
+        transition: opacity 0.3s ease;
+    }
 
-/* لمنع القفزة في المحتوى عند التثبيت */
-body.nav-fixed-active {
-    padding-top: 80px; /* نفس ارتفاع الناف بار تقريباً */
-}
+    .nav-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 15px 0;
+        gap: 30px;
+        transition: padding 0.3s ease;
+    }
 
-.main-nav.scrolled .nav-container {
-    padding: 10px 0;
-}
-
-/* يمكنك إضافة تأثيرات إضافية */
-.main-nav.scrolled .logo-text .brand-tagline {
-    opacity: 0;
-    height: 0;
-    overflow: hidden;
-    transition: opacity 0.3s ease;
-}
-
-.main-nav:not(.scrolled) .logo-text .brand-tagline {
-    opacity: 1;
-    height: auto;
-    transition: opacity 0.3s ease;
-}
-
-.nav-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 15px 0;
-    gap: 30px;
-    transition: padding 0.3s ease;
-}
-
-
-.main-nav.nav-hidden {
-    transform: translateY(-100%);
-    transition: transform 0.3s ease;
-}
-
-.main-nav.scrolling-up {
-    transform: translateY(0);
-    transition: transform 0.3s ease;
-}
-
-/* تأثيرات للعناصر الداخلية */
-.main-nav.scrolled .logo-image img {
-    transform: scale(0.9);
-    transition: transform 0.3s ease;
-}
-
-.main-nav.scrolled .search-input {
-    padding: 8px 15px;
-    transition: padding 0.3s ease;
-}
-
-/* تأثيرات للقوائم المنسدلة */
-.main-nav.scrolled .dropdown-menu {
-    margin-top: 10px;
-}
-
-/* تحسين الظل عند التمرير */
-.main-nav.scrolled {
-    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.08);
-}
     /* Logo Section */
     .logo-section {
         flex-shrink: 0;
@@ -329,16 +424,13 @@ body.nav-fixed-active {
         transition: var(--transition);
     }
 
-   
-
     .logo-image img {
-        width: 50px;
-        height: 50px;
-        border-radius: var(--border-radius);
+        width: 70px !important;
+        height: 70px !important;
         object-fit: cover;
-        border: 3px solid var(--primary-color);
-        box-shadow: 0 4px 15px rgba(231, 106, 4, 0.2);
+        box-shadow: none !important;
         transition: var(--transition);
+        border : none !important ;
     }
 
     .logo:hover .logo-image img {
@@ -375,7 +467,7 @@ body.nav-fixed-active {
         flex: 1;
         max-width: 500px;
         position: relative;
-        color : var(--primary-color);
+        color: var(--primary-color);
     }
 
     .desktop-search {
@@ -390,10 +482,6 @@ body.nav-fixed-active {
         transition: var(--transition);
         overflow: hidden;
         box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    }
-
-    .mobile-search-toggle i{
-        color : var(--primary-color) ;
     }
 
     .search-box:focus-within {
@@ -440,29 +528,11 @@ body.nav-fixed-active {
         transform: translateY(-50%) scale(1.05);
     }
 
-    .mobile-search-toggle {
-        display: none;
-        background: none;
-        border: none;
-        color: var(--text-dark);
-        font-size: 1.3rem;
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
-        transition: var(--transition);
-        cursor: pointer;
-    }
-
-    .mobile-search-toggle:hover {
-        background: rgba(231, 106, 4, 0.1);
-        color: var(--primary-color);
-    }
-
     /* Navigation Actions */
     .nav-actions {
         display: flex;
         align-items: center;
-        gap: 20px;
+        gap: 10px;
     }
 
     .nav-menu {
@@ -470,8 +540,7 @@ body.nav-fixed-active {
         list-style: none;
         margin: 0;
         padding: 0;
-        gap: 8px;
-        
+        gap: 5px;
     }
 
     .nav-item {
@@ -585,8 +654,8 @@ body.nav-fixed-active {
         align-items: center;
         gap: 8px;
         padding: 10px 16px;
-        background: var(--primary-color);
-        border: 2px solid transparent;
+        background: white;
+        border: 2px solid var(--primary-color);
         border-radius: 25px;
         color: var(--text-dark);
         font-weight: 600;
@@ -596,8 +665,8 @@ body.nav-fixed-active {
     }
 
     .lang-toggle:hover {
-        border-color: var(--primary-color);
-        background: var(--bg-white);
+        background: var(--primary-color);
+        color: white;
         box-shadow: var(--shadow);
         transform: translateY(-2px);
     }
@@ -611,7 +680,7 @@ body.nav-fixed-active {
         position: absolute;
         top: 100%;
         right: 0;
-        background: var(--primary-color);
+        background: white;
         border-radius: var(--border-radius);
         box-shadow: var(--shadow-xl);
         padding: 8px;
@@ -621,6 +690,7 @@ body.nav-fixed-active {
         transform: translateY(10px);
         transition: var(--transition);
         z-index: 1000;
+        border: 1px solid var(--border-color);
     }
 
     .lang-dropdown:hover .lang-menu {
@@ -634,7 +704,7 @@ body.nav-fixed-active {
         align-items: center;
         gap: 10px;
         padding: 12px 16px;
-        color: white;
+        color: var(--text-dark);
         text-decoration: none;
         border-radius: 8px;
         transition: var(--transition-fast);
@@ -643,7 +713,7 @@ body.nav-fixed-active {
 
     .lang-option:hover {
         background: rgba(231, 106, 4, 0.1);
-        color: var(--dark-color);
+        color: var(--primary-color);
     }
 
     .lang-option.active {
@@ -662,14 +732,11 @@ body.nav-fixed-active {
         flex-direction: column;
         gap: 4px;
         background: white;
-        border: none;
-        padding: 8px;
+        border: 2px solid var(--primary-color);
+        border-radius: 8px;
+        padding: 10px;
         cursor: pointer;
         transition: var(--transition);
-    }
-
-    .mobile-menu-toggle span {
-        color: var(--primary-color);
     }
 
     .menu-bar {
@@ -794,7 +861,7 @@ body.nav-fixed-active {
         left: -100%;
         width: 320px;
         height: 100vh;
-        background: var(--bg-white);
+        background: var(--dark-color);
         box-shadow: var(--shadow-xl);
         z-index: 9998;
         transition: var(--transition);
@@ -805,7 +872,6 @@ body.nav-fixed-active {
 
     .mobile-menu.active {
         left: 0;
-        background-color : #144734ff;
     }
 
     .mobile-menu-header {
@@ -813,8 +879,8 @@ body.nav-fixed-active {
         align-items: center;
         justify-content: space-between;
         padding: 20px;
-        border-bottom: 1px solid var(--border-color);
-        background: var(--bg-light);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.1);
     }
 
     .mobile-logo {
@@ -839,7 +905,7 @@ body.nav-fixed-active {
     .mobile-menu-close {
         background: none;
         border: none;
-        color: var(--primary-color);
+        color: white;
         font-size: 1.5rem;
         cursor: pointer;
         transition: var(--transition-fast);
@@ -857,7 +923,7 @@ body.nav-fixed-active {
         flex-direction: column;
         gap: 25px;
         overflow-y: auto;
-        margin-bottom : 50px;
+        margin-bottom: 50px;
     }
 
     /* Mobile Search in Menu */
@@ -867,9 +933,9 @@ body.nav-fixed-active {
 
     .mobile-nav-search-box {
         display: flex;
-        background: var(--bg-light);
+        background: white;
         border-radius: 25px;
-        border: 2px solid transparent;
+        border: 2px solid var(--primary-color);
         transition: var(--transition);
         overflow: hidden;
     }
@@ -885,7 +951,6 @@ body.nav-fixed-active {
         padding: 12px 16px;
         font-size: 0.9rem;
         outline: none;
-        border: 1px solid var(--primary-color)
     }
 
     .mobile-nav-search-btn {
@@ -938,16 +1003,10 @@ body.nav-fixed-active {
         width: 24px;
         text-align: center;
     }
-    .mobile-contact-item span {
-        color : white ;
-    }
-    .mobile-contact-item a {
-        color : white ;
-    }
 
     /* Mobile Contact Section */
     .mobile-contact-section {
-        background: var(--bg-light);
+        background: rgba(255, 255, 255, 0.1);
         padding: 20px;
         border-radius: var(--border-radius);
     }
@@ -962,7 +1021,7 @@ body.nav-fixed-active {
         display: flex;
         align-items: center;
         gap: 10px;
-        color: var(--text-dark);
+        color: white;
         font-size: 0.85rem;
     }
 
@@ -981,64 +1040,76 @@ body.nav-fixed-active {
         color: var(--primary-color);
     }
 
+    .mobile-contact-item span {
+        color: white;
+    }
+
+    /* تنسيق خاص لرابط الموقع في الموبايل */
+    .mobile-location-item {
+        cursor: pointer;
+    }
+
+    .mobile-location-item:hover {
+        color: var(--primary-color);
+    }
+
+    .mobile-location-item:hover i {
+        transform: scale(1.1);
+    }
+
     /* Mobile Language Selector Container */
-.mobile-language-selector {
-    display: flex;
-    gap: 10px;
-    padding: 10px 0;
-}
+    .mobile-language-selector {
+        display: flex;
+        gap: 10px;
+        padding: 10px 0;
+    }
 
-/* الحالة العادية: الزر غير مفعل (نص وأيقونة باللون الأبيض) */
-.mobile-lang-option {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px;
-    border: 2px solid rgba(255, 255, 255, 0.3); /* حدود بيضاء شفافة قليلاً */
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    background: transparent;
-    transition: all 0.3s ease;
-}
+    .mobile-lang-option {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        background: transparent;
+        transition: all 0.3s ease;
+    }
 
-/* ضمان أن النص والأيقونة باللون الأبيض في الحالة العادية */
-.mobile-lang-option span,
-.mobile-lang-option i,
-.mobile-lang-option svg {
-    color: white !important;
-    fill: white;
-}
+    .mobile-lang-option span,
+    .mobile-lang-option i,
+    .mobile-lang-option svg {
+        color: white !important;
+        fill: white;
+    }
 
-/* الحالة المفعلة: عند ضغط الزر (خلفية بيضاء، نص وأيقونة باللون الأخضر الغامق) */
-.mobile-lang-option.active {
-    background: white !important;
-    border-color: white !important; /* لجعل الزر يبدو كقطعة واحدة بيضاء */
-}
+    .mobile-lang-option.active {
+        background: white !important;
+        border-color: white !important;
+    }
 
-/* تغيير لون النص والأيقونة للأخضر عند التفعيل */
-.mobile-lang-option.active span,
-.mobile-lang-option.active i,
-.mobile-lang-option.active svg {
-    color: #144734ff !important;
-    fill: #144734ff;
-}
+    .mobile-lang-option.active span,
+    .mobile-lang-option.active i,
+    .mobile-lang-option.active svg {
+        color: #144734ff !important;
+        fill: #144734ff;
+    }
 
-/* تأثير التمرير (Hover) */
-.mobile-lang-option:hover {
-    transform: translateY(-2px);
-    border-color: white;
-    background: rgba(255, 255, 255, 0.1); /* تعتيم بسيط عند التمرير */
-}
+    .mobile-lang-option:hover {
+        transform: translateY(-2px);
+        border-color: white;
+        background: rgba(255, 255, 255, 0.1);
+    }
 
-/* منع تداخل ألوان الروابط الافتراضية */
-.mobile-lang-option:focus, 
-.mobile-lang-option:active {
-    text-decoration: none;
-    outline: none;
-}
+    .mobile-lang-option:focus,
+    .mobile-lang-option:active {
+        text-decoration: none;
+        outline: none;
+    }
+
     /* ===== FLOATING BUTTONS ===== */
     .floating-whatsapp {
         position: fixed;
@@ -1072,7 +1143,7 @@ body.nav-fixed-active {
     .scroll-to-top {
         position: fixed;
         bottom: 25px;
-        left : 25px;
+        right: 25px;
         z-index: 1000;
     }
 
@@ -1166,12 +1237,12 @@ body.nav-fixed-active {
         .nav-container {
             gap: 20px;
         }
-        
+
         .nav-link {
             padding: 10px 15px;
             font-size: 0.9rem;
         }
-        
+
         .search-section {
             max-width: 400px;
         }
@@ -1181,31 +1252,30 @@ body.nav-fixed-active {
         .top-bar {
             display: none;
         }
-        
+
         .nav-menu,
         .desktop-search,
         .language-selector {
             display: none;
         }
-        
-        .mobile-search-toggle,
+
         .mobile-menu-toggle {
             display: flex;
         }
-        
+
         .nav-container {
             padding: 12px 0;
         }
-        
+
         .logo-image img {
             width: 45px;
             height: 45px;
         }
-        
+
         .brand-name {
             font-size: 1.2rem;
         }
-        
+
         .brand-tagline {
             font-size: 0.7rem;
         }
@@ -1215,40 +1285,40 @@ body.nav-fixed-active {
         .nav-container {
             gap: 15px;
         }
-        
+
         .logo {
             gap: 10px;
         }
-        
+
         .logo-image img {
             width: 40px;
             height: 40px;
         }
-        
+
         .brand-name {
             font-size: 1.1rem;
         }
-        
+
         .mobile-menu {
             width: 280px;
         }
-        
+
         .floating-whatsapp {
             bottom: 20px;
             left: 20px;
         }
-        
+
         .scroll-to-top {
             bottom: 20px;
-            left : 20px;
+            right: 20px;
         }
-        
+
         .whatsapp-float {
             width: 55px;
             height: 55px;
             font-size: 1.6rem;
         }
-        
+
         .scroll-top-btn {
             width: 45px;
             height: 45px;
@@ -1257,33 +1327,33 @@ body.nav-fixed-active {
     }
 
     @media (max-width: 576px) {
-        .main-nav{
-            height: 75px;
-            
+        .main-nav {
+            min-height: 75px;
         }
+
         .nav-container {
             padding: 10px 0;
-            display : flex;
-            align-items : center;
+            display: flex;
+            align-items: center;
         }
-        
+
         .logo-image img {
             width: 35px;
             height: 35px;
         }
-        
+
         .brand-name {
             font-size: 1rem;
         }
-        
+
         .brand-tagline {
             display: none;
         }
-        
+
         .mobile-menu {
             width: 100%;
         }
-        
+
         .search-modal-content {
             margin: 20px;
             padding: 25px;
@@ -1291,11 +1361,7 @@ body.nav-fixed-active {
     }
 
     @media (max-width: 480px) {
-        
-        
-        .mobile-search-toggle,
         .mobile-menu-toggle {
-            width: 40px;
             height: 40px;
         }
     }
@@ -1339,12 +1405,6 @@ body.nav-fixed-active {
         left: 25px;
     }
 
-    /* ===== SCROLL BEHAVIOR ===== */
-    .header.scrolled .main-nav {
-        box-shadow: var(--shadow-lg);
-        background: rgba(255, 255, 255, 0.98);
-    }
-
     /* ===== ACCESSIBILITY ===== */
     @media (prefers-reduced-motion: reduce) {
         * {
@@ -1358,7 +1418,6 @@ body.nav-fixed-active {
     .nav-link:focus,
     .search-btn:focus,
     .lang-toggle:focus,
-    .mobile-search-toggle:focus,
     .mobile-menu-toggle:focus,
     .mobile-nav-item:focus,
     .whatsapp-float:focus,
@@ -1377,62 +1436,91 @@ body.nav-fixed-active {
 <body>
 <header id="header" class="header">
     <!-- Top Bar -->
-    <div class="top-bar">
+     <div class="top-bar">
         <div class="container-fluid">
             <div class="top-bar-content">
                 <!-- Contact Info -->
                 <div class="contact-info">
-                    <div class="contact-item">
-                        <i class="bi bi-clock"></i>
-                        <span><?= isset($contact_boxData[3]['value']) ? $contact_boxData[3]['value'] : 'السبت - الخميس: 8ص - 10م' ?></span>
+                    <?php if (!empty($google_maps_url)): ?>
+                    <div class="contact-item google-maps-icon" onclick="window.open('<?= htmlspecialchars($google_maps_url) ?>', '_blank')" title="<?= htmlspecialchars($google_maps_label) ?>">
+                        <i class="bi bi-geo-alt-fill"></i>
+                        <span>RIYAD</span>
                     </div>
+                    <?php elseif ($has_location): ?>
+                    <div class="contact-item google-maps-icon" onclick="window.open('https://www.google.com/maps/search/?api=1&query=<?= urlencode($location_address) ?>', '_blank')" title="عرض الموقع على خرائط جوجل">
+                        
+                    <i class="bi bi-geo-alt-fill"></i>
+                        <span>خرائط جوجل</span>
+                    </div>
+                    <?php else: ?>
+                    <div class="contact-item">
+                        <i class="bi bi-geo-alt"></i>
+                        <span>إضافة موقع من صفحة معلومات الاتصال</span>
+                    </div>
+                    <?php endif; ?>
+
+                    <?php if (!empty($email_address)): ?>
                     <div class="contact-item">
                         <i class="bi bi-envelope"></i>
-                        <a href="mailto:<?= isset($contact_boxData[2]['value']) ? $contact_boxData[2]['value'] : 'info@ruknalamasy.com' ?>">
-                            <?= isset($contact_boxData[2]['value']) ? $contact_boxData[2]['value'] : 'info@ruknalamasy.com' ?>
+                        <a href="mailto:<?= htmlspecialchars($email_address) ?>">
+                            <?= htmlspecialchars($email_address) ?>
                         </a>
                     </div>
+                    <?php else: ?>
+                    <div class="contact-item">
+                        <i class="bi bi-envelope"></i>
+                        <span>البريد غير متوفر</span>
+                    </div>
+                    <?php endif; ?>
+
+                    <?php if (!empty($phone_number)): ?>
                     <div class="contact-item">
                         <i class="bi bi-phone"></i>
-                        <a href="tel:<?= isset($contact_boxData[1]['value']) ? trim($contact_boxData[1]['value']) : '+966500000000' ?>">
-                            <?= isset($contact_boxData[1]['value']) ? $contact_boxData[1]['value'] : '+966 50 000 0000' ?>
+                        <a href="tel:<?= htmlspecialchars(str_replace(' ', '', $phone_number)) ?>">
+                            <?= htmlspecialchars($phone_number) ?>
                         </a>
                     </div>
+                    <?php else: ?>
+                    <div class="contact-item">
+                        <i class="bi bi-phone"></i>
+                        <span>الهاتف غير متوفر</span>
+                    </div>
+                    <?php endif; ?>
                 </div>
 
                 <!-- Social Links -->
                 <div class="social-links">
-                            <?php if (isset($contactData[0]['twitter']) && !empty($contactData[0]['twitter'])): ?>
-                                <a href="https://x.com/<?= $contactData[0]['twitter'] ?>" class="twitter" target="_blank" title="Twitter">
-                                    <i class="bi bi-twitter-x"></i>
-                                </a>
-                            <?php endif; ?>
-                            <?php if (isset($contactData[0]['facebook']) && !empty($contactData[0]['facebook'])): ?>
-                                <a href="https://facebook.com/<?= $contactData[0]['facebook'] ?>" class="facebook" target="_blank" title="Facebook">
-                                    <i class="bi bi-facebook"></i>
-                                </a>
-                            <?php endif; ?>
-                            <?php if (isset($contactData[0]['instagram']) && !empty($contactData[0]['instagram'])): ?>
-                                <a href="https://instagram.com/<?= $contactData[0]['instagram'] ?>" class="instagram" target="_blank" title="Instagram">
-                                    <i class="bi bi-instagram"></i>
-                                </a>
-                            <?php endif; ?>
-                            <?php if (isset($contactData[0]['linkedin']) && !empty($contactData[0]['linkedin'])): ?>
-                                <a href="https://linkedin.com/in/<?= $contactData[0]['linkedin'] ?>" class="linkedin" target="_blank" title="LinkedIn">
-                                    <i class="bi bi-linkedin"></i>
-                                </a>
-                            <?php endif; ?>
-                            <?php if (isset($contactData[0]['youtube']) && !empty($contactData[0]['youtube'])): ?>
-                                <a href="https://www.youtube.com/<?= $contactData[0]['youtube'] ?>" class="youtube" target="_blank" title="YouTube">
-                                    <i class="bi bi-youtube"></i>
-                                </a>
-                            <?php endif; ?>
-                            <?php if (isset($contactData[0]['whatsapp']) && !empty($contactData[0]['whatsapp'])): ?>
-                                <a href="https://wa.me/<?= $contactData[0]['whatsapp'] ?>" class="whatsapp" target="_blank" title="WhatsApp">
-                                    <i class="bi bi-whatsapp"></i>
-                                </a>
-                            <?php endif; ?>
-                        </div>
+                    <?php if (isset($contactData[0]['twitter']) && !empty($contactData[0]['twitter'])): ?>
+                        <a href="https://x.com/<?= $contactData[0]['twitter'] ?>" class="social-link twitter" target="_blank" title="Twitter">
+                            <i class="bi bi-twitter-x"></i>
+                        </a>
+                    <?php endif; ?>
+                    <?php if (isset($contactData[0]['facebook']) && !empty($contactData[0]['facebook'])): ?>
+                        <a href="https://facebook.com/<?= $contactData[0]['facebook'] ?>" class="social-link facebook" target="_blank" title="Facebook">
+                            <i class="bi bi-facebook"></i>
+                        </a>
+                    <?php endif; ?>
+                    <?php if (isset($contactData[0]['instagram']) && !empty($contactData[0]['instagram'])): ?>
+                        <a href="https://instagram.com/<?= $contactData[0]['instagram'] ?>" class="social-link instagram" target="_blank" title="Instagram">
+                            <i class="bi bi-instagram"></i>
+                        </a>
+                    <?php endif; ?>
+                    <?php if (isset($contactData[0]['linkedin']) && !empty($contactData[0]['linkedin'])): ?>
+                        <a href="https://linkedin.com/in/<?= $contactData[0]['linkedin'] ?>" class="social-link linkedin" target="_blank" title="LinkedIn">
+                            <i class="bi bi-linkedin"></i>
+                        </a>
+                    <?php endif; ?>
+                    <?php if (isset($contactData[0]['youtube']) && !empty($contactData[0]['youtube'])): ?>
+                        <a href="https://www.youtube.com/<?= $contactData[0]['youtube'] ?>" class="social-link youtube" target="_blank" title="YouTube">
+                            <i class="bi bi-youtube"></i>
+                        </a>
+                    <?php endif; ?>
+                    <?php if (isset($contactData[0]['whatsapp']) && !empty($contactData[0]['whatsapp'])): ?>
+                        <a href="https://wa.me/<?= $contactData[0]['whatsapp'] ?>" class="social-link whatsapp" target="_blank" title="WhatsApp">
+                            <i class="bi bi-whatsapp"></i>
+                        </a>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </div>
@@ -1445,7 +1533,7 @@ body.nav-fixed-active {
                 <div class="logo-section">
                     <a href="index.php" class="logo">
                         <div class="logo-image">
-                            <img src="assets/img/logo.png" alt="Rukn Alamasy" 
+                            <img src="assets/img/logo.png" alt="Rukn Alamasy"
                                  onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHZpZXdCb3g9IjAgMCA1MCA1MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiByeD0iMTAiIGZpbGw9IiNlNzZhMDQiLz4KPHN2ZyB4PSIxMiIgeT0iMTIiIHdpZHRoPSIyNiIgaGVpZ2h0PSIyNiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiPgo8cGF0aCBkPSJNMTIgMkM2LjQ4IDIgMiA2LjQ4IDIgMTJzNC40OCAxMCAxMCAxMCAxMC00LjQ4IDEwLTEwUzE3LjUyIDIgMTIgMnpNMTIgMjBsLTMtMyAyLTcgNyA1LTIgN3oiLz4KPC9zdmc+Cjwvc3ZnPg=='">
                         </div>
                         <div class="logo-text">
@@ -1461,10 +1549,10 @@ body.nav-fixed-active {
                     <div class="desktop-search">
                         <form class="search-form" action="search.php" method="GET">
                             <div class="search-box">
-                                <input type="text" 
-                                       class="search-input" 
-                                       name="q" 
-                                       placeholder="<?= $t['search'] ?>" 
+                                <input type="text"
+                                       class="search-input"
+                                       name="q"
+                                       placeholder="<?= $t['search'] ?>"
                                        value="<?= isset($_GET['q']) ? htmlspecialchars($_GET['q']) : '' ?>">
                                 <button class="search-btn" type="submit">
                                     <i class="bi bi-search"></i>
@@ -1472,9 +1560,6 @@ body.nav-fixed-active {
                             </div>
                         </form>
                     </div>
-
-                    <!-- Mobile Search Icon -->
-                    
                 </div>
 
                 <!-- Navigation & Actions -->
@@ -1493,17 +1578,12 @@ body.nav-fixed-active {
                                 <span><?= $t['about'] ?></span>
                             </a>
                         </li>
-                        <li class="nav-item dropdown">
-                            <a href="services.php" class="nav-link dropdown-toggle <?= ($current_page == 'services.php') ? 'active' : '' ?>">
+                        <li class="nav-item">
+                            <a href="services.php" class="nav-link <?= ($current_page == 'services.php') ? 'active' : '' ?>">
                                 <i class="bi bi-gear"></i>
                                 <span><?= $t['services'] ?></span>
                             </a>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" href="services.php#web"><?= ($lang == 'ar') ? 'تطوير الويب' : 'Web Development' ?></a>
-                                <a class="dropdown-item" href="services.php#mobile"><?= ($lang == 'ar') ? 'تطبيقات الجوال' : 'Mobile Apps' ?></a>
-                                <a class="dropdown-item" href="services.php#seo"><?= ($lang == 'ar') ? 'تحسين محركات البحث' : 'SEO' ?></a>
-                                <a class="dropdown-item" href="services.php#marketing"><?= ($lang == 'ar') ? 'التسويق الرقمي' : 'Digital Marketing' ?></a>
-                            </div>
+                            
                         </li>
                         <li class="nav-item">
                             <a href="products.php" class="nav-link <?= ($current_page == 'products.php') ? 'active' : '' ?>">
@@ -1528,6 +1608,7 @@ body.nav-fixed-active {
                                         <rect width="24" height="18" fill="#006C35"/>
                                         <text x="12" y="12" text-anchor="middle" fill="#FFFFFF" font-size="8" font-weight="bold">ﷲ</text>
                                     </svg>
+                                    <span class="lang-text">العربية</span>
                                 <?php else: ?>
                                     <svg class="flag-icon" width="20" height="15" viewBox="0 0 24 18">
                                         <rect width="24" height="1.38" fill="#B22234" y="0"/>
@@ -1539,8 +1620,8 @@ body.nav-fixed-active {
                                         <rect width="24" height="1.38" fill="#B22234" y="16.56"/>
                                         <rect width="9.6" height="9.66" fill="#3C3B6E"/>
                                     </svg>
+                                    <span class="lang-text">English</span>
                                 <?php endif; ?>
-                                <span class="lang-text"><?= ($lang == 'ar') ? $t['arabic'] : $t['english'] ?></span>
                                 <i class="bi bi-chevron-down"></i>
                             </button>
                             <div class="lang-menu">
@@ -1585,30 +1666,6 @@ body.nav-fixed-active {
         </div>
     </nav>
 
-    <!-- Mobile Search Modal -->
-    <div class="mobile-search-modal">
-        <div class="search-modal-content">
-            <div class="search-modal-header">
-                <h3><?= $t['search'] ?></h3>
-                <button class="close-search-modal">
-                    <i class="bi bi-x-lg"></i>
-                </button>
-            </div>
-            <form class="mobile-search-form" action="search.php" method="GET">
-                <div class="search-input-group">
-                    <input type="text" 
-                           class="mobile-search-input" 
-                           name="q" 
-                           placeholder="<?= $t['search'] ?>..." 
-                           value="<?= isset($_GET['q']) ? htmlspecialchars($_GET['q']) : '' ?>">
-                    <button class="mobile-search-btn" type="submit">
-                        <i class="bi bi-search"></i>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <!-- Mobile Menu -->
     <div class="mobile-menu">
         <div class="mobile-menu-header">
@@ -1626,10 +1683,10 @@ body.nav-fixed-active {
             <div class="mobile-search-container">
                 <form class="mobile-nav-search-form" action="search.php" method="GET">
                     <div class="mobile-nav-search-box">
-                        <input type="text" 
-                               class="mobile-nav-search-input" 
-                               name="q" 
-                               placeholder="<?= $t['search'] ?>..." 
+                        <input type="text"
+                               class="mobile-nav-search-input"
+                               name="q"
+                               placeholder="<?= $t['search'] ?>..."
                                value="<?= isset($_GET['q']) ? htmlspecialchars($_GET['q']) : '' ?>">
                         <button class="mobile-nav-search-btn" type="submit">
                             <i class="bi bi-search"></i>
@@ -1665,22 +1722,45 @@ body.nav-fixed-active {
             <!-- Mobile Contact Info -->
             <div class="mobile-contact-section">
                 <div class="mobile-contact-info">
-                    <div class="mobile-contact-item">
-                        <i class="bi bi-clock"></i>
-                        <span><?= isset($contact_boxData[3]['value']) ? $contact_boxData[3]['value'] : 'السبت - الخميس: 8ص - 10م' ?></span>
+                    <?php if (!empty($location_address) && $google_maps_url !== '#'): ?>
+                    <div class="mobile-contact-item mobile-location-item" onclick="window.open('<?= $google_maps_url ?>', '_blank')" title="عرض الموقع على خرائط جوجل">
+                        <i class="bi bi-geo-alt"></i>
+                        <span><?= htmlspecialchars($location_address) ?></span>
                     </div>
+                    <?php else: ?>
+                    <div class="mobile-contact-item">
+                        <i class="bi bi-geo-alt"></i>
+                        <span>العنوان غير متوفر</span>
+                    </div>
+                    <?php endif; ?>
+
+                    <?php if (!empty($email_address)): ?>
                     <div class="mobile-contact-item">
                         <i class="bi bi-envelope"></i>
-                        <a href="mailto:<?= isset($contact_boxData[2]['value']) ? $contact_boxData[2]['value'] : 'info@ruknalamasy.com' ?>">
-                            <?= isset($contact_boxData[2]['value']) ? $contact_boxData[2]['value'] : 'info@ruknalamasy.com' ?>
+                        <a href="mailto:<?= htmlspecialchars($email_address) ?>">
+                            <?= htmlspecialchars($email_address) ?>
                         </a>
                     </div>
+                    <?php else: ?>
+                    <div class="mobile-contact-item">
+                        <i class="bi bi-envelope"></i>
+                        <span>البريد غير متوفر</span>
+                    </div>
+                    <?php endif; ?>
+
+                    <?php if (!empty($phone_number)): ?>
                     <div class="mobile-contact-item">
                         <i class="bi bi-phone"></i>
-                        <a href="tel:<?= isset($contact_boxData[1]['value']) ? trim($contact_boxData[1]['value']) : '+966500000000' ?>">
-                            <?= isset($contact_boxData[1]['value']) ? $contact_boxData[1]['value'] : '+966 50 000 0000' ?>
+                        <a href="tel:<?= htmlspecialchars(str_replace(' ', '', $phone_number)) ?>">
+                            <?= htmlspecialchars($phone_number) ?>
                         </a>
                     </div>
+                    <?php else: ?>
+                    <div class="mobile-contact-item">
+                        <i class="bi bi-phone"></i>
+                        <span>الهاتف غير متوفر</span>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -1715,13 +1795,14 @@ body.nav-fixed-active {
 <div class="mobile-overlay"></div>
 
 <!-- Floating WhatsApp Button -->
+<?php if (!empty($whatsapp_number)): ?>
 <div class="floating-whatsapp">
-    <a href="https://wa.me/<?= isset($contactData[0]['whatsapp']) ? $contactData[0]['whatsapp'] : '+966500000000' ?>" target="_blank" class="whatsapp-float">
+    <a href="https://wa.me/<?= $whatsapp_number ?>" target="_blank" class="whatsapp-float">
         <i class="bi bi-whatsapp"></i>
     </a>
 </div>
+<?php endif; ?>
 
-<!-- Scroll to Top Button -->
 
 
 <script>
@@ -1735,15 +1816,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeSearchModal = document.querySelector('.close-search-modal');
     const scrollTopBtn = document.querySelector('.scroll-top-btn');
     const mobileOverlay = document.querySelector('.mobile-overlay');
-    
+    const locationItems = document.querySelectorAll('.location-contact-item, .mobile-location-item');
+
     // دالة فتح/إغلاق القائمة الجانبية
     function toggleMobileMenu() {
         const isOpening = !mobileMenu.classList.contains('active');
-        
+
         mobileMenu.classList.toggle('active');
         mobileOverlay.classList.toggle('active');
         document.body.classList.toggle('menu-open', isOpening);
-        
+
         // Animate menu bars
         const bars = mobileMenuToggle.querySelectorAll('.menu-bar');
         if (mobileMenu.classList.contains('active')) {
@@ -1757,19 +1839,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // دالة فتح/إغلاق نافذة البحث
-    function toggleSearchModal() {
-        const isOpening = !mobileSearchModal.classList.contains('active');
-        
-        mobileSearchModal.classList.toggle('active');
-        document.body.classList.toggle('menu-open', isOpening);
-        
-        if (mobileSearchModal.classList.contains('active')) {
-            setTimeout(() => {
-                mobileSearchModal.querySelector('.mobile-search-input').focus();
-            }, 300);
-        }
-    }
+    // Close mobile menu when clicking on links
+    document.querySelectorAll('.mobile-nav-item, .mobile-lang-option').forEach(item => {
+        item.addEventListener('click', function() {
+            if (mobileMenu.classList.contains('active')) {
+                toggleMobileMenu();
+            }
+        });
+    });
 
     // Event Listeners
     if (mobileMenuToggle) {
@@ -1780,31 +1857,34 @@ document.addEventListener('DOMContentLoaded', function() {
         mobileMenuClose.addEventListener('click', toggleMobileMenu);
     }
 
-    if (mobileSearchToggle) {
-        mobileSearchToggle.addEventListener('click', toggleSearchModal);
-    }
-
-    if (closeSearchModal) {
-        closeSearchModal.addEventListener('click', toggleSearchModal);
-    }
-
     // Close modals with overlay
     mobileOverlay.addEventListener('click', function() {
         if (mobileMenu.classList.contains('active')) {
             toggleMobileMenu();
         }
-        if (mobileSearchModal.classList.contains('active')) {
-            toggleSearchModal();
+    });
+
+    // إضافة تأثير hover للأيقونة
+    locationItems.forEach(item => {
+        const icon = item.querySelector('i');
+        if (icon) {
+            item.addEventListener('mouseenter', function() {
+                icon.style.transform = 'scale(1.1)';
+            });
+            item.addEventListener('mouseleave', function() {
+                icon.style.transform = 'scale(1)';
+            });
         }
     });
 
     // Scroll to top functionality
     window.addEventListener('scroll', function() {
+        const mainNav = document.querySelector('.main-nav');
         if (window.scrollY > 300) {
-            header.classList.add('scrolled');
+            mainNav.classList.add('scrolled');
             scrollTopBtn.classList.add('show');
         } else {
-            header.classList.remove('scrolled');
+            mainNav.classList.remove('scrolled');
             scrollTopBtn.classList.remove('show');
         }
     });
@@ -1819,7 +1899,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Search form validation
-    const searchForms = document.querySelectorAll('.search-form, .mobile-search-form, .mobile-nav-search-form');
+    const searchForms = document.querySelectorAll('.search-form, .mobile-nav-search-form');
     searchForms.forEach(form => {
         form.addEventListener('submit', function(e) {
             const searchInput = this.querySelector('input[name="q"]');
@@ -1834,23 +1914,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Close mobile menu when clicking on links
-    document.querySelectorAll('.mobile-nav-item, .mobile-lang-option').forEach(item => {
-        item.addEventListener('click', function() {
-            if (mobileMenu.classList.contains('active')) {
-                toggleMobileMenu();
-            }
-        });
-    });
-
     // Keyboard navigation
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             if (mobileMenu.classList.contains('active')) {
                 toggleMobileMenu();
-            }
-            if (mobileSearchModal.classList.contains('active')) {
-                toggleSearchModal();
             }
         }
     });
@@ -1862,7 +1930,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (isTouchDevice()) {
         document.body.classList.add('touch-device');
-        
+
         // Add touch-specific improvements
         const navLinks = document.querySelectorAll('.nav-link, .mobile-nav-item');
         navLinks.forEach(link => {
@@ -1877,23 +1945,6 @@ document.addEventListener('DOMContentLoaded', function() {
         item.style.animation = 'slideIn 0.3s ease forwards';
     });
 });
-
-window.addEventListener('scroll', function() {
-    const nav = document.querySelector('.main-nav');
-    const scrollPosition = window.scrollY;
-    
-    if (scrollPosition > 80) { // يبدأ التأثير بعد 80 بكسل
-        nav.classList.add('scrolled');
-        // إضافة أنيميشن بسيط للعناصر الداخلية
-        document.querySelectorAll('.nav-item').forEach((el, index) => {
-            el.style.transitionDelay = `${index * 0.05}s`;
-        });
-    } else {
-        nav.classList.remove('scrolled');
-    }
-});
-
-
 </script>
 </body>
 </html>

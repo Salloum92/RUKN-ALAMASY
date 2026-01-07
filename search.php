@@ -105,19 +105,21 @@ if (is_array($search_results) && count($search_results) > 0) {
     <style>
         /* ===== VARIABLES ===== */
         :root {
-            --primary-color: #e76a04;
-            --primary-dark: #d45a04;
-            --secondary-color: #2c3e50;
-            --text-dark: #2c3e50;
-            --text-light: #6c757d;
-            --bg-light: #f8f9fa;
-            --white: #ffffff;
-            --border-color: #e9ecef;
-            --shadow: 0 5px 25px rgba(0, 0, 0, 0.08);
-            --shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.15);
-            --border-radius: 12px;
-            --transition: all 0.3s ease;
-        }
+      --primary-color: #e76a04;
+      --primary-dark: #d45f00;
+      --secondary-color: #e76a04;
+      --secondary-dark: #e76a04;
+      --dark-color: #144734ff;
+      --dark-light: rgb(30, 91, 72);
+      --light-color: #f8f9fa;
+      --text-dark: #2c3e50;
+      --text-light: #6c757d;
+      --white: #ffffff;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      --gradient-primary: #e76a04;
+      --gradient-dark: linear-gradient(135deg, #144734, #1e5b48);
+    }
 
         /* ===== GLOBAL RESET ===== */
         .search-page {

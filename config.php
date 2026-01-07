@@ -9,7 +9,7 @@ class Database
         $servername = "localhost";
         $username = "root";
         $password = "";
-        $dbname = "business_website";
+        $dbname = "rukndb";
 
         $this->conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -180,4 +180,6 @@ class Database
         return $this->conn->insert_id;
     }
 }
+
+
 ?>

@@ -74,11 +74,11 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
   
   <style>
     /* نفس الـ CSS من صفحة About مع تعديلات بسيطة */
-    :root {
+     :root {
       --primary-color: #e76a04;
       --primary-dark: #d45f00;
-      --secondary-color: rgb(243, 212, 23);
-      --secondary-dark: rgb(223, 192, 3);
+      --secondary-color: #e76a04;
+      --secondary-dark: #e76a04;
       --dark-color: #144734ff;
       --dark-light: rgb(30, 91, 72);
       --light-color: #f8f9fa;
@@ -87,7 +87,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       --white: #ffffff;
       --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
       --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      --gradient-primary: linear-gradient(135deg, #e76a04, #f3d417);
+      --gradient-primary: #e76a04;
       --gradient-dark: linear-gradient(135deg, #144734, #1e5b48);
     }
 
@@ -824,6 +824,350 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       box-shadow: 0 25px 50px rgba(231, 106, 4, 0.6);
     }
 
+    /* قسم "لماذا تختارنا" الاحترافي */
+    .why-choose-professional {
+      padding: 100px 0;
+      background: #ffffff;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .why-choose-professional .professional-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    .why-choose-professional .bg-gradient {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 40%;
+      background: linear-gradient(135deg, rgba(20, 71, 52, 0.05) 0%, rgba(231, 106, 4, 0.05) 100%);
+    }
+
+    .why-choose-professional .bg-pattern {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(231, 106, 4, 0.03) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(20, 71, 52, 0.03) 0%, transparent 20%);
+    }
+
+    /* العنوان الرئيسي */
+    .section-header-professional {
+      text-align: center;
+      margin-bottom: 60px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .professional-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, #144734 0%, #1e6b4e 100%);
+      color: white;
+      padding: 8px 20px;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      margin-bottom: 20px;
+    }
+
+    .badge-icon {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    .professional-title {
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: #144734;
+      margin-bottom: 20px;
+      line-height: 1.2;
+    }
+
+    .professional-title em {
+      font-style: normal;
+      background: linear-gradient(90deg, #e76a04, #ff9a00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .professional-subtitle {
+      font-size: 1.1rem;
+      color: #666;
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* الشبكة */
+    .features-professional {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      margin-bottom: 60px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .feature-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+    }
+
+    /* البطاقات */
+    .feature-card-pro {
+      perspective: 1000px;
+      height: 100%;
+    }
+
+    .feature-card-inner {
+      position: relative;
+      background: white;
+      border-radius: 16px;
+      padding: 40px 30px;
+      height: 100%;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(20, 71, 52, 0.1);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+    }
+
+    .feature-card-inner:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(20, 71, 52, 0.15);
+      border-color: rgba(231, 106, 4, 0.2);
+    }
+
+    .feature-card-inner::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, #e76a04, #ff9a00);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s ease;
+    }
+
+    .feature-card-inner:hover::before {
+      transform: scaleX(1);
+    }
+
+    .feature-hover-effect {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(20, 71, 52, 0.03) 0%, rgba(231, 106, 4, 0.03) 100%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: 0;
+    }
+
+    .feature-card-inner:hover .feature-hover-effect {
+      opacity: 1;
+    }
+
+    /* الأيقونة */
+    .feature-icon {
+      margin-bottom: 25px;
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+
+    /* المحتوى */
+    .feature-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .feature-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #144734;
+      margin-bottom: 15px;
+      line-height: 1.3;
+      text-align: center;
+    }
+
+    .feature-desc {
+      font-size: 0.95rem;
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 25px;
+      text-align: center;
+    }
+
+    /* الإحصائيات */
+    .feature-stat {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, rgba(20, 71, 52, 0.05) 0%, rgba(231, 106, 4, 0.05) 100%);
+      border-radius: 30px;
+      border: 1px solid rgba(20, 71, 52, 0.1);
+      margin: 0 auto;
+      display: block;
+      text-align: center;
+      width: fit-content;
+    }
+
+    .stat-value {
+      font-size: 1.4rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, #e76a04, #ff9a00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: inline-block;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #144734;
+      display: inline-block;
+      margin-left: 5px;
+    }
+
+    /* شهادة الجودة */
+    .quality-certificate {
+      background: linear-gradient(135deg, #144734 0%, #1e6b4e 100%);
+      border-radius: 20px;
+      padding: 50px;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .quality-certificate::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+      z-index: 0;
+    }
+
+    .certificate-content {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .certificate-icon {
+      text-align: center;
+    }
+
+    .certificate-text h3 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 10px;
+    }
+
+    .certificate-text p {
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.9);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* SVG أيقونات */
+    .feature-icon svg {
+      stroke-width: 2;
+    }
+
+    /* تصميم متجاوب */
+    @media (max-width: 1200px) {
+      .professional-title {
+        font-size: 2.4rem;
+      }
+    }
+
+    @media (max-width: 992px) {
+      .feature-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .professional-title {
+        font-size: 2.2rem;
+      }
+      
+      .quality-certificate {
+        padding: 40px 30px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .why-choose-professional {
+        padding: 70px 0;
+      }
+      
+      .feature-row {
+        grid-template-columns: 1fr;
+      }
+      
+      .professional-title {
+        font-size: 2rem;
+      }
+      
+      .certificate-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+      }
+      
+      .feature-card-inner {
+        padding: 30px 20px;
+      }
+      
+      .feature-title {
+        font-size: 1.3rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .professional-title {
+        font-size: 1.8rem;
+      }
+      
+      .professional-subtitle {
+        font-size: 1rem;
+      }
+      
+      .certificate-text h3 {
+        font-size: 1.5rem;
+      }
+      
+      .certificate-text p {
+        font-size: 1rem;
+      }
+    }
+
     /* Animations */
     .fade-in-up {
       animation: fadeInUp 1.2s ease forwards;
@@ -1034,104 +1378,263 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
             <?php echo ($lang == 'ar') ? 'خدماتنا المتميزة' : 'Our Premium Services'; ?>
           </div>
           <h2 class="section-title"><?php echo ($lang == 'ar') ? 'مجموعة خدماتنا الشاملة' : 'Our Comprehensive Service Portfolio'; ?></h2>
-          <p class="section-subtitle"><?php echo ($lang == 'ar') ? 'نقدم مجموعة واسعة من خدمات الأمن والسلامة التي تلبي جميع متطلبات المنشآت بأنواعها' : 'We offer a wide range of safety and security services that meet all the requirements of various types of facilities'; ?></p>
+          <p class="section-subtitle">
+            <?php echo ($lang == 'ar') ? 'نلتزم بالجودة، وسرعة التوريد، وتوفير حلول متكاملة تناسب متطلبات كل مشروع' : 'We are committed to quality, fast delivery, and providing integrated solutions that meet the requirements of each project'; ?>
+          </p>
         </div>
 
         <div class="row gy-5">
-          <?php if (!empty($services)): ?>
-            <?php foreach ($services as $index => $service): ?>
-              <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="<?php echo ($index * 100); ?>">
+            <!-- كرت الخدمة 1 -->
+            <div class="col-xl-4 col-lg-6" data-aos="fade-up" data-aos-delay="100">
                 <div class="service-card">
-                  <div class="service-icon">
-                    <i class="<?php echo isset($service['icon']) ? $service['icon'] : 'bi bi-shield-check'; ?>"></i>
-                  </div>
-                  <h3><?php echo isset($service['title']) ? htmlspecialchars($service['title']) : 'Service'; ?></h3>
-                  <p><?php echo isset($service['description']) ? htmlspecialchars($service['description']) : 'Premium service description'; ?></p>
-                  
-                  <?php if (!empty($service['features'])): ?>
-                    <ul class="service-features">
-                      <?php 
-                      $features = explode(';', $service['features']);
-                      foreach ($features as $feature):
-                        if (!empty(trim($feature))): ?>
-                          <li><i class="bi bi-check-circle"></i> <?php echo htmlspecialchars(trim($feature)); ?></li>
-                        <?php endif;
-                      endforeach; ?>
-                    </ul>
-                  <?php endif; ?>
-                  
-                  <?php if (!empty($service['link'])): ?>
-                    <a href="<?php echo htmlspecialchars($service['link']); ?>" class="btn-service btn-primary-service">
-                      <i class="bi bi-arrow-right"></i>
-                      <?php echo ($lang == 'ar') ? 'المزيد من التفاصيل' : 'Learn More'; ?>
-                    </a>
-                  <?php endif; ?>
+                    <div class="service-icon">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <h3><?php echo ($lang == 'ar') ? 'توريد معدات الوقاية الشخصية (PPE)' : 'Personal Protective Equipment (PPE) Supply'; ?></h3>
+                    <p><?php echo ($lang == 'ar') ? 'توريد جميع أنواع معدات الوقاية الشخصية لحماية العاملين من المخاطر المهنية' : 'Supply of all types of personal protective equipment to protect workers from occupational hazards'; ?></p>
                 </div>
-              </div>
-            <?php endforeach; ?>
-          <?php else: ?>
-            <!-- Services Default Cards -->
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
-              <div class="service-card">
-                <div class="service-icon">
-                  <i class="bi bi-shield-check"></i>
-                </div>
-                <h3><?php echo ($lang == 'ar') ? 'استشارات الأمن والسلامة' : 'Security & Safety Consultations'; ?></h3>
-                <p><?php echo ($lang == 'ar') ? 'تقييم احتياجات الأمن والسلامة وتقديم الحلول المثلى لمنشآتك' : 'Assessment of security and safety needs and providing optimal solutions for your facilities'; ?></p>
-                <ul class="service-features">
-                  <li><i class="bi bi-check-circle"></i> <?php echo ($lang == 'ar') ? 'تحليل المخاطر' : 'Risk Analysis'; ?></li>
-                  <li><i class="bi bi-check-circle"></i> <?php echo ($lang == 'ar') ? 'تخطيط أنظمة السلامة' : 'Safety Systems Planning'; ?></li>
-                  <li><i class="bi bi-check-circle"></i> <?php echo ($lang == 'ar') ? 'تقييم الامتثال' : 'Compliance Assessment'; ?></li>
-                </ul>
-                <a href="contact.php" class="btn-service btn-primary-service">
-                  <i class="bi bi-arrow-right"></i>
-                  <?php echo ($lang == 'ar') ? 'المزيد من التفاصيل' : 'Learn More'; ?>
-                </a>
-              </div>
             </div>
-            
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
-              <div class="service-card">
-                <div class="service-icon">
-                  <i class="bi bi-tools"></i>
+
+            <!-- كرت الخدمة 2 -->
+            <div class="col-xl-4 col-lg-6" data-aos="fade-up" data-aos-delay="200">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="bi bi-fire"></i>
+                    </div>
+                    <h3><?php echo ($lang == 'ar') ? 'توريد أنظمة وأدوات مكافحة الحريق' : 'Fire Fighting Systems & Tools Supply'; ?></h3>
+                    <p><?php echo ($lang == 'ar') ? 'أنظمة الإطفاء الحديثة ومعدات مكافحة الحرائق بمختلف أنواعها' : 'Modern fire extinguishing systems and firefighting equipment of various types'; ?></p>
                 </div>
-                <h3><?php echo ($lang == 'ar') ? 'تركيب وصيانة الأنظمة' : 'System Installation & Maintenance'; ?></h3>
-                <p><?php echo ($lang == 'ar') ? 'تركيب وصيانة جميع أنظمة الأمن والسلامة بأعلى معايير الجودة' : 'Installation and maintenance of all security and safety systems with the highest quality standards'; ?></p>
-                <ul class="service-features">
-                  <li><i class="bi bi-check-circle"></i> <?php echo ($lang == 'ar') ? 'تركيب الأنظمة' : 'System Installation'; ?></li>
-                  <li><i class="bi bi-check-circle"></i> <?php echo ($lang == 'ar') ? 'الصيانة الدورية' : 'Periodic Maintenance'; ?></li>
-                  <li><i class="bi bi-check-circle"></i> <?php echo ($lang == 'ar') ? 'الإصلاح العاجل' : 'Emergency Repair'; ?></li>
-                </ul>
-                <a href="contact.php" class="btn-service btn-primary-service">
-                  <i class="bi bi-arrow-right"></i>
-                  <?php echo ($lang == 'ar') ? 'المزيد من التفاصيل' : 'Learn More'; ?>
-                </a>
-              </div>
             </div>
-            
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
-              <div class="service-card">
-                <div class="service-icon">
-                  <i class="bi bi-people"></i>
+
+            <!-- كرت الخدمة 3 -->
+            <div class="col-xl-4 col-lg-6" data-aos="fade-up" data-aos-delay="300">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="bi bi-signpost"></i>
+                    </div>
+                    <h3><?php echo ($lang == 'ar') ? 'توريد لوحات وإشارات السلامة' : 'Safety Signs & Boards Supply'; ?></h3>
+                    <p><?php echo ($lang == 'ar') ? 'لوحات تحذيرية وإرشادية معتمدة تعزز الوعي بالسلامة في المنشآت' : 'Approved warning and guidance boards that enhance safety awareness in facilities'; ?></p>
                 </div>
-                <h3><?php echo ($lang == 'ar') ? 'التدريب والتأهيل' : 'Training & Qualification'; ?></h3>
-                <p><?php echo ($lang == 'ar') ? 'برامج تدريبية متخصصة للعاملين في مجال الأمن والسلامة المهنية' : 'Specialized training programs for workers in the field of occupational safety and security'; ?></p>
-                <ul class="service-features">
-                  <li><i class="bi bi-check-circle"></i> <?php echo ($lang == 'ar') ? 'تدريب فرق الطوارئ' : 'Emergency Teams Training'; ?></li>
-                  <li><i class="bi bi-check-circle"></i> <?php echo ($lang == 'ar') ? 'برامج السلامة المهنية' : 'Occupational Safety Programs'; ?></li>
-                  <li><i class="bi bi-check-circle"></i> <?php echo ($lang == 'ar') ? 'ورش العمل التخصصية' : 'Specialized Workshops'; ?></li>
-                </ul>
-                <a href="contact.php" class="btn-service btn-primary-service">
-                  <i class="bi bi-arrow-right"></i>
-                  <?php echo ($lang == 'ar') ? 'المزيد من التفاصيل' : 'Learn More'; ?>
-                </a>
-              </div>
             </div>
-          <?php endif; ?>
+
+            <!-- كرت الخدمة 4 -->
+            <div class="col-xl-4 col-lg-6" data-aos="fade-up" data-aos-delay="400">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
+                    <h3><?php echo ($lang == 'ar') ? 'توريد معدات الطوارئ والإخلاء' : 'Emergency & Evacuation Equipment Supply'; ?></h3>
+                    <p><?php echo ($lang == 'ar') ? 'معدات متكاملة لخطط الطوارئ والإخلاء في حالات الخطر' : 'Integrated equipment for emergency and evacuation plans in hazardous situations'; ?></p>
+                </div>
+            </div>
+
+            <!-- كرت الخدمة 5 -->
+            <div class="col-xl-4 col-lg-6" data-aos="fade-up" data-aos-delay="500">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="bi bi-building-gear"></i>
+                    </div>
+                    <h3><?php echo ($lang == 'ar') ? 'توريد أدوات السلامة المهنية' : 'Professional Safety Tools Supply'; ?></h3>
+                    <p><?php echo ($lang == 'ar') ? 'أدوات ومعدات السلامة المهنية للمصانع والمشاريع الإنشائية' : 'Professional safety tools and equipment for factories and construction projects'; ?></p>
+                </div>
+            </div>
+
+            <!-- كرت الخدمة 6 -->
+            <div class="col-xl-4 col-lg-6" data-aos="fade-up" data-aos-delay="600">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="bi bi-award"></i>
+                    </div>
+                    <h3><?php echo ($lang == 'ar') ? 'مستلزمات أمن وسلامة معتمدة' : 'Certified Safety & Security Supplies'; ?></h3>
+                    <p><?php echo ($lang == 'ar') ? 'مستلزمات معتمدة محلياً ودولياً تلبي أعلى معايير الجودة' : 'Locally and internationally certified supplies meeting the highest quality standards'; ?></p>
+                </div>
+            </div>
         </div>
       </div>
     </section>
 
+    <!-- قسم "لماذا تختارنا" -->
+    <section class="why-choose-professional" id="why-choose">
+        <!-- خلفية متدرجة أنيقة -->
+        <div class="professional-bg">
+            <div class="bg-gradient"></div>
+            <div class="bg-pattern"></div>
+        </div>
+
+        <div class="container">
+            <!-- العنوان الرئيسي -->
+            <div class="section-header-professional" data-aos="fade-up">
+                <div class="professional-badge">
+                    <span class="badge-icon">✓</span>
+                    <span class="badge-text"><?php echo ($lang == 'ar') ? 'التميز في كل تفصيل' : 'Excellence in Every Detail'; ?></span>
+                </div>
+                <h2 class="professional-title">
+                    <span class="title-main"><?php echo ($lang == 'ar') ? 'لماذا نحن <em>الخيار الأول</em> للأمن والسلامة؟' : 'Why We Are The <em>First Choice</em> for Safety & Security?'; ?></span>
+                </h2>
+                <p class="professional-subtitle">
+                    <?php echo ($lang == 'ar') ? 'نحن نؤمن بأن الجودة ليست مجرد شعار، بل التزام نلتزم به في كل مشروع وكل منتج' : 'We believe that quality is not just a slogan, but a commitment we uphold in every project and product'; ?>
+                </p>
+            </div>
+
+            <!-- الميزات الرئيسية -->
+            <div class="features-professional">
+                <!-- الصف العلوي -->
+                <div class="feature-row top-row">
+                    <!-- بطاقة 1 -->
+                    <div class="feature-card-pro" data-aos="fade-right" data-aos-delay="100">
+                        <div class="feature-card-inner">
+                            <div class="feature-icon">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#e76a04" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M2 17L12 22L22 17" stroke="#e76a04" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M2 12L12 17L22 12" stroke="#e76a04" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <div class="feature-content">
+                                <h3 class="feature-title"><?php echo ($lang == 'ar') ? 'خبرة عقد من الزمان' : 'A Decade of Expertise'; ?></h3>
+                                <p class="feature-desc"><?php echo ($lang == 'ar') ? 'أكثر من 10 سنوات من الخبرة المتخصصة في مجال الأمن والسلامة' : 'Over 10 years of specialized experience in security and safety'; ?></p>
+                                <div class="feature-stat">
+                                    <span class="stat-value">10+</span>
+                                    <span class="stat-label"><?php echo ($lang == 'ar') ? 'سنوات نجاح' : 'Years of Success'; ?></span>
+                                </div>
+                            </div>
+                            <div class="feature-hover-effect"></div>
+                        </div>
+                    </div>
+
+                    <!-- بطاقة 2 -->
+                    <div class="feature-card-pro" data-aos="fade-up" data-aos-delay="200">
+                        <div class="feature-card-inner">
+                            <div class="feature-icon">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="#144734" stroke-width="2"/>
+                                    <path d="M19.4 15C19.2663 15.3031 19.133 15.6063 19 15.9094C18.4 17.2094 17.8 18.5094 17.2 19.8094C16.9895 20.294 16.495 20.6 16 20.6C15.505 20.6 15.0105 20.294 14.8 19.8094C14.2 18.5094 13.6 17.2094 13 15.9094C12.4 17.2094 11.8 18.5094 11.2 19.8094C10.9895 20.294 10.495 20.6 10 20.6C9.505 20.6 9.0105 20.294 8.8 19.8094C8.2 18.5094 7.6 17.2094 7 15.9094C6.86699 15.6063 6.73366 15.3031 6.6 15" stroke="#144734" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 2V4" stroke="#144734" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 20V22" stroke="#144734" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M4 12H2" stroke="#144734" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M22 12H20" stroke="#144734" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            <div class="feature-content">
+                                <h3 class="feature-title"><?php echo ($lang == 'ar') ? 'جودة عالمية' : 'Global Quality Standards'; ?></h3>
+                                <p class="feature-desc"><?php echo ($lang == 'ar') ? 'منتجات معتمدة محلياً ودولياً بمواصفات تضمن أعلى درجات الأمان' : 'Locally and internationally certified products with specifications ensuring highest safety levels'; ?></p>
+                                <div class="feature-stat">
+                                    <span class="stat-value">100%</span>
+                                    <span class="stat-label"><?php echo ($lang == 'ar') ? 'جودة مضمونة' : 'Quality Guaranteed'; ?></span>
+                                </div>
+                            </div>
+                            <div class="feature-hover-effect"></div>
+                        </div>
+                    </div>
+
+                    <!-- بطاقة 3 -->
+                    <div class="feature-card-pro" data-aos="fade-left" data-aos-delay="300">
+                        <div class="feature-card-inner">
+                            <div class="feature-icon">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                                    <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" stroke="#e76a04" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M9 11C11.2091 11 13 9.20914 13 7C13 4.79086 11.2091 3 9 3C6.79086 3 5 4.79086 5 7C5 9.20914 6.79086 11 9 11Z" stroke="#e76a04" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M23 21V19C22.9993 18.1137 22.7044 17.2528 22.1614 16.5523C21.6184 15.8519 20.8581 15.3516 20 15.13" stroke="#e76a04" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M16 3.13C16.8604 3.35031 17.623 3.85071 18.1676 4.55232C18.7122 5.25392 19.0078 6.11683 19.0078 7.005C19.0078 7.89318 18.7122 8.75608 18.1676 9.45769C17.623 10.1593 16.8604 10.6597 16 10.88" stroke="#e76a04" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <div class="feature-content">
+                                <h3 class="feature-title"><?php echo ($lang == 'ar') ? 'فريق احترافي' : 'Professional Team'; ?></h3>
+                                <p class="feature-desc"><?php echo ($lang == 'ar') ? 'كادر فني متخصص مدرب على أعلى المستويات للتعامل مع جميع التحديات' : 'Specialized technical staff trained to the highest levels to handle all challenges'; ?></p>
+                                <div class="feature-stat">
+                                    <span class="stat-value">50+</span>
+                                    <span class="stat-label"><?php echo ($lang == 'ar') ? 'متخصص معتمد' : 'Certified Specialists'; ?></span>
+                                </div>
+                            </div>
+                            <div class="feature-hover-effect"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- الصف السفلي -->
+                <div class="feature-row bottom-row">
+                    <!-- بطاقة 4 -->
+                    <div class="feature-card-pro" data-aos="fade-right" data-aos-delay="400">
+                        <div class="feature-card-inner">
+                            <div class="feature-icon">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#144734" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M12 6V12L16 14" stroke="#144734" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <div class="feature-content">
+                                <h3 class="feature-title"><?php echo ($lang == 'ar') ? 'دعم مستمر 24/7' : '24/7 Continuous Support'; ?></h3>
+                                <p class="feature-desc"><?php echo ($lang == 'ar') ? 'خدمات ما بعد البيع متاحة على مدار الساعة لضمان استمرارية العمل' : 'After-sales services available around the clock to ensure business continuity'; ?></p>
+                                <div class="feature-stat">
+                                    <span class="stat-value">24/7</span>
+                                    <span class="stat-label"><?php echo ($lang == 'ar') ? 'دعم فني' : 'Technical Support'; ?></span>
+                                </div>
+                            </div>
+                            <div class="feature-hover-effect"></div>
+                        </div>
+                    </div>
+
+                    <!-- بطاقة 5 -->
+                    <div class="feature-card-pro" data-aos="fade-up" data-aos-delay="500">
+                        <div class="feature-card-inner">
+                            <div class="feature-icon">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                                    <path d="M21 16V8C20.9996 7.64927 20.9071 7.30481 20.7315 7.00116C20.556 6.69751 20.3037 6.44536 20 6.27L13 2.27C12.696 2.09446 12.3511 2.00205 12 2.00205C11.6489 2.00205 11.304 2.09446 11 2.27L4 6.27C3.69626 6.44536 3.44398 6.69751 3.26846 7.00116C3.09294 7.30481 3.00036 7.64927 3 8V16C3.00036 16.3507 3.09294 16.6952 3.26846 16.9988C3.44398 17.3025 3.69626 17.5546 4 17.73L11 21.73C11.304 21.9055 11.6489 21.9979 12 21.9979C12.3511 21.9979 12.696 21.9055 13 21.73L20 17.73C20.3037 17.5546 20.556 17.3025 20.7315 16.9988C20.9071 16.6952 20.9996 16.3507 21 16Z" stroke="#e76a04" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M3.27 6.96L12 12.01L20.73 6.96" stroke="#e76a04" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M12 22.08V12" stroke="#e76a04" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <div class="feature-content">
+                                <h3 class="feature-title"><?php echo ($lang == 'ar') ? 'حلول متكاملة' : 'Integrated Solutions'; ?></h3>
+                                <p class="feature-desc"><?php echo ($lang == 'ar') ? 'خدمات شاملة من التوريد حتى الصيانة من مصدر واحد' : 'Comprehensive services from supply to maintenance from a single source'; ?></p>
+                                <div class="feature-stat">
+                                    <span class="stat-value">6</span>
+                                    <span class="stat-label"><?php echo ($lang == 'ar') ? 'خدمات رئيسية' : 'Core Services'; ?></span>
+                                </div>
+                            </div>
+                            <div class="feature-hover-effect"></div>
+                        </div>
+                    </div>
+
+                    <!-- بطاقة 6 -->
+                    <div class="feature-card-pro" data-aos="fade-left" data-aos-delay="600">
+                        <div class="feature-card-inner">
+                            <div class="feature-icon">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 1V23" stroke="#144734" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M17 5H9.5C8.57174 5 7.6815 5.36875 7.02513 6.02513C6.36875 6.6815 6 7.57174 6 8.5C6 9.42826 6.36875 10.3185 7.02513 10.9749C7.6815 11.6313 8.57174 12 9.5 12H14.5C15.4283 12 16.3185 12.3687 16.9749 13.0251C17.6313 13.6815 18 14.5717 18 15.5C18 16.4283 17.6313 17.3185 16.9749 17.9749C16.3185 18.6313 15.4283 19 14.5 19H6" stroke="#144734" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            <div class="feature-content">
+                                <h3 class="feature-title"><?php echo ($lang == 'ar') ? 'أسعار تنافسية' : 'Competitive Pricing'; ?></h3>
+                                <p class="feature-desc"><?php echo ($lang == 'ar') ? 'عروض متميزة تناسب جميع الميزانيات مع الحفاظ على أعلى معايير الجودة' : 'Premium offers suitable for all budgets while maintaining highest quality standards'; ?></p>
+                                <div class="feature-stat">
+                                    <span class="stat-value">⭐</span>
+                                    <span class="stat-label"><?php echo ($lang == 'ar') ? 'أفضل قيمة' : 'Best Value'; ?></span>
+                                </div>
+                            </div>
+                            <div class="feature-hover-effect"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- شهادة الجودة -->
+            <div class="quality-certificate" data-aos="fade-up" data-aos-delay="700">
+                <div class="certificate-content">
+                    <div class="certificate-icon">
+                        <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
+                            <path d="M9 12L11 14L15 10M12 3C13.1819 3 14.3522 3.23279 15.4442 3.68508C16.5361 4.13738 17.5282 4.80031 18.364 5.63604C19.1997 6.47177 19.8626 7.46392 20.3149 8.55585C20.7672 9.64778 21 10.8181 21 12C21 13.1819 20.7672 14.3522 20.3149 15.4442C19.8626 16.5361 19.1997 17.5282 18.364 18.364C17.5282 19.1997 16.5361 19.8626 15.4442 20.3149C14.3522 20.7672 13.1819 21 12 21C10.8181 21 9.64778 20.7672 8.55585 20.3149C7.46392 19.8626 6.47177 19.1997 5.63604 18.364C4.80031 17.5282 4.13738 16.5361 3.68508 15.4442C3.23279 14.3522 3 13.1819 3 12C3 9.61305 3.94821 7.32387 5.63604 5.63604C7.32387 3.94821 9.61305 3 12 3Z" stroke="#e76a04" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="certificate-text">
+                        <h3><?php echo ($lang == 'ar') ? 'شريكك الموثوق في الأمن والسلامة' : 'Your Trusted Safety & Security Partner'; ?></h3>
+                        <p><?php echo ($lang == 'ar') ? 'نحن لا نبيع منتجات، نقدم حلولاً واستثماراً في أمان عملك' : 'We don\'t sell products, we provide solutions and invest in the security of your business'; ?></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- Statistics Section -->
     <section class="stats-section-services">
@@ -1619,7 +2122,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
           cursor.style.top = e.clientY + 'px';
         });
 
-        document.querySelectorAll('a, button, .btn, .service-card, .stats-card-services').forEach(el => {
+        document.querySelectorAll('a, button, .btn, .service-card, .stats-card-services, .feature-card-pro').forEach(el => {
           el.addEventListener('mouseenter', () => {
             cursor.style.transform = 'scale(2)';
             cursor.style.background = 'radial-gradient(circle, rgba(231,106,4,0.5), transparent)';
@@ -1632,14 +2135,29 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       }
 
       // تأثيرات hover للبطاقات
-      const cards = document.querySelectorAll('.service-card, .stats-card-services');
+      const cards = document.querySelectorAll('.service-card, .stats-card-services, .feature-card-pro');
       cards.forEach(card => {
         card.addEventListener('mouseenter', function() {
-          this.style.transform = 'translateY(-25px) scale(1.03)';
+          if (this.classList.contains('feature-card-pro')) {
+            this.style.transform = 'scale(1.02)';
+          } else {
+            this.style.transform = 'translateY(-25px) scale(1.03)';
+          }
         });
         
         card.addEventListener('mouseleave', function() {
           this.style.transform = 'translateY(0) scale(1)';
+        });
+      });
+
+      // تأثيرات hover للبطاقات الاحترافية
+      document.querySelectorAll('.feature-card-pro').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+          this.style.transform = 'scale(1.02)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+          this.style.transform = 'scale(1)';
         });
       });
 
@@ -1714,6 +2232,28 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       }
 
       animateParticles();
+
+      // تأثيرات الظهور التدريجي للبطاقات الاحترافية
+      const observerOptions = {
+        threshold: 0.2,
+        rootMargin: '0px 0px -50px 0px'
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+          }
+        });
+      }, observerOptions);
+
+      document.querySelectorAll('.feature-card-pro').forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(card);
+      });
     });
 
     // Smooth scrolling for anchor links

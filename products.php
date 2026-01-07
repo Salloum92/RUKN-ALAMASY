@@ -64,8 +64,8 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
     :root {
       --primary-color: #e76a04;
       --primary-dark: #d45f00;
-      --secondary-color: rgb(243, 212, 23);
-      --secondary-dark: rgb(223, 192, 3);
+      --secondary-color: #e76a04;
+      --secondary-dark: #e76a04;
       --dark-color: #144734ff;
       --dark-light: rgb(30, 91, 72);
       --light-color: #f8f9fa;
@@ -74,7 +74,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       --white: #ffffff;
       --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
       --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      --gradient-primary: linear-gradient(135deg, #e76a04, #f3d417);
+      --gradient-primary: #e76a04;
       --gradient-dark: linear-gradient(135deg, #144734, #1e5b48);
     }
 
