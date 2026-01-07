@@ -101,33 +101,48 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
 
     /* Loading Animation */
     .loading-screen {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--dark-color);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 99999;
-      transition: opacity 0.5s, visibility 0.5s;
-    }
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--dark-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  transition: opacity 0.5s, visibility 0.5s;
+}
 
-    .loader {
-      width: 120px;
-      height: 120px;
-      position: relative;
-    }
+.loader {
+  width: 120px;
+  height: 120px;
+  position: relative;
+  text-align : center ;
+}
 
-    .loader-diamond {
-      width: 100%;
-      height: 100%;
-      background: var(--gradient-primary);
-      clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-      animation: loader-spin 2s infinite linear;
-      filter: drop-shadow(0 0 20px rgba(231, 106, 4, 0.5));
-    }
+.loader-diamond {
+  width: 100%;
+  height: 100%;
+  background: var(--gradient-primary);
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  animation: loader-spin 2s infinite linear;
+  filter: drop-shadow(0 0 20px rgba(231, 106, 4, 0.5));
+}
+.loader h3{
+  font-size: 1.5rem;
+  margin-top: 1rem;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #ffffff 0%, #e76a04 50%, #e76a04 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  animation: title-glow 3s infinite alternate;
+  position: relative;
+  line-height : 1.5;
+  
+}
 
     @keyframes loader-spin {
       0% { transform: rotate(0deg) scale(1); }
@@ -254,7 +269,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       font-size: 3rem;
       font-weight: 800;
       color: var(--dark-color);
-      margin-bottom: 30px;
+      margin: 30px 0;
       position: relative;
       display: inline-block;
     }
@@ -1062,7 +1077,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      background: var(--dark-light);
       transition: 0.8s;
       z-index: -1;
     }
@@ -1080,7 +1095,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       display: inline-flex;
       align-items: center;
       gap: 12px;
-      background: var(--gradient-primary);
+      background: var(--dark-light);
       color: white;
       padding: 18px 45px;
       border-radius: 60px;
@@ -1118,94 +1133,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
     }
 
 
-     .features-section {
-      padding: 120px 0;
-      background: var(--gradient-dark);
-      position: relative;
-      overflow: hidden;
-    }
-.features-section .container {
-    position: relative;
-    z-index: 2; /* لجعل المحتوى فوق الجسيمات */
-}
-    .feature-card {
-      background: rgba(255, 255, 255, 0.1);
-      padding: 50px 35px;
-      border-radius: 25px;
-      text-align: center;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-      transition: all 0.5s ease;
-      height: 100%;
-      position: relative;
-      overflow: hidden;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .feature-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 5px;
-      background: var(--gradient-primary);
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform 0.5s ease;
-    }
-
-    .feature-card:hover::before {
-      transform: scaleX(1);
-    }
-
-    .feature-card:hover {
-      transform: translateY(-25px) scale(1.03);
-      background: rgba(255, 255, 255, 0.15);
-      border-color: rgba(231, 106, 4, 0.3);
-      box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
-    }
-    .feature-card h4{
-      color : #144734ff !important;
-
-    }
-    .feature-card p{
-      color : #144734ff !important;
-      
-    }
-    .feature-icon {
-      width: 100px;
-      height: 100px;
-      background: var(--gradient-primary);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 35px;
-      font-size: 2.8rem;
-      color: white;
-      transition: all 0.5s ease;
-      box-shadow: 0 15px 35px rgba(231, 106, 4, 0.3);
-    }
-
-    .feature-card:hover .feature-icon {
-      transform: rotateY(360deg) scale(1.1);
-      box-shadow: 0 25px 50px rgba(231, 106, 4, 0.4);
-    }
-
-    .feature-card h4 {
-      font-size: 1.8rem;
-      font-weight: 800;
-      color: white;
-      margin-bottom: 20px;
-    }
-
-    .feature-card p {
-      color: rgba(255, 255, 255, 0.9);
-      line-height: 1.8;
-      font-size: 1.05rem;
-    }
-
+    
     /* CTA Section */
     .cta-section {
       padding: 120px 0;
@@ -1455,6 +1383,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
   <div class="loading-screen">
     <div class="loader">
       <div class="loader-diamond"></div>
+      <h3>ركن الأماسي</h3>
     </div>
   </div>
   
@@ -1510,7 +1439,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
                         <img src="assets/img/about/<?php echo htmlspecialchars($aboutItems['image']); ?>" 
                              alt="<?php echo ($lang == 'ar') ? 'ركن الأماسي' : 'Rukn Alamasy'; ?>" 
                              class="story-image"
-                             onerror="this.src='assets/img/6952312cc0531-1766994220.jpg'">
+                             onerror="this.src='assets/img/ph.jpg'">
                     <?php else: ?>
                         <div style="background: var(--gradient-primary); height: 100%; display: flex; align-items: center; justify-content: center; color: white;">
                             <i class="bi bi-shield-check" style="font-size: 4rem;"></i>
@@ -1723,7 +1652,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
                 </div>
                 <div class="certificate-text">
                     <h3><?php echo ($lang == 'ar') ? 'شريكك الموثوق في الأمن والسلامة' : 'Your Trusted Safety & Security Partner'; ?></h3>
-                    <p><?php echo ($lang == 'ar') ? 'نحن لا نبيع منتجات، نقدم حلولاً واستثماراً في أمان عملك' : 'We don\'t sell products, we provide solutions and invest in the security of your business'; ?></p>
+                    <p><?php echo ($lang == 'ar') ? 'نحن لا نبيع منتجات فقط ، نحن نقدم حلولاً واستثماراً في أمان عملك' : 'We don\'t sell products, we provide solutions and invest in the security of your business'; ?></p>
                 </div>
             </div>
         </div>
@@ -1958,34 +1887,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
     </section>
 
     <!-- Features Section -->
-    <?php if (!empty($features)): ?>
-    <section class="features-section" style="padding: 120px 0; background: linear-gradient(135deg, var(--light-color) 0%, #ffffff 100%);">
-      <div class="container">
-        <div class="section-header" data-aos="fade-up">
-          <div class="section-badge floating-element">
-            <i class="bi bi-stars"></i>
-            <?php echo ($lang == 'ar') ? 'لماذا تختارنا' : 'Why Choose Us'; ?>
-          </div>
-          <h2 class="section-title"><?php echo ($lang == 'ar') ? 'مميزاتنا الاستثنائية' : 'Our Exceptional Features'; ?></h2>
-          <p class="section-subtitle"><?php echo ($lang == 'ar') ? 'اكتشف ما يجعلنا مختلفين وأفضل' : 'Discover what makes us different and better'; ?></p>
-        </div>
 
-        <div class="row">
-          <?php foreach ($features as $index => $feature): ?>
-            <div class="col-xl-4 col-lg-6 mb-4" data-aos="fade-up" data-aos-delay="<?php echo $index * 100; ?>">
-              <div class="feature-card">
-                <div class="feature-icon">
-                  <i class="<?php echo htmlspecialchars($feature['icon']); ?>"></i>
-                </div>
-                <h4><?php echo htmlspecialchars($feature['title']); ?></h4>
-                <p><?php echo htmlspecialchars($feature['description']); ?></p>
-              </div>
-            </div>
-          <?php endforeach; ?>
-        </div>
-      </div>
-    </section>
-    <?php endif; ?>
 
     <!-- CTA Section -->
     <section class="cta-section">

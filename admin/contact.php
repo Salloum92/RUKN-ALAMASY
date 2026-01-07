@@ -1,5 +1,11 @@
 <?php
 include 'check.php';
+// استيراد الدوال المشتركة
+require_once '../contact_functions.php';
+
+// جلب معلومات الاتصال باستخدام الدوال المشتركة
+$contact = getContactInfo('social');
+$contact_box = getContactInfo('box');
 
 // جلب معلومات الاتصال
 $contact = $query->select('contact', "*")[0] ?? [];

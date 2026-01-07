@@ -299,7 +299,7 @@ body {
   text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   animation: title-glow 3s infinite alternate;
   position: relative;
-  line-height: 1.1;
+  line-height: 1.5;
 }
 
 @keyframes title-glow {
@@ -588,6 +588,7 @@ body {
   width: 120px;
   height: 120px;
   position: relative;
+  text-align : center ;
 }
 
 .loader-diamond {
@@ -609,6 +610,8 @@ body {
   text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   animation: title-glow 3s infinite alternate;
   position: relative;
+  line-height : 1.5;
+  
 }
 @keyframes loader-spin {
   0% {

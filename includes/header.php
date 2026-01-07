@@ -1,10 +1,18 @@
 <?php
+
+// استيراد الملفات المطلوبة
 require_once 'config.php';
+require_once 'lang.php';
+
+// استيراد ملف الدوال مع التحقق من عدم تكرار التضمين
+if (!function_exists('getContactInfo')) {
+    require_once 'contact_functions.php';
+}
 
 // استعلامات قاعدة البيانات
 $query = new Database();
-$contact_boxData = $query->select('contact_box');
-$contactData = $query->select('contact');
+$contact_boxData = getContactInfo('box');
+$contactData = getContactInfo('social');
 
 // تحديد اللغة الافتراضية
 if (!isset($_SESSION['lang'])) {
@@ -57,8 +65,102 @@ $translations = [
     ]
 ];
 
-$contact_boxData = $query->select('contact_box');
-$contactData = $query->select('contact');
+// دالة لاستخراج معلومات التواصل
+function extractContactInfo($contact_boxData, $contactData) {
+    $contact_info = [
+        'google_maps_url' => '',
+        'google_maps_label' => '',
+        'location_address' => '',
+        'phone_number' => '',
+        'email_address' => '',
+        'whatsapp_number' => '',
+        'social_media' => []
+    ];
+    
+    // البحث عن رابط خرائط جوجل
+    $google_maps_item = null;
+    foreach ($contact_boxData as $item) {
+        if (isset($item['type']) && $item['type'] === 'google_maps' && !empty($item['value'])) {
+            $google_maps_item = $item;
+            break;
+        }
+    }
+    
+    if ($google_maps_item) {
+        $contact_info['google_maps_url'] = $google_maps_item['value'];
+        $contact_info['google_maps_label'] = $google_maps_item['label'] ?? 'الموقع على خرائط جوجل';
+    }
+    
+    // البحث عن العنوان
+    foreach ($contact_boxData as $item) {
+        if (isset($item['type']) && $item['type'] === 'location' && !empty($item['value'])) {
+            $contact_info['location_address'] = $item['value'];
+            break;
+        }
+        // دعم الهياكل القديمة
+        if (isset($item['title']) && stripos($item['title'], 'موقع') !== false && !empty($item['value'])) {
+            $contact_info['location_address'] = $item['value'];
+            break;
+        }
+    }
+    
+    // إذا لم نجد رابط خرائط، استخدم العنوان لإنشاء رابط
+    if (empty($contact_info['google_maps_url']) && !empty($contact_info['location_address'])) {
+        $encoded_address = urlencode($contact_info['location_address']);
+        $contact_info['google_maps_url'] = "https://www.google.com/maps/search/?api=1&query=" . $encoded_address;
+        $contact_info['google_maps_label'] = 'الموقع على خرائط جوجل';
+    }
+    
+    // إذا لم يتم العثور على عنوان في contact_box، ابحث في جدول contact
+    if (empty($contact_info['location_address']) && isset($contactData['location'])) {
+        $contact_info['location_address'] = $contactData['location'];
+        $encoded_address = urlencode($contact_info['location_address']);
+        $contact_info['google_maps_url'] = "https://www.google.com/maps/search/?api=1&query=" . $encoded_address;
+    }
+    
+    // الحصول على معلومات الاتصال الأخرى
+    foreach ($contact_boxData as $contact) {
+        if (isset($contact['type']) && $contact['type'] === 'phone' && !empty($contact['value'])) {
+            $contact_info['phone_number'] = $contact['value'];
+        } elseif (isset($contact['title']) && stripos($contact['title'], 'هاتف') !== false && !empty($contact['value'])) {
+            $contact_info['phone_number'] = $contact['value'];
+        }
+        
+        if (isset($contact['type']) && $contact['type'] === 'email' && !empty($contact['value'])) {
+            $contact_info['email_address'] = $contact['value'];
+        } elseif (isset($contact['title']) && (stripos($contact['title'], 'بريد') !== false || stripos($contact['title'], 'email') !== false) && !empty($contact['value'])) {
+            $contact_info['email_address'] = $contact['value'];
+        }
+    }
+    
+    // إذا لم يتم العثور على البريد في contact_box، ابحث في جدول contact
+    if (empty($contact_info['email_address']) && isset($contactData['email'])) {
+        $contact_info['email_address'] = $contactData['email'];
+    }
+    
+    // تنظيف رقم الهاتف من المسافات والرموز
+    $clean_phone = preg_replace('/[^0-9]/', '', $contact_info['phone_number']);
+    
+    // الحصول على رقم الواتساب
+    if (isset($contactData['whatsapp']) && !empty($contactData['whatsapp'])) {
+        $contact_info['whatsapp_number'] = $contactData['whatsapp'];
+    } elseif (!empty($clean_phone)) {
+        $contact_info['whatsapp_number'] = $clean_phone;
+    }
+    
+    // الحصول على وسائل التواصل الاجتماعي
+    $social_fields = ['twitter', 'facebook', 'instagram', 'linkedin', 'youtube', 'whatsapp', 'telegram'];
+    foreach ($social_fields as $field) {
+        if (isset($contactData[$field]) && !empty($contactData[$field])) {
+            $contact_info['social_media'][$field] = $contactData[$field];
+        }
+    }
+    
+    return $contact_info;
+}
+
+// استخدام الدالة لاستخراج المعلومات
+$contact_info = extractContactInfo($contact_boxData, $contactData);
 
 $lang = $_SESSION['lang'];
 $t = $translations[$lang];
@@ -67,126 +169,17 @@ $current_page = basename($_SERVER['PHP_SELF']);
 $is_logged_in = isset($_SESSION['user_id']);
 $user_name = $is_logged_in ? $_SESSION['username'] : '';
 
-// الحصول على عنوان الموقع من قاعدة البيانات
-$google_maps_url = '';
-$google_maps_label = ''; 
-// البحث عن رابط خرائط جوجل من صفحة معلومات الاتصال
-$google_maps_url = '';
-$google_maps_label = '';
+// الآن يمكنك استخدام $contact_info في كل مكان
+$google_maps_url = $contact_info['google_maps_url'];
+$google_maps_label = $contact_info['google_maps_label'];
+$location_address = $contact_info['location_address'];
+$phone_number = $contact_info['phone_number'];
+$email_address = $contact_info['email_address'];
+$whatsapp_number = $contact_info['whatsapp_number'];
+$social_media = $contact_info['social_media'];
 
-// البحث في جدول contact_box برقم id محدد (افترضنا id=1 للخرائط)
-$google_maps_item = $query->select('contact_box', '*', "WHERE id = 1")[0] ?? null;
-
-if ($google_maps_item && !empty($google_maps_item['value'])) {
-    $google_maps_url = $google_maps_item['value'];
-    $google_maps_label = $google_maps_item['label'] ?? 'الموقع على خرائط جوجل';
-} else {
-    // البحث عن أي سجل يحتوي على google_maps في النوع
-    foreach ($contact_boxData as $item) {
-        if (isset($item['type']) && $item['type'] === 'google_maps' && !empty($item['value'])) {
-            $google_maps_url = $item['value'];
-            $google_maps_label = $item['label'] ?? 'الموقع على خرائط جوجل';
-            break;
-        }
-    }
-}
-
-// إذا لم نجد رابط خرائط، ابحث عن العنوان العادي
-$location_address = '';
-$has_location = false;
-
-foreach ($contact_boxData as $item) {
-    if (isset($item['type']) && $item['type'] === 'location' && !empty($item['value'])) {
-        $location_address = $item['value'];
-        $has_location = true;
-        break;
-    }
-    // دعم الهياكل القديمة
-    if (isset($item['title']) && stripos($item['title'], 'موقع') !== false && !empty($item['value'])) {
-        $location_address = $item['value'];
-        $has_location = true;
-        break;
-    }
-}
-
-// إذا لم نجد رابط خرائط، استخدم العنوان لإنشاء رابط
-if (empty($google_maps_url) && $has_location && !empty($location_address)) {
-    $encoded_address = urlencode($location_address);
-    $google_maps_url = "https://www.google.com/maps/search/?api=1&query=" . $encoded_address;
-    $google_maps_label = 'الموقع على خرائط جوجل';
-}
-
-// الحصول على معلومات الاتصال الأخرى
-$phone_number = '';
-$email_address = '';
-
-foreach ($contact_boxData as $contact) {
-    if (isset($contact['type'])) {
-        if ($contact['type'] === 'phone' && !empty($contact['value'])) {
-            $phone_number = $contact['value'];
-        } elseif ($contact['type'] === 'email' && !empty($contact['value'])) {
-            $email_address = $contact['value'];
-        }
-    }
-}
-
-foreach ($contact_boxData as $contact) {
-    if (isset($contact['type']) && $contact['type'] === 'location' && !empty($contact['value'])) {
-        $location_address = $contact['value'];
-        $encoded_address = urlencode($location_address);
-        $google_maps_url = "https://www.google.com/maps/search/?api=1&query=" . $encoded_address;
-        break;
-    }
-    // دعم أعمدة العنوان المختلفة
-    if (isset($contact['title']) && stripos($contact['title'], 'موقع') !== false && !empty($contact['value'])) {
-        $location_address = $contact['value'];
-        $encoded_address = urlencode($location_address);
-        $google_maps_url = "https://www.google.com/maps/search/?api=1&query=" . $encoded_address;
-        break;
-    }
-}
-
-// إذا لم يتم العثور على عنوان في contact_box، ابحث في جدول contact
-if (empty($location_address) && isset($contactData[0]['location'])) {
-    $location_address = $contactData[0]['location'];
-    $encoded_address = urlencode($location_address);
-    $google_maps_url = "https://www.google.com/maps/search/?api=1&query=" . $encoded_address;
-}
-
-// الحصول على معلومات الاتصال الأخرى
-$phone_number = '';
-$email_address = '';
-
-foreach ($contact_boxData as $contact) {
-    if (isset($contact['type']) && $contact['type'] === 'phone' && !empty($contact['value'])) {
-        $phone_number = $contact['value'];
-    } elseif (isset($contact['title']) && stripos($contact['title'], 'هاتف') !== false && !empty($contact['value'])) {
-        $phone_number = $contact['value'];
-    }
-    
-    if (isset($contact['type']) && $contact['type'] === 'email' && !empty($contact['value'])) {
-        $email_address = $contact['value'];
-    } elseif (isset($contact['title']) && (stripos($contact['title'], 'بريد') !== false || stripos($contact['title'], 'email') !== false) && !empty($contact['value'])) {
-        $email_address = $contact['value'];
-    }
-}
-
-// إذا لم يتم العثور على البريد في contact_box، ابحث في جدول contact
-if (empty($email_address) && isset($contactData[0]['email'])) {
-    $email_address = $contactData[0]['email'];
-}
-
-// تنظيف رقم الهاتف من المسافات والرموز
-$clean_phone = preg_replace('/[^0-9]/', '', $phone_number);
-$whatsapp_number = '';
-
-// إذا كان هناك رقم واتساب في جدول contact
-if (isset($contactData[0]['whatsapp']) && !empty($contactData[0]['whatsapp'])) {
-    $whatsapp_number = $contactData[0]['whatsapp'];
-} elseif (!empty($clean_phone)) {
-    // استخدم رقم الهاتف الأساسي للواتساب
-    $whatsapp_number = $clean_phone;
-}
+// التحقق من وجود عنوان
+$has_location = !empty($location_address);
 ?>
 
 <!DOCTYPE html>
@@ -276,17 +269,19 @@ if (isset($contactData[0]['whatsapp']) && !empty($contactData[0]['whatsapp'])) {
     }
 
     .contact-item {
-        display: flex;
+        display: flex !important;
         align-items: center;
         gap: 8px;
         color: #bdc3c7;
         font-size: 0.85rem;
         transition: var(--transition-fast);
+        cursor: pointer;
     }
 
     .contact-item i {
         color: var(--primary-color);
         font-size: 0.9rem;
+        transition: var(--transition-fast);
     }
 
     .contact-item a {
@@ -304,19 +299,16 @@ if (isset($contactData[0]['whatsapp']) && !empty($contactData[0]['whatsapp'])) {
         transform: translateY(-1px);
     }
 
+    .contact-item:hover i {
+        transform: scale(1.1);
+    }
+
     /* تنسيق خاص لرابط الموقع */
     .location-contact-item {
         cursor: pointer;
     }
 
-    .location-contact-item:hover {
-        color: var(--primary-color);
-    }
-
-    .location-contact-item:hover i {
-        transform: scale(1.1);
-    }
-
+    /* Social Links */
     .social-links {
         display: flex;
         gap: 12px;
@@ -1023,11 +1015,14 @@ if (isset($contactData[0]['whatsapp']) && !empty($contactData[0]['whatsapp'])) {
         gap: 10px;
         color: white;
         font-size: 0.85rem;
+        cursor: pointer;
+        transition: var(--transition-fast);
     }
 
     .mobile-contact-item i {
         color: var(--primary-color);
         width: 16px;
+        transition: var(--transition-fast);
     }
 
     .mobile-contact-item a {
@@ -1040,17 +1035,17 @@ if (isset($contactData[0]['whatsapp']) && !empty($contactData[0]['whatsapp'])) {
         color: var(--primary-color);
     }
 
-    .mobile-contact-item span {
-        color: white;
+    .mobile-contact-item:hover {
+        color: var(--primary-color);
     }
 
+    .mobile-contact-item:hover i {
+        transform: scale(1.1);
+    }
+   
     /* تنسيق خاص لرابط الموقع في الموبايل */
     .mobile-location-item {
         cursor: pointer;
-    }
-
-    .mobile-location-item:hover {
-        color: var(--primary-color);
     }
 
     .mobile-location-item:hover i {
@@ -1138,6 +1133,36 @@ if (isset($contactData[0]['whatsapp']) && !empty($contactData[0]['whatsapp'])) {
         transform: scale(1.1);
         box-shadow: 0 6px 25px rgba(37, 211, 102, 0.6);
         animation: none;
+    }
+     /* Scroll to Top */
+    .scroll-top {
+      position: fixed;
+      bottom: 40px;
+      left: 40px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      color: white;
+      text-decoration: none;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      box-shadow: 0 15px 40px rgba(231, 106, 4, 0.4);
+      z-index: 999;
+      transition: all 0.4s ease;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .scroll-top:hover {
+      transform: translateY(-5px) scale(1.1);
+      box-shadow: 0 25px 50px rgba(231, 106, 4, 0.6);
     }
 
     .scroll-to-top {
@@ -1338,8 +1363,8 @@ if (isset($contactData[0]['whatsapp']) && !empty($contactData[0]['whatsapp'])) {
         }
 
         .logo-image img {
-            width: 35px;
-            height: 35px;
+            width: 25px !important;
+            height: 25px !important;
         }
 
         .brand-name {
@@ -1490,34 +1515,39 @@ if (isset($contactData[0]['whatsapp']) && !empty($contactData[0]['whatsapp'])) {
 
                 <!-- Social Links -->
                 <div class="social-links">
-                    <?php if (isset($contactData[0]['twitter']) && !empty($contactData[0]['twitter'])): ?>
-                        <a href="https://x.com/<?= $contactData[0]['twitter'] ?>" class="social-link twitter" target="_blank" title="Twitter">
+                    <?php if (isset($contactData['twitter']) && !empty($contactData['twitter'])): ?>
+                        <a href="https://x.com/<?= $contactData['twitter'] ?>" class="social-link twitter" target="_blank" title="Twitter">
                             <i class="bi bi-twitter-x"></i>
                         </a>
                     <?php endif; ?>
-                    <?php if (isset($contactData[0]['facebook']) && !empty($contactData[0]['facebook'])): ?>
-                        <a href="https://facebook.com/<?= $contactData[0]['facebook'] ?>" class="social-link facebook" target="_blank" title="Facebook">
+                    <?php if (isset($contactData['facebook']) && !empty($contactData['facebook'])): ?>
+                        <a href="https://facebook.com/<?= $contactData['facebook'] ?>" class="social-link facebook" target="_blank" title="Facebook">
                             <i class="bi bi-facebook"></i>
                         </a>
                     <?php endif; ?>
-                    <?php if (isset($contactData[0]['instagram']) && !empty($contactData[0]['instagram'])): ?>
-                        <a href="https://instagram.com/<?= $contactData[0]['instagram'] ?>" class="social-link instagram" target="_blank" title="Instagram">
+                    <?php if (isset($contactData['instagram']) && !empty($contactData['instagram'])): ?>
+                        <a href="https://instagram.com/<?= $contactData['instagram'] ?>" class="social-link instagram" target="_blank" title="Instagram">
                             <i class="bi bi-instagram"></i>
                         </a>
                     <?php endif; ?>
-                    <?php if (isset($contactData[0]['linkedin']) && !empty($contactData[0]['linkedin'])): ?>
-                        <a href="https://linkedin.com/in/<?= $contactData[0]['linkedin'] ?>" class="social-link linkedin" target="_blank" title="LinkedIn">
+                    <?php if (isset($contactData['linkedin']) && !empty($contactData['linkedin'])): ?>
+                        <a href="https://linkedin.com/in/<?= $contactData['linkedin'] ?>" class="social-link linkedin" target="_blank" title="LinkedIn">
                             <i class="bi bi-linkedin"></i>
                         </a>
                     <?php endif; ?>
-                    <?php if (isset($contactData[0]['youtube']) && !empty($contactData[0]['youtube'])): ?>
-                        <a href="https://www.youtube.com/<?= $contactData[0]['youtube'] ?>" class="social-link youtube" target="_blank" title="YouTube">
+                    <?php if (isset($contactData['youtube']) && !empty($contactData['youtube'])): ?>
+                        <a href="https://www.youtube.com/<?= $contactData['youtube'] ?>" class="social-link youtube" target="_blank" title="YouTube">
                             <i class="bi bi-youtube"></i>
                         </a>
                     <?php endif; ?>
-                    <?php if (isset($contactData[0]['whatsapp']) && !empty($contactData[0]['whatsapp'])): ?>
-                        <a href="https://wa.me/<?= $contactData[0]['whatsapp'] ?>" class="social-link whatsapp" target="_blank" title="WhatsApp">
+                    <?php if (isset($contactData['whatsapp']) && !empty($contactData['whatsapp'])): ?>
+                        <a href="<?= $contactData['whatsapp'] ?>" class="social-link whatsapp" target="_blank" title="WhatsApp">
                             <i class="bi bi-whatsapp"></i>
+                        </a>
+                    <?php endif; ?>
+                    <?php if (isset($contactData['telegram']) && !empty($contactData['telegram'])): ?>
+                        <a href="https://t.me/<?= $contactData['telegram'] ?>" class="social-link telegram" target="_blank" title="Telegram">
+                            <i class="bi bi-telegram"></i>
                         </a>
                     <?php endif; ?>
                 </div>
@@ -1722,10 +1752,15 @@ if (isset($contactData[0]['whatsapp']) && !empty($contactData[0]['whatsapp'])) {
             <!-- Mobile Contact Info -->
             <div class="mobile-contact-section">
                 <div class="mobile-contact-info">
-                    <?php if (!empty($location_address) && $google_maps_url !== '#'): ?>
-                    <div class="mobile-contact-item mobile-location-item" onclick="window.open('<?= $google_maps_url ?>', '_blank')" title="عرض الموقع على خرائط جوجل">
-                        <i class="bi bi-geo-alt"></i>
-                        <span><?= htmlspecialchars($location_address) ?></span>
+                    <?php if (!empty($google_maps_url)): ?>
+                    <div class="mobile-contact-item google-maps-icon" onclick="window.open('<?= htmlspecialchars($google_maps_url) ?>', '_blank')" title="<?= htmlspecialchars($google_maps_label) ?>">
+                        <i class="bi bi-geo-alt-fill"></i>
+                        <span>RIYAD</span>
+                    </div>
+                    <?php elseif ($has_location): ?>
+                    <div class="mobile-contact-item google-maps-icon" onclick="window.open('https://www.google.com/maps/search/?api=1&query=<?= urlencode($location_address) ?>', '_blank')" title="عرض الموقع على خرائط جوجل">
+                        <i class="bi bi-geo-alt-fill"></i>
+                        <span>خرائط جوجل</span>
                     </div>
                     <?php else: ?>
                     <div class="mobile-contact-item">
@@ -1797,26 +1832,28 @@ if (isset($contactData[0]['whatsapp']) && !empty($contactData[0]['whatsapp'])) {
 <!-- Floating WhatsApp Button -->
 <?php if (!empty($whatsapp_number)): ?>
 <div class="floating-whatsapp">
-    <a href="https://wa.me/<?= $whatsapp_number ?>" target="_blank" class="whatsapp-float">
+    
+     <a href="<?= $contactData['whatsapp'] ?>" class="whatsapp-float" target="_blank" title="WhatsApp">
         <i class="bi bi-whatsapp"></i>
     </a>
 </div>
 <?php endif; ?>
 
-
+     <a href="#" class="scroll-top" id="scroll-top">
+    <i class="bi bi-arrow-up"></i>
+  </a> 
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const header = document.querySelector('.header');
+    const mainNav = document.querySelector('.main-nav');
     const mobileMenu = document.querySelector('.mobile-menu');
     const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
     const mobileMenuClose = document.querySelector('.mobile-menu-close');
-    const mobileSearchToggle = document.querySelector('.mobile-search-toggle');
-    const mobileSearchModal = document.querySelector('.mobile-search-modal');
-    const closeSearchModal = document.querySelector('.close-search-modal');
     const scrollTopBtn = document.querySelector('.scroll-top-btn');
     const mobileOverlay = document.querySelector('.mobile-overlay');
-    const locationItems = document.querySelectorAll('.location-contact-item, .mobile-location-item');
+    const googleMapsIcons = document.querySelectorAll('.google-maps-icon');
+    const contactItems = document.querySelectorAll('.contact-item, .mobile-contact-item');
 
     // دالة فتح/إغلاق القائمة الجانبية
     function toggleMobileMenu() {
@@ -1864,8 +1901,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // إضافة تأثير hover للأيقونة
-    locationItems.forEach(item => {
+    // إضافة تأثير hover لعناصر الاتصال
+    contactItems.forEach(item => {
         const icon = item.querySelector('i');
         if (icon) {
             item.addEventListener('mouseenter', function() {
@@ -1877,9 +1914,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Scroll to top functionality
+    // Fixed navigation on scroll
     window.addEventListener('scroll', function() {
-        const mainNav = document.querySelector('.main-nav');
         if (window.scrollY > 300) {
             mainNav.classList.add('scrolled');
             scrollTopBtn.classList.add('show');
@@ -1889,6 +1925,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Scroll to top functionality
     if (scrollTopBtn) {
         scrollTopBtn.addEventListener('click', function() {
             window.scrollTo({

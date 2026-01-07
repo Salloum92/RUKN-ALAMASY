@@ -1,5 +1,4 @@
 <?php
-// بدء الجلسة
 session_start();
 if (isset($_GET['lang'])) {
     $_SESSION['lang'] = ($_GET['lang'] == 'en') ? 'en' : 'ar';
@@ -8,12 +7,17 @@ if (isset($_GET['lang'])) {
     exit();
 }
 
+// استيراد الملفات المشتركة
 include 'config.php';
+if (!function_exists('getContactInfo')) {
+    include_once 'contact_functions.php';
+}
+
 require_once 'lang.php';
 
-$query = new Database();
-$contact_boxData = $query->select('contact_box');
-$contactData = $query->select('contact');
+// جلب البيانات باستخدام الدوال المشتركة
+$contact_boxData = getContactInfo('box');
+$contactData = getContactInfo('social');
 
 $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
 ?>
@@ -33,7 +37,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
   <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
   
-  <!-- مكتبات لإضافة الجاذبية -->
+  <!-- مكتبات CSS -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
@@ -50,12 +54,10 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
   <link href="assets/css/main.css" rel="stylesheet">
   
   <style>
-    /* نفس الـ CSS من صفحة About مع تعديلات لصفحة الاتصال */
-     :root {
+    :root {
       --primary-color: #e76a04;
       --primary-dark: #d45f00;
       --secondary-color: #e76a04;
-      --secondary-dark: #e76a04;
       --dark-color: #144734ff;
       --dark-light: rgb(30, 91, 72);
       --light-color: #f8f9fa;
@@ -64,7 +66,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       --white: #ffffff;
       --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
       --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      --gradient-primary: #e76a04;
+      --gradient-primary: linear-gradient(135deg, #e76a04, #f3d417);
       --gradient-dark: linear-gradient(135deg, #144734, #1e5b48);
     }
 
@@ -80,75 +82,10 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       background: #fefefe;
     }
 
-    /* Loading Animation */
-    .loading-screen {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--dark-color);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 99999;
-      transition: opacity 0.5s, visibility 0.5s;
-    }
-
-    .loader {
-      width: 120px;
-      height: 120px;
-      position: relative;
-    }
-
-    .loader-diamond {
-      width: 100%;
-      height: 100%;
-      background: var(--gradient-primary);
-      clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-      animation: loader-spin 2s infinite linear;
-      filter: drop-shadow(0 0 20px rgba(231, 106, 4, 0.5));
-    }
-
-    @keyframes loader-spin {
-      0% { transform: rotate(0deg) scale(1); }
-      50% { transform: rotate(180deg) scale(1.2); }
-      100% { transform: rotate(360deg) scale(1); }
-    }
-
-    /* Floating Particles Background */
-    .floating-particles {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-      pointer-events: none;
-    }
-
-    .particle {
-      position: absolute;
-      border-radius: 50%;
-      background: var(--gradient-primary);
-      animation: float 6s infinite ease-in-out;
-    }
-
-    @keyframes float {
-      0%, 100% {
-        transform: translateY(0) rotate(0deg);
-        filter: blur(0);
-      }
-      50% {
-        transform: translateY(-40px) rotate(180deg);
-        filter: blur(2px);
-      }
-    }
-
     /* Hero Section */
     .contact-hero-section {
-      height: 40vh;
-      min-height: 300px;
+      height: 50vh;
+      min-height: 400px;
       position: relative;
       overflow: hidden;
       background: var(--gradient-dark);
@@ -170,7 +107,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       text-align: center;
       color: var(--white);
       padding: 0 20px;
-      margin-top : 3.5rem;
+      margin-top: 8rem;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -178,7 +115,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
     }
 
     .contact-hero-title {
-      font-size: 4rem;
+      font-size: 3.5rem;
       font-weight: 900;
       margin-bottom: 25px;
       text-transform: uppercase;
@@ -191,16 +128,12 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
     }
 
     @keyframes titleGlow {
-      0% {
-        filter: drop-shadow(2px 2px 8px rgba(0, 0, 0, 0.3));
-      }
-      100% {
-        filter: drop-shadow(0 0 20px rgba(231, 106, 4, 0.5));
-      }
+      0% { filter: drop-shadow(2px 2px 8px rgba(0, 0, 0, 0.3)); }
+      100% { filter: drop-shadow(0 0 20px rgba(231, 106, 4, 0.5)); }
     }
 
     .contact-hero-subtitle {
-      font-size: 1.5rem;
+      font-size: 1.3rem;
       margin-bottom: 40px;
       max-width: 800px;
       margin-left: auto;
@@ -209,14 +142,21 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       line-height: 1.8;
     }
 
-    /* Contact Info Section - تصميم احترافي */
+    /* Contact Info Section */
     .contact-info-section {
-      padding: 120px 0;
+      padding: 100px 0;
       background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
       position: relative;
       overflow: hidden;
     }
-
+    .row-info{
+    
+    display: grid;
+    flex-wrap: wrap;
+    margin-top: calc(-1 * var(--bs-gutter-y));
+    margin-right: calc(-.5 * var(--bs-gutter-x));
+    margin-left: calc(-.5 * var(--bs-gutter-x));
+    }
     #particles-js-contact-info {
       position: absolute;
       width: 100%;
@@ -235,7 +175,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
     .contact-card-pro {
       background: var(--white);
       border-radius: 25px;
-      padding: 60px 40px;
+      padding: 40px 30px;
       box-shadow: 0 30px 80px rgba(0, 0, 0, 0.12);
       transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       height: 100%;
@@ -244,6 +184,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       border: 2px solid transparent;
       backdrop-filter: blur(10px);
       background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(248, 249, 250, 0.95));
+      margin-bottom: 30px;
     }
 
     .contact-card-pro::before {
@@ -259,37 +200,20 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       transition: transform 0.6s ease;
     }
 
-    .contact-card-pro::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--gradient-primary);
-      opacity: 0;
-      transition: opacity 0.6s ease;
-      z-index: -1;
-    }
-
     .contact-card-pro:hover::before {
       transform: scaleX(1);
     }
 
-    .contact-card-pro:hover::after {
-      opacity: 0.05;
-    }
-
     .contact-card-pro:hover {
-      transform: translateY(-30px) scale(1.05);
+      transform: translateY(-15px) scale(1.03);
       box-shadow: 0 50px 100px rgba(231, 106, 4, 0.15);
       border-color: rgba(231, 106, 4, 0.2);
     }
 
     .contact-icon-pro {
-      width: 120px;
-      height: 120px;
-      margin: 0 auto 40px;
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 30px;
       position: relative;
       display: flex;
       align-items: center;
@@ -301,25 +225,21 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
     }
 
     .contact-card-pro:hover .contact-icon-pro {
-      transform: rotateY(360deg) scale(1.15);
+      transform: rotateY(360deg) scale(1.1);
       box-shadow: 0 30px 70px rgba(231, 106, 4, 0.4);
     }
 
     .contact-icon-pro i {
-      font-size: 3.2rem;
+      font-size: 2.5rem;
       color: white;
       transition: all 0.6s ease;
     }
 
-    .contact-card-pro:hover .contact-icon-pro i {
-      transform: scale(1.2);
-    }
-
     .contact-card-pro h3 {
-      font-size: 2rem;
+      font-size: 1.5rem;
       font-weight: 800;
       color: var(--dark-color);
-      margin-bottom: 25px;
+      margin-bottom: 20px;
       text-align: center;
       transition: color 0.3s ease;
       position: relative;
@@ -343,22 +263,18 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       width: 100px;
     }
 
-    .contact-card-pro:hover h3 {
-      color: var(--primary-color);
-    }
-
     .contact-card-pro .contact-value {
       color: var(--text-dark);
-      font-size: 1.3rem;
+      font-size: 1.1rem;
       line-height: 1.8;
       text-align: center;
       font-weight: 500;
-      margin-bottom: 30px;
+      margin-bottom: 25px;
       transition: color 0.3s ease;
-    }
-
-    .contact-card-pro:hover .contact-value {
-      color: var(--text-light);
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .contact-action-btn {
@@ -368,14 +284,14 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       gap: 10px;
       background: var(--gradient-primary);
       color: var(--white);
-      padding: 15px 35px;
+      padding: 12px 25px;
       border-radius: 50px;
       text-decoration: none;
       font-weight: 700;
       transition: all 0.4s ease;
       border: 2px solid transparent;
-      font-size: 1.1rem;
-      margin-top: 20px;
+      font-size: 1rem;
+      margin-top: 10px;
       position: relative;
       overflow: hidden;
       z-index: 1;
@@ -398,14 +314,14 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
     }
 
     .contact-action-btn:hover {
-      transform: translateY(-5px);
+      transform: translateY(-3px);
       box-shadow: 0 15px 35px rgba(231, 106, 4, 0.3);
       border-color: var(--white);
     }
 
-    /* Social Media Section - تصميم احترافي */
+    /* Social Media Section */
     .social-media-section {
-      padding: 100px 0;
+      padding: 80px 0;
       background: var(--gradient-dark);
       position: relative;
       overflow: hidden;
@@ -423,8 +339,8 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
 
     .social-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 25px;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 20px;
       max-width: 900px;
       margin: 0 auto;
     }
@@ -432,61 +348,49 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
     .social-card {
       background: rgba(255, 255, 255, 0.1);
       border-radius: 20px;
-      padding: 40px 20px;
+      padding: 30px 15px;
       text-align: center;
       transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       border: 2px solid transparent;
       backdrop-filter: blur(10px);
       position: relative;
       overflow: hidden;
-    }
-
-    .social-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--gradient-primary);
-      opacity: 0;
-      transition: opacity 0.5s ease;
-      z-index: -1;
-    }
-
-    .social-card:hover::before {
-      opacity: 0.1;
+      text-decoration: none;
+      color: inherit;
+      display: block;
     }
 
     .social-card:hover {
-      transform: translateY(-20px) scale(1.1);
+      transform: translateY(-10px) scale(1.05);
       border-color: rgba(255, 255, 255, 0.3);
       box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+      text-decoration: none;
+      color: inherit;
     }
 
     .social-icon {
-      width: 80px;
-      height: 80px;
+      width: 70px;
+      height: 70px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 25px;
+      margin: 0 auto 20px;
       background: var(--gradient-primary);
       color: white;
-      font-size: 2.2rem;
+      font-size: 2rem;
       transition: all 0.5s ease;
       box-shadow: 0 15px 35px rgba(231, 106, 4, 0.3);
     }
 
     .social-card:hover .social-icon {
-      transform: rotateY(360deg) scale(1.2);
+      transform: rotateY(360deg) scale(1.1);
       box-shadow: 0 25px 50px rgba(231, 106, 4, 0.4);
     }
 
     .social-card h4 {
       color: white;
-      font-size: 1.3rem;
+      font-size: 1.1rem;
       font-weight: 700;
       margin-bottom: 10px;
       transition: color 0.3s ease;
@@ -500,13 +404,13 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
 
     /* Map Section */
     .map-section {
-      padding: 100px 0;
+      padding: 80px 0;
       background: linear-gradient(135deg, var(--light-color) 0%, #ffffff 100%);
       position: relative;
     }
 
     .map-container-pro {
-      border-radius: 30px;
+      border-radius: 20px;
       overflow: hidden;
       box-shadow: 0 40px 80px rgba(0, 0, 0, 0.15);
       transition: all 0.6s ease;
@@ -515,38 +419,21 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       position: relative;
     }
 
-    .map-container-pro::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      border: 3px solid transparent;
-      border-radius: 30px;
-      background: var(--gradient-primary);
-      background-clip: padding-box;
-      -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      pointer-events: none;
-    }
-
     .map-container-pro:hover {
-      transform: translateY(-20px);
+      transform: translateY(-10px);
       box-shadow: 0 60px 120px rgba(0, 0, 0, 0.2);
     }
 
     .map-container-pro iframe {
       width: 100%;
-      height: 500px;
+      height: 400px;
       border: none;
       display: block;
     }
 
     /* Working Hours Section */
     .hours-section {
-      padding: 100px 0;
+      padding: 80px 0;
       background: var(--gradient-dark);
       position: relative;
       overflow: hidden;
@@ -555,7 +442,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
     .hours-card {
       background: rgba(255, 255, 255, 0.1);
       border-radius: 25px;
-      padding: 60px 50px;
+      padding: 40px 30px;
       text-align: center;
       transition: all 0.5s ease;
       border: 2px solid rgba(255, 255, 255, 0.1);
@@ -565,7 +452,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
     }
 
     .hours-card:hover {
-      transform: translateY(-20px);
+      transform: translateY(-10px);
       border-color: rgba(231, 106, 4, 0.3);
       box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
     }
@@ -573,14 +460,14 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
     .hours-list {
       list-style: none;
       padding: 0;
-      margin: 40px 0 0 0;
+      margin: 30px 0 0 0;
     }
 
     .hours-list li {
-      padding: 20px 0;
+      padding: 15px 0;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       color: white;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -595,14 +482,14 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
     }
 
     .hours-list li span:last-child {
-      color: var(--secondary-color);
+      color: var(--primary-color);
       font-weight: 700;
     }
 
     /* Section Header */
     .section-header {
       text-align: center;
-      margin-bottom: 80px;
+      margin-bottom: 60px;
       position: relative;
     }
 
@@ -612,11 +499,11 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       gap: 12px;
       background: var(--gradient-primary);
       color: white;
-      padding: 12px 30px;
+      padding: 10px 25px;
       border-radius: 60px;
-      font-size: 1rem;
+      font-size: 0.9rem;
       font-weight: 700;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
       box-shadow: var(--shadow);
       position: relative;
       overflow: hidden;
@@ -624,28 +511,11 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       letter-spacing: 1px;
     }
 
-    .section-badge::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      transform: rotate(45deg);
-      animation: shine 3s infinite linear;
-    }
-
-    @keyframes shine {
-      0% { transform: translateX(-100%) rotate(45deg); }
-      100% { transform: translateX(100%) rotate(45deg); }
-    }
-
     .section-title {
-      font-size: 3.5rem;
+      font-size: 2.5rem;
       font-weight: 900;
       color: var(--dark-color);
-      margin-bottom: 25px;
+      margin-bottom: 20px;
       position: relative;
       display: inline-block;
       text-transform: uppercase;
@@ -659,50 +529,40 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
     .section-title::after {
       content: '';
       position: absolute;
-      bottom: -20px;
+      bottom: -15px;
       left: 50%;
       transform: translateX(-50%);
-      width: 150px;
-      height: 6px;
+      width: 100px;
+      height: 4px;
       background: var(--gradient-primary);
       border-radius: 5px;
       animation: lineWidth 3s infinite alternate;
     }
 
     @keyframes lineWidth {
-      0% { width: 100px; }
-      100% { width: 200px; }
+      0% { width: 80px; }
+      100% { width: 150px; }
     }
 
     .section-subtitle {
-      font-size: 1.3rem;
+      font-size: 1.1rem;
       color: var(--text-light);
       max-width: 800px;
       margin: 0 auto;
-      line-height: 1.9;
+      line-height: 1.7;
     }
 
     .section-subtitle-white {
       color: rgba(255, 255, 255, 0.9) !important;
     }
 
-    /* Floating Elements */
-    .floating-element {
-      animation: floatAnimation 3s ease-in-out infinite;
-    }
-
-    @keyframes floatAnimation {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-25px) rotate(5deg); }
-    }
-
     /* Scroll to Top */
     .scroll-top {
       position: fixed;
-      bottom: 40px;
-      right: 40px;
-      width: 60px;
-      height: 60px;
+      bottom: 30px;
+      right: 30px;
+      width: 50px;
+      height: 50px;
       border-radius: 50%;
       background: var(--gradient-primary);
       color: white;
@@ -710,8 +570,8 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       display: none;
       align-items: center;
       justify-content: center;
-      font-size: 1.8rem;
-      box-shadow: 0 15px 40px rgba(231, 106, 4, 0.4);
+      font-size: 1.5rem;
+      box-shadow: 0 10px 30px rgba(231, 106, 4, 0.4);
       z-index: 999;
       transition: all 0.4s ease;
       animation: bounce 2s infinite;
@@ -719,88 +579,37 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
 
     @keyframes bounce {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
+      50% { transform: translateY(-5px); }
     }
 
     .scroll-top:hover {
-      transform: translateY(-5px) scale(1.1);
-      box-shadow: 0 25px 50px rgba(231, 106, 4, 0.6);
-    }
-
-    /* Animations */
-    .fade-in-up {
-      animation: fadeInUp 1.2s ease forwards;
-    }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(50px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* Cursor Effect */
-    .cursor-effect {
-      position: fixed;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      background: radial-gradient(circle, var(--primary-color), transparent);
-      pointer-events: none;
-      z-index: 9999;
-      mix-blend-mode: screen;
-      transition: transform 0.2s ease;
+      transform: translateY(-3px) scale(1.1);
+      box-shadow: 0 20px 40px rgba(231, 106, 4, 0.6);
     }
 
     /* Responsive Design */
     @media (max-width: 1200px) {
       .contact-hero-title {
-        font-size: 3.2rem;
-      }
-      
-      .section-title {
         font-size: 3rem;
       }
       
-      .contact-card-pro {
-        padding: 50px 30px;
+      .section-title {
+        font-size: 2.2rem;
       }
       
-      .contact-icon-pro {
-        width: 100px;
-        height: 100px;
+      .contact-card-pro {
+        padding: 35px 25px;
       }
     }
 
     @media (max-width: 992px) {
+      .contact-hero-section {
+        height: 40vh;
+        min-height: 350px;
+      }
+      
       .contact-hero-title {
-        font-size: 2.8rem;
-      }
-      
-      .contact-hero-subtitle {
-        font-size: 1.3rem;
-      }
-      
-      .section-title {
         font-size: 2.5rem;
-      }
-      
-      .contact-card-pro {
-        margin-bottom: 30px;
-      }
-      
-      .social-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    @media (max-width: 768px) {
-      .contact-hero-title {
-        font-size: 2.2rem;
       }
       
       .contact-hero-subtitle {
@@ -811,24 +620,64 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
         font-size: 2rem;
       }
       
-      .section-subtitle {
-        font-size: 1.1rem;
-      }
-      
-      .contact-card-pro {
-        padding: 40px 25px;
-      }
-      
-      .contact-card-pro h3 {
-        font-size: 1.7rem;
-      }
-      
-      .contact-card-pro .contact-value {
-        font-size: 1.1rem;
+      .social-grid {
+        grid-template-columns: repeat(3, 1fr);
       }
       
       .map-container-pro iframe {
-        height: 400px;
+        height: 350px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .contact-hero-section {
+        height: 35vh;
+        min-height: 300px;
+      }
+      
+      .contact-hero-title {
+        font-size: 2rem;
+      }
+      
+      .contact-hero-content {
+        margin-top: 6rem;
+      }
+      
+      .section-title {
+        font-size: 1.8rem;
+      }
+      
+      .section-subtitle {
+        font-size: 1rem;
+      }
+      
+      .contact-card-pro {
+        padding: 30px 20px;
+      }
+      
+      .contact-icon-pro {
+        width: 70px;
+        height: 70px;
+      }
+      
+      .contact-icon-pro i {
+        font-size: 2rem;
+      }
+      
+      .social-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .map-container-pro iframe {
+        height: 300px;
+      }
+      
+      .hours-card {
+        padding: 30px 20px;
+      }
+      
+      .hours-list li {
+        font-size: 1rem;
       }
     }
 
@@ -839,25 +688,20 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       }
       
       .contact-hero-title {
-        font-size: 1.8rem;
+        font-size: 1.6rem;
       }
       
-      .section-title {
-        font-size: 1.8rem;
-      }
-      
-      .section-badge {
-        padding: 10px 20px;
+      .contact-hero-subtitle {
         font-size: 0.9rem;
       }
       
-      .contact-icon-pro {
-        width: 80px;
-        height: 80px;
+      .section-title {
+        font-size: 1.5rem;
       }
       
-      .contact-icon-pro i {
-        font-size: 2.5rem;
+      .section-badge {
+        padding: 8px 20px;
+        font-size: 0.8rem;
       }
       
       .social-grid {
@@ -865,62 +709,64 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       }
       
       .map-container-pro iframe {
-        height: 350px;
-      }
-      
-      .hours-card {
-        padding: 40px 30px;
+        height: 250px;
       }
       
       .hours-list li {
-        font-size: 1rem;
         flex-direction: column;
-        gap: 10px;
         text-align: center;
+        gap: 5px;
       }
     }
 
-    /* Canvas styles */
-    #particles-js-contact canvas,
-    #particles-js-contact-info canvas,
-    #particles-js-social canvas {
-      display: block;
-      vertical-align: bottom;
-      transform: translate3d(0, 0, 0);
+    /* إصلاحات إضافية */
+    .no-data {
+      text-align: center;
+      padding: 50px 20px;
+      color: var(--text-light);
+      font-size: 1.1rem;
+    }
+
+    .contact-value a {
+      color: inherit;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .contact-value a:hover {
+      color: var(--primary-color);
+      text-decoration: underline;
+    }
+
+    /* Animations */
+    .fade-in-up {
+      animation: fadeInUp 1s ease forwards;
+      opacity: 0;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
   </style>
 </head>
 
 <body class="contact-page">
-  <!-- Loading Screen -->
-  <div class="loading-screen">
-    <div class="loader">
-      <div class="loader-diamond"></div>
-    </div>
-  </div>
   
-  <!-- Floating Particles Background -->
-  <div class="floating-particles">
-    <div class="particle"></div>
-    <div class="particle"></div>
-    <div class="particle"></div>
-    <div class="particle"></div>
-    <div class="particle"></div>
-  </div>
-
-  <!-- تأثيرات المؤشر -->
-  <div class="cursor-effect"></div>
-
-  <!-- تأثيرات الجسيمات للهيرو -->
-  <div id="particles-js-contact"></div>
-
   <?php include 'includes/header.php'; ?>
 
   <main class="main">
     <!-- Hero Section -->
     <section class="contact-hero-section">
+      <div id="particles-js-contact"></div>
       <div class="container">
-        <div class="contact-hero-content fade-in-up">
+        <div class="contact-hero-content">
           <h1 class="contact-hero-title animate__animated animate__fadeInDown"><?php echo ($lang == 'ar') ? 'اتصل بنا' : 'Contact Us'; ?></h1>
           <p class="contact-hero-subtitle animate__animated animate__fadeInUp animate__delay-1s">
             <?php echo ($lang == 'ar') ? 'تواصل مع فريق ركن الأماسي المتخصص للحصول على أفضل حلول الأمن والسلامة' : 'Contact the specialized Rukn Alamasy team for the best security and safety solutions'; ?>
@@ -929,13 +775,13 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       </div>
     </section>
 
-    <!-- Contact Info Section - تصميم احترافي -->
+    <!-- Contact Info Section -->
     <section class="contact-info-section">
       <div id="particles-js-contact-info"></div>
       
       <div class="container contact-grid-container">
         <div class="section-header" data-aos="fade-up">
-          <div class="section-badge floating-element">
+          <div class="section-badge">
             <i class="bi bi-telephone"></i>
             <?php echo ($lang == 'ar') ? 'معلومات الاتصال' : 'Contact Information'; ?>
           </div>
@@ -944,39 +790,101 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
         </div>
 
         <div class="row">
-          <?php foreach ($contact_boxData as $index => $contact): ?>
-            <div class="col-xl-3 col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="<?php echo ($index + 1) * 100; ?>">
-              <div class="contact-card-pro fade-in-up">
-                <div class="contact-icon-pro floating-element">
-                  <i class="<?php echo htmlspecialchars($contact['icon']); ?>"></i>
-                </div>
-                <h3><?php echo htmlspecialchars($contact['title']); ?></h3>
-                <p class="contact-value"><?php echo htmlspecialchars($contact['value']); ?></p>
-                
-                <?php 
-                // إضافة زر للاتصال حسب نوع الوسيلة
-                $contact_type = strtolower($contact['title']);
-                if (strpos($contact_type, 'هاتف') !== false || strpos($contact_type, 'phone') !== false) {
-                  $phone_number = preg_replace('/[^0-9+]/', '', $contact['value']);
-                  echo '<a href="tel:' . $phone_number . '" class="contact-action-btn">
-                          <i class="bi bi-telephone"></i>
-                          ' . ($lang == 'ar' ? 'اتصل الآن' : 'Call Now') . '
-                        </a>';
-                } elseif (strpos($contact_type, 'بريد') !== false || strpos($contact_type, 'email') !== false) {
-                  echo '<a href="mailto:' . $contact['value'] . '" class="contact-action-btn">
-                          <i class="bi bi-envelope"></i>
-                          ' . ($lang == 'ar' ? 'أرسل بريد' : 'Send Email') . '
-                        </a>';
-                } elseif (strpos($contact_type, 'موقع') !== false || strpos($contact_type, 'location') !== false) {
-                  echo '<a href="https://maps.google.com/?q=' . urlencode($contact['value']) . '" target="_blank" class="contact-action-btn">
-                          <i class="bi bi-geo-alt"></i>
-                          ' . ($lang == 'ar' ? 'افتح الخريطة' : 'Open Map') . '
-                        </a>';
-                }
-                ?>
+          <?php 
+          if (!empty($contact_boxData)): 
+            $contact_types = [
+              'phone' => ['icon' => 'bi bi-telephone', 'action' => 'tel'],
+              'email' => ['icon' => 'bi bi-envelope', 'action' => 'mailto'],
+              'location' => ['icon' => 'bi bi-geo-alt', 'action' => 'map'],
+              'working_hours' => ['icon' => 'bi bi-clock', 'action' => 'none'],
+              'support_email' => ['icon' => 'bi bi-headset', 'action' => 'mailto'],
+              'fax' => ['icon' => 'bi bi-printer', 'action' => 'none'],
+              'whatsapp_business' => ['icon' => 'bi bi-whatsapp', 'action' => 'whatsapp'],
+              'google_maps' => ['icon' => 'bi bi-geo-alt-fill', 'action' => 'link']
+            ];
+            
+            $labels = [
+              'phone' => ($lang == 'ar') ? 'رقم الهاتف' : 'Phone Number',
+              'email' => ($lang == 'ar') ? 'البريد الإلكتروني' : 'Email',
+              'location' => ($lang == 'ar') ? 'العنوان' : 'Address',
+              'working_hours' => ($lang == 'ar') ? 'ساعات العمل' : 'Working Hours',
+              'support_email' => ($lang == 'ar') ? 'البريد للدعم' : 'Support Email',
+              'fax' => ($lang == 'ar') ? 'فاكس' : 'Fax',
+              'whatsapp_business' => ($lang == 'ar') ? 'واتساب الأعمال' : 'Business WhatsApp',
+              'google_maps' => ($lang == 'ar') ? 'خرائط جوجل' : 'Google Maps'
+            ];
+            
+            foreach ($contact_boxData as $index => $contact_item): 
+              $type = $contact_item['type'] ?? '';
+              $type_info = $contact_types[$type] ?? ['icon' => 'bi bi-info-circle', 'action' => 'none'];
+              $label = $contact_item['label'] ?? ($labels[$type] ?? ($contact_item['title'] ?? ($lang == 'ar') ? 'معلومات الاتصال' : 'Contact Info'));
+              $value = $contact_item['value'] ?? '';
+          ?>
+          <div class="col-xl-3 col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="<?php echo ($index % 4) * 100; ?>">
+            <div class="contact-card-pro fade-in-up">
+              <div class="contact-icon-pro">
+                <i class="<?php echo htmlspecialchars($type_info['icon']); ?>"></i>
               </div>
+              <h3><?php echo htmlspecialchars($label); ?></h3>
+              <p class="contact-value">
+                <?php 
+                if ($type === 'google_maps' && !empty($value)): 
+                  echo '<a href="' . htmlspecialchars($value) . '" target="_blank">' . 
+                       (($lang == 'ar') ? 'انقر لفتح الخريطة' : 'Click to open map') . 
+                       '</a>';
+                elseif ($type === 'location' && !empty($value)): 
+                  echo htmlspecialchars($value);
+                else:
+                  echo htmlspecialchars($value);
+                endif;
+                ?>
+              </p>
+              
+              <?php 
+              $action = $type_info['action'];
+              
+              if ($action === 'tel' && !empty($value)): 
+                $phone_number = preg_replace('/[^0-9+]/', '', $value);
+                ?>
+                <a href="tel:<?php echo $phone_number; ?>" class="contact-action-btn">
+                  <i class="bi bi-telephone"></i>
+                  <?php echo ($lang == 'ar') ? 'اتصل الآن' : 'Call Now'; ?>
+                </a>
+              <?php elseif ($action === 'mailto' && !empty($value)): ?>
+                <a href="mailto:<?php echo htmlspecialchars($value); ?>" class="contact-action-btn">
+                  <i class="bi bi-envelope"></i>
+                  <?php echo ($lang == 'ar') ? 'أرسل بريد' : 'Send Email'; ?>
+                </a>
+              <?php elseif ($action === 'map' && !empty($value)): ?>
+                <a href="https://maps.google.com/?q=<?php echo urlencode($value); ?>" target="_blank" class="contact-action-btn">
+                  <i class="bi bi-geo-alt"></i>
+                  <?php echo ($lang == 'ar') ? 'افتح الخريطة' : 'Open Map'; ?>
+                </a>
+              <?php elseif ($action === 'whatsapp' && !empty($value)): 
+                $whatsapp_number = preg_replace('/[^0-9+]/', '', $value);
+                ?>
+                <a href="https://wa.me/<?php echo $whatsapp_number; ?>" target="_blank" class="contact-action-btn">
+                  <i class="bi bi-whatsapp"></i>
+                  <?php echo ($lang == 'ar') ? 'تواصل عبر واتساب' : 'Chat on WhatsApp'; ?>
+                </a>
+              <?php elseif ($action === 'link' && !empty($value)): ?>
+                <a href="<?php echo htmlspecialchars($value); ?>" target="_blank" class="contact-action-btn">
+                  <i class="bi bi-link"></i>
+                  <?php echo ($lang == 'ar') ? 'فتح الرابط' : 'Open Link'; ?>
+                </a>
+              <?php endif; ?>
             </div>
+          </div>
           <?php endforeach; ?>
+          
+          <?php else: ?>
+          <div class="col-12">
+            <div class="no-data">
+              <i class="bi bi-info-circle" style="font-size: 3rem; margin-bottom: 20px; color: var(--primary-color);"></i>
+              <p><?php echo ($lang == 'ar') ? 'لا توجد معلومات اتصال متاحة حالياً' : 'No contact information available at the moment'; ?></p>
+            </div>
+          </div>
+          <?php endif; ?>
         </div>
       </div>
     </section>
@@ -987,7 +895,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       
       <div class="container">
         <div class="section-header" data-aos="fade-up">
-          <div class="section-badge floating-element" style="background: rgba(255,255,255,0.2);">
+          <div class="section-badge" style="background: rgba(255,255,255,0.2);">
             <i class="bi bi-people"></i>
             <?php echo ($lang == 'ar') ? 'وسائل التواصل' : 'Social Media'; ?>
           </div>
@@ -996,63 +904,48 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
         </div>
 
         <div class="social-grid">
-          <?php if (isset($contactData[0]['whatsapp']) && !empty($contactData[0]['whatsapp'])): ?>
-          <div class="social-card" data-aos="fade-up" data-aos-delay="100">
+          <?php 
+          $social_platforms = [
+            'whatsapp' => ['icon' => 'bi bi-whatsapp', 'label_ar' => 'واتساب', 'label_en' => 'WhatsApp'],
+            'telegram' => ['icon' => 'bi bi-telegram', 'label_ar' => 'تيليجرام', 'label_en' => 'Telegram'],
+            'twitter' => ['icon' => 'bi bi-twitter-x', 'label_ar' => 'تويتر', 'label_en' => 'Twitter'],
+            'facebook' => ['icon' => 'bi bi-facebook', 'label_ar' => 'فيسبوك', 'label_en' => 'Facebook'],
+            'instagram' => ['icon' => 'bi bi-instagram', 'label_ar' => 'انستغرام', 'label_en' => 'Instagram'],
+            'youtube' => ['icon' => 'bi bi-youtube', 'label_ar' => 'يوتيوب', 'label_en' => 'YouTube'],
+            'tiktok' => ['icon' => 'bi bi-tiktok', 'label_ar' => 'تيك توك', 'label_en' => 'TikTok'],
+            'snapchat' => ['icon' => 'bi bi-snapchat', 'label_ar' => 'سناب شات', 'label_en' => 'Snapchat'],
+            'linkedin' => ['icon' => 'bi bi-linkedin', 'label_ar' => 'لينكد إن', 'label_en' => 'LinkedIn'],
+            'pinterest' => ['icon' => 'bi bi-pinterest', 'label_ar' => 'بنترست', 'label_en' => 'Pinterest']
+          ];
+          
+          $has_social = false;
+          $delay = 100;
+          
+          foreach ($social_platforms as $platform => $info): 
+            if (!empty($contactData[$platform])): 
+              $has_social = true;
+              $link = $contactData[$platform];
+              $label = ($lang == 'ar') ? $info['label_ar'] : $info['label_en'];
+          ?>
+          <a href="<?php echo htmlspecialchars($link); ?>" target="_blank" class="social-card" data-aos="fade-up" data-aos-delay="<?php echo $delay; ?>">
             <div class="social-icon">
-              <i class="bi bi-whatsapp"></i>
+              <i class="<?php echo $info['icon']; ?>"></i>
             </div>
-            <h4>WhatsApp</h4>
-            <p><?php echo ($lang == 'ar') ? 'اتصال مباشر' : 'Direct Contact'; ?></p>
-          </div>
-          <?php endif; ?>
-
-          <?php if (isset($contactData[0]['telegram']) && !empty($contactData[0]['telegram'])): ?>
-          <div class="social-card" data-aos="fade-up" data-aos-delay="200">
-            <div class="social-icon">
-              <i class="bi bi-telegram"></i>
+            <h4><?php echo $label; ?></h4>
+            <p><?php echo ($lang == 'ar') ? 'انقر للمتابعة' : 'Click to follow'; ?></p>
+          </a>
+          <?php 
+              $delay += 50;
+            endif;
+          endforeach; 
+          
+          if (!$has_social):
+          ?>
+          <div class="col-12">
+            <div class="no-data" style="color: white;">
+              <i class="bi bi-share" style="font-size: 3rem; margin-bottom: 20px;"></i>
+              <p><?php echo ($lang == 'ar') ? 'لا توجد وسائل تواصل اجتماعي متاحة حالياً' : 'No social media links available at the moment'; ?></p>
             </div>
-            <h4>Telegram</h4>
-            <p><?php echo ($lang == 'ar') ? 'قناتنا الرسمية' : 'Our Official Channel'; ?></p>
-          </div>
-          <?php endif; ?>
-
-          <?php if (isset($contactData[0]['twitter']) && !empty($contactData[0]['twitter'])): ?>
-          <div class="social-card" data-aos="fade-up" data-aos-delay="300">
-            <div class="social-icon">
-              <i class="bi bi-twitter-x"></i>
-            </div>
-            <h4>Twitter</h4>
-            <p><?php echo ($lang == 'ar') ? 'أحدث التغريدات' : 'Latest Tweets'; ?></p>
-          </div>
-          <?php endif; ?>
-
-          <?php if (isset($contactData[0]['facebook']) && !empty($contactData[0]['facebook'])): ?>
-          <div class="social-card" data-aos="fade-up" data-aos-delay="400">
-            <div class="social-icon">
-              <i class="bi bi-facebook"></i>
-            </div>
-            <h4>Facebook</h4>
-            <p><?php echo ($lang == 'ar') ? 'صفحتنا الرسمية' : 'Our Official Page'; ?></p>
-          </div>
-          <?php endif; ?>
-
-          <?php if (isset($contactData[0]['instagram']) && !empty($contactData[0]['instagram'])): ?>
-          <div class="social-card" data-aos="fade-up" data-aos-delay="500">
-            <div class="social-icon">
-              <i class="bi bi-instagram"></i>
-            </div>
-            <h4>Instagram</h4>
-            <p><?php echo ($lang == 'ar') ? 'معرض أعمالنا' : 'Our Work Gallery'; ?></p>
-          </div>
-          <?php endif; ?>
-
-          <?php if (isset($contactData[0]['youtube']) && !empty($contactData[0]['youtube'])): ?>
-          <div class="social-card" data-aos="fade-up" data-aos-delay="600">
-            <div class="social-icon">
-              <i class="bi bi-youtube"></i>
-            </div>
-            <h4>YouTube</h4>
-            <p><?php echo ($lang == 'ar') ? 'فيديوهات توضيحية' : 'Explanatory Videos'; ?></p>
           </div>
           <?php endif; ?>
         </div>
@@ -1063,7 +956,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
     <section class="map-section">
       <div class="container">
         <div class="section-header" data-aos="fade-up">
-          <div class="section-badge floating-element">
+          <div class="section-badge">
             <i class="bi bi-geo-alt"></i>
             <?php echo ($lang == 'ar') ? 'موقعنا على الخريطة' : 'Our Location'; ?>
           </div>
@@ -1071,14 +964,15 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
           <p class="section-subtitle"><?php echo ($lang == 'ar') ? 'تعرف على موقعنا الجغرافي وكيفية الوصول إلينا بسهولة' : 'Learn about our geographical location and how to easily reach us'; ?></p>
         </div>
 
-        <div class="row justify-content-center">
+        <div class="row-info">
           <div class="col-lg-10" data-aos="fade-up" data-aos-delay="100">
-            <div class="map-container-pro fade-in-up">
+            <div class="map-container-pro">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2974.8813426551865!2d67.01298087569626!3d39.58263960598262!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3f4d21d3f20f2e7d%3A0x65da282d59cb1b22!2sUy!5e1!3m2!1sen!2s!4v1738728573422!5m2!1sen!2s"
-                width="100%" height="500" style="border:0;" allowfullscreen="" loading="lazy"
+                src="https://www.google.com/maps?q=%D8%B1%D9%83%D9%86+%D8%A7%D9%84%D8%A3%D9%85%D8%A7%D8%B3%D9%8A+%D9%84%D9%84%D8%A3%D9%85%D9%86+%D9%88%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%D8%A9%D8%8C+%D8%B7%D8%B1%D9%8A%D9%82+%D8%A7%D8%A8%D9%8A+%D8%A8%D9%83%D8%B1+%D8%A7%D9%84%D8%B5%D8%AF%D9%8A%D9%82%D8%8C+%D8%A7%D9%84%D9%85%D8%B5%D9%8A%D9%81%D8%8C+%D8%A7%D9%84%D8%B1%D9%8A%D8%A7%D8%B6+12466&ftid=0x3e2efd000462b7cd:0x9d295b4e23aa8425&entry=gps&lucs=,94275415,94231188,47071704,94218641,94282134,94286869&g_ep=CAISEjI1LjI0LjEuNzY5MjczNTU2MBgAIIgnKjYsOTQyNzU0MTUsOTQyMzExODgsNDcwNzE3MDQsOTQyMTg2NDEsOTQyODIxMzQsOTQyODY4NjlCAlNB&skid=35b4be49-f459-495c-b831-8085a6ef8689&g_st=com.google.maps.preview.copy"
+                width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy"
                 referrerpolicy="no-referrer-when-downgrade" 
-                title="<?php echo ($lang == 'ar') ? 'موقع ركن الأماسي على الخريطة' : 'Rukn Alamasy Location on Map'; ?>"></iframe>
+                title="<?php echo ($lang == 'ar') ? 'موقع ركن الأماسي على الخريطة' : 'Rukn Alamasy Location on Map'; ?>">
+              </iframe>
             </div>
           </div>
         </div>
@@ -1089,7 +983,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
     <section class="hours-section">
       <div class="container">
         <div class="section-header" data-aos="fade-up">
-          <div class="section-badge floating-element" style="background: rgba(255,255,255,0.2);">
+          <div class="section-badge" style="background: rgba(255,255,255,0.2);">
             <i class="bi bi-clock"></i>
             <?php echo ($lang == 'ar') ? 'ساعات العمل' : 'Working Hours'; ?>
           </div>
@@ -1099,27 +993,24 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
 
         <div class="row justify-content-center">
           <div class="col-lg-8" data-aos="fade-up" data-aos-delay="100">
-            <div class="hours-card fade-in-up">
-              <h3 style="color: white; font-size: 2.5rem; margin-bottom: 30px;">
+            <div class="hours-card">
+              <h3 style="color: white; font-size: 2rem; margin-bottom: 25px;">
                 <i class="bi bi-calendar-week"></i> <?php echo ($lang == 'ar') ? 'أوقات الدوام الرسمي' : 'Official Working Hours'; ?>
               </h3>
               
               <ul class="hours-list">
                 <li>
-                  <span><?php echo ($lang == 'ar') ? 'السبت - الأربعاء' : 'Saturday - Wednesday'; ?></span>
-                  <span>8:00 <?php echo ($lang == 'ar') ? 'ص' : 'AM'; ?> - 5:00 <?php echo ($lang == 'ar') ? 'م' : 'PM'; ?></span>
+                  <span><?php echo ($lang == 'ar') ? 'السبت - الخميس' : 'Saturday - Thersday'; ?></span>
+                  <span>8:00 <?php echo ($lang == 'ar') ? 'ص' : 'AM'; ?> - 9:00 <?php echo ($lang == 'ar') ? 'م' : 'PM'; ?></span>
                 </li>
-                <li>
-                  <span><?php echo ($lang == 'ar') ? 'الخميس' : 'Thursday'; ?></span>
-                  <span>8:00 <?php echo ($lang == 'ar') ? 'ص' : 'AM'; ?> - 3:00 <?php echo ($lang == 'ar') ? 'م' : 'PM'; ?></span>
-                </li>
+               
                 <li>
                   <span><?php echo ($lang == 'ar') ? 'الجمعة' : 'Friday'; ?></span>
-                  <span style="color: var(--secondary-color);"><?php echo ($lang == 'ar') ? 'إجازة رسمية' : 'Official Holiday'; ?></span>
+                  <span style="color: var(--primary-color);"><?php echo ($lang == 'ar') ? 'إجازة رسمية' : 'Official Holiday'; ?></span>
                 </li>
                 <li>
                   <span><?php echo ($lang == 'ar') ? 'الدعم الفني الطارئ' : 'Emergency Technical Support'; ?></span>
-                  <span style="color: var(--primary-color);">24/7</span>
+                  <span style="color: var(--primary-color); font-weight: 800;">24/7</span>
                 </li>
               </ul>
             </div>
@@ -1131,11 +1022,11 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
   </main>
 
   <?php include 'includes/footer.php'; ?>
-
-  <a href="#" class="scroll-top" id="scroll-top">
+ <a href="#" class="scroll-top" id="scroll-top">
     <i class="bi bi-arrow-up"></i>
   </a>
   
+ 
   <!-- مكتبات JavaScript -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
   <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
@@ -1147,20 +1038,11 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
   <script src="assets/js/main.js"></script>
 
   <script>
-    // Initialize when page loads
-    window.addEventListener('DOMContentLoaded', (event) => {
-      // Remove loading screen
-      setTimeout(() => {
-        document.querySelector('.loading-screen').style.opacity = '0';
-        document.querySelector('.loading-screen').style.visibility = 'hidden';
-      }, 1500);
-    }); 
-    
     document.addEventListener('DOMContentLoaded', function() {
       // تهيئة AOS
       if (typeof AOS !== 'undefined') {
         AOS.init({
-          duration: 1200,
+          duration: 800,
           once: true,
           offset: 100,
           easing: 'ease-out-cubic'
@@ -1172,89 +1054,17 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
         // Contact Hero Particles
         particlesJS('particles-js-contact', {
           particles: {
-            number: {
-              value: 80,
-              density: {
-                enable: true,
-                value_area: 800
-              }
-            },
-            color: {
-              value: ["#e76a04", "#f3d417", "#ffffff"]
-            },
-            shape: {
-              type: ["circle", "triangle"],
-              stroke: {
-                width: 0,
-                color: "#000000"
-              }
-            },
-            opacity: {
-              value: 0.5,
-              random: true,
-              anim: {
-                enable: true,
-                speed: 1,
-                opacity_min: 0.1,
-                sync: false
-              }
-            },
-            size: {
-              value: 3,
-              random: true,
-              anim: {
-                enable: true,
-                speed: 2,
-                size_min: 0.1,
-                sync: false
-              }
-            },
-            line_linked: {
-              enable: false,
-              distance: 150,
-              color: "#e76a04",
-              opacity: 0.4,
-              width: 1
-            },
-            move: {
-              enable: true,
-              speed: 1,
-              direction: "none",
-              random: true,
-              straight: false,
-              out_mode: "out",
-              bounce: false,
-              attract: {
-                enable: false,
-                rotateX: 600,
-                rotateY: 1200
-              }
-            }
+            number: { value: 60, density: { enable: true, value_area: 800 } },
+            color: { value: ["#e76a04", "#f3d417", "#ffffff"] },
+            shape: { type: "circle" },
+            opacity: { value: 0.5, random: true },
+            size: { value: 3, random: true },
+            line_linked: { enable: false },
+            move: { enable: true, speed: 1, direction: "none", random: true }
           },
           interactivity: {
             detect_on: "canvas",
-            events: {
-              onhover: {
-                enable: true,
-                mode: "grab"
-              },
-              onclick: {
-                enable: true,
-                mode: "push"
-              },
-              resize: true
-            },
-            modes: {
-              grab: {
-                distance: 140,
-                line_linked: {
-                  opacity: 1
-                }
-              },
-              push: {
-                particles_nb: 4
-              }
-            }
+            events: { onhover: { enable: true, mode: "grab" } }
           },
           retina_detect: true
         });
@@ -1262,176 +1072,37 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
         // Contact Info Particles
         particlesJS('particles-js-contact-info', {
           particles: {
-            number: {
-              value: 60,
-              density: {
-                enable: true,
-                value_area: 800
-              }
-            },
-            color: {
-              value: "#144734"
-            },
-            shape: {
-              type: "circle",
-              stroke: {
-                width: 0,
-                color: "#144734"
-              }
-            },
-            opacity: {
-              value: 0.2,
-              random: true,
-              anim: {
-                enable: false
-              }
-            },
-            size: {
-              value: 4,
-              random: true,
-              anim: {
-                enable: false
-              }
-            },
-            line_linked: {
-              enable: false,
-              distance: 150,
-              color: "#144734",
-              opacity: 0.2,
-              width: 1
-            },
-            move: {
-              enable: true,
-              speed: 1,
-              direction: "none",
-              random: true,
-              straight: false,
-              out_mode: "out",
-              bounce: false
-            }
+            number: { value: 40, density: { enable: true, value_area: 800 } },
+            color: { value: "#144734" },
+            shape: { type: "circle" },
+            opacity: { value: 0.1, random: true },
+            size: { value: 4, random: true },
+            line_linked: { enable: false },
+            move: { enable: true, speed: 0.5, direction: "none", random: true }
           },
-          interactivity: {
-            detect_on: "canvas",
-            events: {
-              onhover: {
-                enable: true,
-                mode: "grab"
-              },
-              onclick: {
-                enable: false
-              }
-            }
-          },
+          interactivity: { detect_on: "canvas", events: { onhover: { enable: false } } },
           retina_detect: true
         });
 
         // Social Media Particles
         particlesJS('particles-js-social', {
           particles: {
-            number: {
-              value: 80,
-              density: {
-                enable: true,
-                value_area: 800
-              }
-            },
-            color: {
-              value: "#ffffff"
-            },
-            shape: {
-              type: "circle"
-            },
-            opacity: {
-              value: 0.3,
-              random: true
-            },
-            size: {
-              value: 3,
-              random: true
-            },
-            line_linked: {
-              enable: true,
-              distance: 150,
-              color: "#ffffff",
-              opacity: 0.2,
-              width: 1
-            },
-            move: {
-              enable: true,
-              speed: 2,
-              direction: "none",
-              random: false,
-              straight: false,
-              out_mode: "out",
-              bounce: false
-            }
+            number: { value: 60, density: { enable: true, value_area: 800 } },
+            color: { value: "#ffffff" },
+            shape: { type: "circle" },
+            opacity: { value: 0.2, random: true },
+            size: { value: 3, random: true },
+            line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.1, width: 1 },
+            move: { enable: true, speed: 1, direction: "none", random: false }
           },
           interactivity: {
             detect_on: "canvas",
-            events: {
-              onhover: {
-                enable: true,
-                mode: "bubble"
-              },
-              onclick: {
-                enable: false
-              }
-            },
-            modes: {
-              bubble: {
-                distance: 200,
-                size: 6,
-                duration: 2,
-                opacity: 0.8
-              }
-            }
+            events: { onhover: { enable: true, mode: "bubble" } },
+            modes: { bubble: { distance: 200, size: 6, duration: 2, opacity: 0.8 } }
           },
           retina_detect: true
         });
       }
-
-      // تأثيرات المؤشر
-      const cursor = document.querySelector('.cursor-effect');
-      if (cursor) {
-        document.addEventListener('mousemove', (e) => {
-          cursor.style.left = e.clientX + 'px';
-          cursor.style.top = e.clientY + 'px';
-        });
-
-        document.querySelectorAll('a, button, .contact-card-pro, .social-card, .map-container-pro, .hours-card').forEach(el => {
-          el.addEventListener('mouseenter', () => {
-            cursor.style.transform = 'scale(2)';
-            cursor.style.background = 'radial-gradient(circle, rgba(231,106,4,0.5), transparent)';
-          });
-          el.addEventListener('mouseleave', () => {
-            cursor.style.transform = 'scale(1)';
-            cursor.style.background = 'radial-gradient(circle, var(--primary-color), transparent)';
-          });
-        });
-      }
-
-      // تأثيرات hover للبطاقات
-      const contactCards = document.querySelectorAll('.contact-card-pro');
-      contactCards.forEach(card => {
-        card.addEventListener('mouseenter', function() {
-          this.style.transform = 'translateY(-30px) scale(1.05)';
-        });
-        
-        card.addEventListener('mouseleave', function() {
-          this.style.transform = 'translateY(0) scale(1)';
-        });
-      });
-
-      const socialCards = document.querySelectorAll('.social-card');
-      socialCards.forEach(card => {
-        card.addEventListener('mouseenter', function() {
-          this.style.transform = 'translateY(-20px) scale(1.1)';
-        });
-        
-        card.addEventListener('mouseleave', function() {
-          this.style.transform = 'translateY(0) scale(1)';
-        });
-      });
 
       // زر العودة للأعلى
       const scrollTop = document.getElementById('scroll-top');
@@ -1453,59 +1124,45 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
         });
       }
 
-      // تأثيرات النقر على الأزرار
-      document.querySelectorAll('.contact-action-btn, .social-card').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-          if (this.tagName === 'A') {
-            const ripple = document.createElement('span');
-            const rect = this.getBoundingClientRect();
-            const size = Math.max(rect.width, rect.height);
-            const x = e.clientX - rect.left - size / 2;
-            const y = e.clientY - rect.top - size / 2;
-            
-            ripple.style.cssText = `
-              position: absolute;
-              border-radius: 50%;
-              background: rgba(255, 255, 255, 0.7);
-              transform: scale(0);
-              animation: ripple-animation 0.8s linear;
-              width: ${size}px;
-              height: ${size}px;
-              top: ${y}px;
-              left: ${x}px;
-              pointer-events: none;
-            `;
-            
-            this.appendChild(ripple);
-            
-            setTimeout(() => {
-              ripple.remove();
-            }, 800);
-          }
+      // تأثيرات hover للبطاقات
+      const contactCards = document.querySelectorAll('.contact-card-pro');
+      contactCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+          this.style.transform = 'translateY(-15px) scale(1.03)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+          this.style.transform = 'translateY(0) scale(1)';
         });
       });
 
-      // إضافة CSS للـ ripple effect
-      const style = document.createElement('style');
-      style.textContent = `
-        @keyframes ripple-animation {
-          to {
-            transform: scale(4);
-            opacity: 0;
-          }
-        }
-      `;
-      document.head.appendChild(style);
+      const socialCards = document.querySelectorAll('.social-card');
+      socialCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+          this.style.transform = 'translateY(-10px) scale(1.05)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+          this.style.transform = 'translateY(0) scale(1)';
+        });
+      });
 
-      // Floating Particles Animation
-      function animateParticles() {
-        const particles = document.querySelectorAll('.particle');
-        particles.forEach((particle, index) => {
-          particle.style.animationDelay = `${index * 0.5}s`;
+      // تأثيرات fade-in
+      const fadeElements = document.querySelectorAll('.fade-in-up');
+      fadeElements.forEach((el, index) => {
+        el.style.animationDelay = `${index * 0.1}s`;
+      });
+
+      // إضافة تأثيرات للمس
+      if ('ontouchstart' in window) {
+        document.body.classList.add('touch-device');
+        
+        // تحسين تجربة اللمس
+        const clickableElements = document.querySelectorAll('a, button, .contact-card-pro, .social-card');
+        clickableElements.forEach(el => {
+          el.style.cursor = 'pointer';
         });
       }
-
-      animateParticles();
     });
 
     // Smooth scrolling for anchor links

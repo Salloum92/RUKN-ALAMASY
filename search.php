@@ -475,9 +475,62 @@ if (is_array($search_results) && count($search_results) > 0) {
                 gap: 15px;
             }
         }
+
+        .loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--dark-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  transition: opacity 0.5s, visibility 0.5s;
+}
+
+.loader {
+  width: 120px;
+  height: 120px;
+  position: relative;
+  text-align : center ;
+}
+
+.loader-diamond {
+  width: 100%;
+  height: 100%;
+  background: var(--gradient-primary);
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  animation: loader-spin 2s infinite linear;
+  filter: drop-shadow(0 0 20px rgba(231, 106, 4, 0.5));
+}
+.loader h3{
+  font-size: 1.5rem;
+  margin-top: 1rem;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #ffffff 0%, #e76a04 50%, #e76a04 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  animation: title-glow 3s infinite alternate;
+  position: relative;
+  line-height : 1.5;
+  
+}
+
     </style>
 </head>
 <body class="search-page">
+     <!-- Loading Screen -->
+  <div class="loading-screen">
+    <div class="loader">
+      <div class="loader-diamond"></div>
+      <h3>ركن الأماسي</h3>
+    </div>
+  </div>
+
     <?php include 'includes/header.php'; ?>
 
     <main class="main">
