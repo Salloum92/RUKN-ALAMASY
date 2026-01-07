@@ -882,8 +882,8 @@ $has_location = !empty($location_address);
     }
 
     .mobile-logo-img {
-        width: 40px;
-        height: 40px;
+        width: 80px !important;
+        height: 80px !important;
         border-radius: 8px;
         object-fit: cover;
     }
@@ -1137,7 +1137,7 @@ $has_location = !empty($location_address);
      /* Scroll to Top */
     .scroll-top {
       position: fixed;
-      bottom: 40px;
+      bottom: 20px;
       left: 40px;
       width: 60px;
       height: 60px;
@@ -1293,8 +1293,8 @@ $has_location = !empty($location_address);
         }
 
         .logo-image img {
-            width: 45px;
-            height: 45px;
+            width: 80px;
+            height: 80px;
         }
 
         .brand-name {
@@ -1316,8 +1316,8 @@ $has_location = !empty($location_address);
         }
 
         .logo-image img {
-            width: 40px;
-            height: 40px;
+            width: 80px;
+            height: 80px;
         }
 
         .brand-name {

@@ -1583,6 +1583,12 @@ body {
   .hero-controls {
     gap: 10px;
   }
+  .btn-view-all {
+ 
+  padding: 8px 20px;
+  
+ 
+}
 }
 
 /* باقي الريسبونسف للأقسام الأخرى */
@@ -1975,7 +1981,7 @@ body {
             
             <div class="col-lg-6" style="padding-<?php echo ($lang == 'ar') ? 'right' : 'left'; ?>: 40px;">
                 <div data-aos="fade-left" data-aos-delay="100">
-                    <h2 style="font-size: 2rem; font-weight: 800; color: #144734ff; line-height: 1.2; margin-bottom: 20px;">
+                    <h2 style="font-size: 2rem; font-weight: 800; color: #144734ff; line-height: 1.2; margin-bottom: 20px; margin-top: 20px;">
                         <?php echo ($lang == 'ar') ? 'ركن الأماسي للأمن والسلامة – شريكك الأمين لحلول الأمن والسلامة' : 'Rukn Al-Amasy for Security & Safety – Your Trusted Partner for Safety Solutions'; ?>
                     </h2>
                     

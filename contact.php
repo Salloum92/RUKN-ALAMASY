@@ -184,7 +184,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       border: 2px solid transparent;
       backdrop-filter: blur(10px);
       background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(248, 249, 250, 0.95));
-      margin-bottom: 30px;
+      text-align : center ;
     }
 
     .contact-card-pro::before {
@@ -559,8 +559,8 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
     /* Scroll to Top */
     .scroll-top {
       position: fixed;
-      bottom: 30px;
-      right: 30px;
+      bottom: 20px;
+      left: 30px;
       width: 50px;
       height: 50px;
       border-radius: 50%;
@@ -968,7 +968,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
           <div class="col-lg-10" data-aos="fade-up" data-aos-delay="100">
             <div class="map-container-pro">
               <iframe
-                src="https://www.google.com/maps?q=%D8%B1%D9%83%D9%86+%D8%A7%D9%84%D8%A3%D9%85%D8%A7%D8%B3%D9%8A+%D9%84%D9%84%D8%A3%D9%85%D9%86+%D9%88%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%D8%A9%D8%8C+%D8%B7%D8%B1%D9%8A%D9%82+%D8%A7%D8%A8%D9%8A+%D8%A8%D9%83%D8%B1+%D8%A7%D9%84%D8%B5%D8%AF%D9%8A%D9%82%D8%8C+%D8%A7%D9%84%D9%85%D8%B5%D9%8A%D9%81%D8%8C+%D8%A7%D9%84%D8%B1%D9%8A%D8%A7%D8%B6+12466&ftid=0x3e2efd000462b7cd:0x9d295b4e23aa8425&entry=gps&lucs=,94275415,94231188,47071704,94218641,94282134,94286869&g_ep=CAISEjI1LjI0LjEuNzY5MjczNTU2MBgAIIgnKjYsOTQyNzU0MTUsOTQyMzExODgsNDcwNzE3MDQsOTQyMTg2NDEsOTQyODIxMzQsOTQyODY4NjlCAlNB&skid=35b4be49-f459-495c-b831-8085a6ef8689&g_st=com.google.maps.preview.copy"
+                src="https://maps.app.goo.gl/RgU88JLEDwqH3XFWA"
                 width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy"
                 referrerpolicy="no-referrer-when-downgrade" 
                 title="<?php echo ($lang == 'ar') ? 'موقع ركن الأماسي على الخريطة' : 'Rukn Alamasy Location on Map'; ?>">
