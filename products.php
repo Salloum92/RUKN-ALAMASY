@@ -26,6 +26,122 @@ foreach ($categories as $category) {
 }
 
 $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
+
+// AJAX request للفلترة
+if (isset($_POST['ajax_filter'])) {
+    $search_query = isset($_POST['search']) ? trim($_POST['search']) : '';
+    $category_filter = isset($_POST['category']) ? $_POST['category'] : 'all';
+    $sort_by = isset($_POST['sort']) ? $_POST['sort'] : 'newest';
+    
+    $filtered_products = $products;
+    
+    // فلترة حسب البحث
+    if (!empty($search_query)) {
+        $search_lower = strtolower($search_query);
+        $filtered_products = array_filter($filtered_products, function($product) use ($search_lower) {
+            $product_name = strtolower($product['product_name']);
+            $description = strtolower($product['description']);
+            return strpos($product_name, $search_lower) !== false || 
+                   strpos($description, $search_lower) !== false;
+        });
+    }
+    
+    // فلترة حسب الفئة
+    if ($category_filter !== 'all') {
+        $filtered_products = array_filter($filtered_products, function($product) use ($category_filter) {
+            return $product['category_id'] == $category_filter;
+        });
+    }
+    
+    // إعادة ترتيب المفاتيح
+    $filtered_products = array_values($filtered_products);
+    
+    // ترتيب المنتجات
+    if ($sort_by === 'price_low') {
+        usort($filtered_products, function($a, $b) {
+            return floatval($a['price']) <=> floatval($b['price']);
+        });
+    } elseif ($sort_by === 'price_high') {
+        usort($filtered_products, function($a, $b) {
+            return floatval($b['price']) <=> floatval($a['price']);
+        });
+    } elseif ($sort_by === 'name_asc') {
+        usort($filtered_products, function($a, $b) {
+            return strcmp($a['product_name'], $b['product_name']);
+        });
+    } elseif ($sort_by === 'name_desc') {
+        usort($filtered_products, function($a, $b) {
+            return strcmp($b['product_name'], $a['product_name']);
+        });
+    }
+    
+    // إرجاع النتائج كـ HTML
+    $product_images_by_id = [];
+    foreach ($product_images as $image) {
+        $product_images_by_id[$image['product_id']] = $image['image_url'];
+    }
+    
+    ob_start();
+    
+    if (empty($filtered_products)): ?>
+        <div class="col-12">
+            <div class="no-products text-center py-5">
+                <i class="bi bi-search display-1 text-muted mb-3"></i>
+                <h3 class="text-muted"><?php echo ($lang == 'ar') ? 'لا توجد نتائج' : 'No Results Found'; ?></h3>
+                <p class="text-muted"><?php echo ($lang == 'ar') ? 'جرب مصطلحات بحث مختلفة' : 'Try different search terms'; ?></p>
+            </div>
+        </div>
+    <?php else: 
+        foreach ($filtered_products as $index => $product): 
+            $image_url = isset($product_images_by_id[$product['id']]) ? $product_images_by_id[$product['id']] : 'default-product.jpg';
+            $category_name = isset($category_names[$product['category_id']]) ? 
+                $category_names[$product['category_id']] : ($lang == 'ar' ? 'غير مصنف' : 'Uncategorized');
+            ?>
+            <div class="col-xl-3 col-lg-4 col-md-6 mb-4 product-item" 
+                 data-category="category-<?php echo $product['category_id']; ?>"
+                 data-aos="fade-up" data-aos-delay="<?php echo ($index % 4) * 100; ?>">
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <img src="assets/img/product/<?php echo htmlspecialchars($image_url); ?>" 
+                             alt="<?php echo htmlspecialchars($product['product_name']); ?>"
+                             class="product-image"
+                             onerror="this.src='assets/img/default-product.jpg'">
+                        <div class="product-badge"><?php echo ($lang == 'ar') ? 'جديد' : 'New'; ?></div>
+                        <div class="product-overlay">
+                            <p><?php echo ($lang == 'ar') ? 'منتج عالي الجودة' : 'High Quality Product'; ?></p>
+                        </div>
+                    </div>
+                    
+                    <div class="product-content">
+                        <div class="product-category"><?php echo htmlspecialchars($category_name); ?></div>
+                        <h3 class="product-title"><?php echo htmlspecialchars($product['product_name']); ?></h3>
+                        <p class="product-description">
+                            <?php echo htmlspecialchars(mb_substr($product['description'], 0, 80)) . (strlen($product['description']) > 80 ? '...' : ''); ?>
+                        </p>
+                        <div class="product-price">
+                            <?php echo ($lang == 'ar') ? 'ر.س ' : 'SAR '; ?><?php echo number_format($product['price'], 0, '', ' '); ?>
+                        </div>
+                        <div class="product-actions">
+                            <a href="product-details.php?id=<?php echo $product['id']; ?>" class="btn-view-details">
+                                <i class="bi bi-eye"></i>
+                                <?php echo ($lang == 'ar') ? 'عرض التفاصيل' : 'View Details'; ?>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach;
+    endif;
+    
+    $html = ob_get_clean();
+    
+    echo json_encode([
+        'success' => true,
+        'count' => count($filtered_products),
+        'html' => $html
+    ]);
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -43,7 +159,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
   <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
   
-  <!-- مكتبات لإضافة الجاذبية -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
@@ -54,13 +169,11 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
   <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
   <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
   
-  <!-- مكتبة particles.js للإبهار -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.css">
   
   <link href="assets/css/main.css" rel="stylesheet">
   
   <style>
-    /* نفس الـ CSS من صفحة About مع تعديلات لصفحة المنتجات */
     :root {
       --primary-color: #e76a04;
       --primary-dark: #d45f00;
@@ -90,7 +203,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       background: #fefefe;
     }
 
-    /* Loading Animation */
     .loading-screen {
       position: fixed;
       top: 0;
@@ -145,7 +257,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       100% { filter: brightness(1.3); }
     }
 
-    /* Floating Particles Background */
     .floating-particles {
       position: fixed;
       top: 0;
@@ -174,7 +285,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       }
     }
 
-    /* Hero Section */
     .products-hero-section {
       height: 40vh;
       min-height: 300px;
@@ -239,9 +349,188 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       color: rgba(255, 255, 255, 0.9);
     }
 
-    /* Filters Section */
+    .advanced-filters {
+      background: linear-gradient(135deg, var(--light-color) 0%, #ffffff 100%);
+      padding: 30px 0;
+      border-bottom: 1px solid rgba(231, 106, 4, 0.1);
+    }
+
+    .filters-container {
+      background: white;
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(231, 106, 4, 0.1);
+    }
+
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .filter-group {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .filter-label {
+      display: block;
+      font-weight: 600;
+      color: var(--dark-color);
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+
+    .search-box {
+      width: 100%;
+      padding: 12px 20px;
+      border: 2px solid rgba(231, 106, 4, 0.2);
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .search-box:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(231, 106, 4, 0.1);
+    }
+
+    .filter-select {
+      width: 100%;
+      padding: 12px 20px;
+      border: 2px solid rgba(231, 106, 4, 0.2);
+      border-radius: 12px;
+      font-size: 1rem;
+      background: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .filter-select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(231, 106, 4, 0.1);
+    }
+
+    .filter-actions {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    .btn-filter {
+      padding: 12px 25px;
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-filter:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(231, 106, 4, 0.2);
+    }
+
+    .btn-reset {
+      padding: 12px 20px;
+      background: var(--light-color);
+      color: var(--text-dark);
+      border: 2px solid rgba(231, 106, 4, 0.2);
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-reset:hover {
+      background: rgba(231, 106, 4, 0.05);
+      border-color: var(--primary-color);
+    }
+
+    .results-info {
+      background: rgba(231, 106, 4, 0.05);
+      padding: 15px 25px;
+      border-radius: 12px;
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .results-count {
+      font-weight: 700;
+      color: var(--dark-color);
+    }
+
+    .active-filters {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filter-tag {
+      background: var(--primary-color);
+      color: white;
+      padding: 6px 15px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .remove-filter {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      padding: 0;
+      font-size: 1rem;
+    }
+
+    .filter-loading {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .filter-loading.active {
+      display: flex;
+    }
+    
+    .filter-spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(231, 106, 4, 0.2);
+      border-radius: 50%;
+      border-top-color: var(--primary-color);
+      animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
     .filters-section {
-      padding: 80px 0;
+      padding: 60px 0 40px;
       background: linear-gradient(135deg, var(--light-color) 0%, #ffffff 100%);
       position: relative;
     }
@@ -324,9 +613,8 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       color: var(--white);
     }
 
-    /* Products Grid Section */
     .products-grid-section {
-      padding: 100px 0;
+      padding: 80px 0;
       background: transparent;
       position: relative;
       overflow: hidden;
@@ -509,7 +797,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       box-shadow: 0 15px 30px rgba(231, 106, 4, 0.3);
     }
 
-    /* Statistics Section */
     .stats-section-products {
       padding: 120px 0;
       background: linear-gradient(135deg, #0d3b28 0%, var(--dark-color) 100%);
@@ -593,7 +880,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       line-height: 1.7;
     }
 
-    /* Section Header */
     .section-header {
       text-align: center;
       margin-bottom: 80px;
@@ -680,7 +966,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       color: rgba(255, 255, 255, 0.9) !important;
     }
 
-    /* CTA Section */
     .cta-section-products {
       padding: 120px 0;
       background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
@@ -721,7 +1006,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       margin-right: auto;
     }
 
-    /* Buttons */
     .btn-view-all-products {
       display: inline-flex;
       align-items: center;
@@ -805,7 +1089,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       box-shadow: 0 25px 50px rgba(255, 255, 255, 0.2);
     }
 
-    /* Floating Elements */
     .floating-element {
       animation: floatAnimation 3s ease-in-out infinite;
     }
@@ -815,7 +1098,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       50% { transform: translateY(-25px) rotate(5deg); }
     }
 
-    /* Scroll to Top */
     .scroll-top {
       position: fixed;
       bottom: 40px;
@@ -846,7 +1128,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       box-shadow: 0 25px 50px rgba(231, 106, 4, 0.6);
     }
 
-    /* Animations */
     .fade-in-up {
       animation: fadeInUp 1.2s ease forwards;
     }
@@ -862,7 +1143,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       }
     }
 
-    /* Cursor Effect */
     .cursor-effect {
       position: fixed;
       width: 30px;
@@ -875,7 +1155,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       transition: transform 0.2s ease;
     }
 
-    /* No Products Message */
     .no-products {
       text-align: center;
       padding: 100px 0;
@@ -897,7 +1176,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       font-size: 1.1rem;
     }
 
-    /* Responsive Design */
     @media (max-width: 1200px) {
       .products-hero-title {
         font-size: 3.2rem;
@@ -979,12 +1257,26 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
         height: 35vh;
         min-height: 250px;
       }
+      
+      .filter-row {
+        flex-direction: column;
+      }
+      
+      .filter-group {
+        width: 100%;
+      }
+      
+      .filter-actions {
+        width: 100%;
+        justify-content: center;
+      }
     }
 
     @media (max-width: 576px) {
       .products-hero-section {
         height: 30vh;
         min-height: 220px;
+        margin-top: 0;
       }
       
       .products-hero-title {
@@ -1016,7 +1308,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       }
     }
 
-    /* Canvas styles */
     #particles-js-products canvas,
     #particles-js-filters canvas,
     #particles-js-products-grid canvas,
@@ -1027,7 +1318,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       transform: translate3d(0, 0, 0);
     }
 
-    /* Animation for product items */
     .product-item {
       opacity: 0;
       transform: translateY(20px);
@@ -1039,7 +1329,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       transform: translateY(0);
     }
 
-    /* CTA Buttons Container */
     .cta-buttons {
       display: flex;
       justify-content: center;
@@ -1051,7 +1340,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       margin: 5px 0;
     }
 
-    /* تحسينات للفلترة */
     .product-filtered {
       display: block !important;
     }
@@ -1060,7 +1348,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       display: none !important;
     }
 
-    /* تنسيق لغة RTL */
     html[dir="rtl"] .scroll-top {
       left: auto;
       right: 40px;
@@ -1082,6 +1369,29 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
         right: 20px;
       }
     }
+    
+    #products-container {
+      transition: opacity 0.3s ease;
+    }
+    
+    #products-container.updating {
+      opacity: 0.5;
+    }
+    
+    .product-item {
+      animation: fadeIn 0.5s ease forwards;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
   </style>
 </head>
 
@@ -1092,6 +1402,11 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       <div class="loader-diamond"></div>
       <h3>ركن الأماسي</h3>
     </div>
+  </div>
+  
+  <!-- Filter Loading Overlay -->
+  <div class="filter-loading" id="filterLoading">
+    <div class="filter-spinner"></div>
   </div>
   
   <!-- Floating Particles Background -->
@@ -1124,10 +1439,8 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       </div>
     </section>
 
-    <!-- Filters Section -->
-    <section class="filters-section">
-      <div id="particles-js-filters"></div>
-      
+    <!-- Advanced Filters -->
+    <section class="advanced-filters">
       <div class="container">
         <div class="section-header" data-aos="fade-up">
           <div class="section-badge floating-element">
@@ -1137,34 +1450,75 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
           <h2 class="section-title"><?php echo ($lang == 'ar') ? 'تصفح منتجاتنا حسب الفئة' : 'Browse Our Products by Category'; ?></h2>
           <p class="section-subtitle"><?php echo ($lang == 'ar') ? 'اختر الفئة التي تناسب احتياجاتك واستعرض أفضل المنتجات' : 'Choose the category that suits your needs and browse the best products'; ?></p>
         </div>
-
-        <div class="filter-buttons-container" data-aos="fade-up" data-aos-delay="100">
-          <button class="filter-btn-product active" data-filter="all">
-            <i class="bi bi-grid-3x3-gap"></i>
-            <?php echo ($lang == 'ar') ? 'جميع المنتجات' : 'All Products'; ?>
-            <span class="products-count"><?php echo count($products); ?></span>
-          </button>
+        <div class="filters-container" data-aos="fade-up">
+          <div class="filter-row">
+            <!-- Search -->
+            <div class="filter-group">
+              <label class="filter-label">
+                <i class="bi bi-search"></i>
+                <?php echo ($lang == 'ar') ? 'بحث' : 'Search'; ?>
+              </label>
+              <input type="text" 
+                     class="search-box" 
+                     id="searchInput" 
+                     placeholder="<?php echo ($lang == 'ar') ? 'ابحث عن منتج...' : 'Search for a product...'; ?>">
+            </div>
+            
+            <!-- Category -->
+            <div class="filter-group">
+              <label class="filter-label">
+                <i class="bi bi-grid-3x3-gap"></i>
+                <?php echo ($lang == 'ar') ? 'الفئة' : 'Category'; ?>
+              </label>
+              <select class="filter-select" id="categorySelect">
+                <option value="all"><?php echo ($lang == 'ar') ? 'جميع الفئات' : 'All Categories'; ?></option>
+                <?php foreach ($categories as $category): ?>
+                  <option value="<?php echo $category['id']; ?>">
+                    <?php echo htmlspecialchars($category['category_name']); ?>
+                  </option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+            
+            <!-- Sort -->
+            <div class="filter-group">
+              <label class="filter-label">
+                <i class="bi bi-sort-down"></i>
+                <?php echo ($lang == 'ar') ? 'ترتيب حسب' : 'Sort By'; ?>
+              </label>
+              <select class="filter-select" id="sortSelect">
+                <option value="newest"><?php echo ($lang == 'ar') ? 'الأحدث' : 'Newest'; ?></option>
+                <option value="price_low"><?php echo ($lang == 'ar') ? 'السعر: منخفض-عالي' : 'Price: Low-High'; ?></option>
+                <option value="price_high"><?php echo ($lang == 'ar') ? 'السعر: عالي-منخفض' : 'Price: High-Low'; ?></option>
+                <option value="name_asc"><?php echo ($lang == 'ar') ? 'الاسم: أ-ي' : 'Name: A-Z'; ?></option>
+                <option value="name_desc"><?php echo ($lang == 'ar') ? 'الاسم: ي-أ' : 'Name: Z-A'; ?></option>
+              </select>
+            </div>
+            
+            <!-- Actions -->
+            <div class="filter-actions">
+              <button type="button" class="btn-filter" onclick="applyFilters()">
+                <i class="bi bi-funnel"></i>
+                <?php echo ($lang == 'ar') ? 'تصفية' : 'Filter'; ?>
+              </button>
+              <button type="button" class="btn-reset" onclick="resetFilters()">
+                <i class="bi bi-arrow-counterclockwise"></i>
+                <?php echo ($lang == 'ar') ? 'إعادة تعيين' : 'Reset'; ?>
+              </button>
+            </div>
+          </div>
           
-          <?php foreach ($categories as $category): 
-            $category_count = 0;
-            foreach ($products as $product) {
-              if ($product['category_id'] == $category['id']) {
-                $category_count++;
-              }
-            }
-          ?>
-            <button class="filter-btn-product" data-filter="category-<?php echo $category['id']; ?>">
-              <?php if (!empty($category['icon'])): ?>
-                <i class="<?php echo htmlspecialchars($category['icon']); ?>"></i>
-              <?php else: ?>
-                <i class="bi bi-box"></i>
-              <?php endif; ?>
-              <?php echo htmlspecialchars($category['category_name']); ?>
-              <?php if ($category_count > 0): ?>
-                <span class="products-count"><?php echo $category_count; ?></span>
-              <?php endif; ?>
-            </button>
-          <?php endforeach; ?>
+          <!-- Results Info -->
+          <div class="results-info" id="resultsInfo" style="display: none;">
+            <div class="results-count">
+              <span id="resultsCount">0</span> 
+              <?php echo ($lang == 'ar') ? 'منتج' : 'products'; ?>
+            </div>
+            
+            <div class="active-filters" id="activeFilters">
+              <!-- Active filters will be added here dynamically -->
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -1237,6 +1591,8 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       </div>
     </section>
 
+
+
     <!-- CTA Section -->
     <section class="cta-section-products">
       <div id="particles-js-cta-products"></div>
@@ -1265,7 +1621,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
 
   <?php include 'includes/footer.php'; ?>
 
-  <a href="#" class="scroll-top" id="scroll-top">
+    <a href="#" class="scroll-top" id="scroll-top">
     <i class="bi bi-arrow-up"></i>
   </a>
   
@@ -1336,6 +1692,27 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
             move: { enable: true, speed: 2 }
           }
         });
+        
+        particlesJS('particles-js-stats-products', {
+          particles: {
+            number: { value: 50 },
+            color: { value: "#ffffff" },
+            opacity: { value: 0.1 },
+            size: { value: 4 },
+            move: { enable: true, speed: 1 }
+          }
+        });
+        
+        particlesJS('particles-js-cta-products', {
+          particles: {
+            number: { value: 70 },
+            color: { value: ["#ffffff", "#f3d417"] },
+            opacity: { value: 0.3 },
+            size: { value: 4 },
+            line_linked: { enable: true, distance: 150, opacity: 0.1 },
+            move: { enable: true, speed: 1.5 }
+          }
+        });
       }
 
       // تأثيرات المؤشر
@@ -1346,79 +1723,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
           cursor.style.top = e.clientY + 'px';
         });
       }
-
-      // فلترة المنتجات - الكود المصحح بشكل نهائي
-      const filterButtons = document.querySelectorAll('.filter-btn-product');
-      const productItems = document.querySelectorAll('.product-item');
-      
-      console.log('عدد أزرار الفلترة:', filterButtons.length);
-      console.log('عدد المنتجات:', productItems.length);
-      
-      // إضافة show class لجميع المنتجات في البداية
-      productItems.forEach(item => {
-        item.classList.add('show');
-        item.style.opacity = '1';
-        item.style.transform = 'translateY(0)';
-      });
-
-      // دالة الفلترة
-      function filterProducts(filterValue) {
-        console.log('التصفية حسب:', filterValue);
-        
-        productItems.forEach(item => {
-          const itemCategory = item.getAttribute('data-category');
-          
-          if (filterValue === 'all' || filterValue === itemCategory) {
-            // إظهار المنتج
-            item.style.display = 'block';
-            setTimeout(() => {
-              item.classList.add('show');
-              item.classList.remove('product-hidden');
-              item.classList.add('product-filtered');
-              item.style.opacity = '1';
-              item.style.transform = 'translateY(0)';
-            }, 10);
-          } else {
-            // إخفاء المنتج
-            item.classList.remove('show');
-            item.classList.add('product-hidden');
-            item.classList.remove('product-filtered');
-            item.style.opacity = '0';
-            item.style.transform = 'translateY(20px)';
-            setTimeout(() => {
-              item.style.display = 'none';
-            }, 400);
-          }
-        });
-        
-        // إعادة تنشيط AOS بعد الفلترة
-        setTimeout(() => {
-          if (typeof AOS !== 'undefined') {
-            AOS.refresh();
-          }
-        }, 500);
-      }
-
-      // إضافة event listeners لأزرار الفلترة
-      filterButtons.forEach(button => {
-        button.addEventListener('click', function() {
-          console.log('تم النقر على زر الفلترة');
-          
-          // إزالة active من جميع الأزرار
-          filterButtons.forEach(btn => {
-            btn.classList.remove('active');
-          });
-          
-          // إضافة active للزر المحدد
-          this.classList.add('active');
-          
-          // الحصول على قيمة التصفية
-          const filterValue = this.getAttribute('data-filter');
-          
-          // تطبيق الفلترة
-          filterProducts(filterValue);
-        });
-      });
 
       // زر العودة للأعلى
       const scrollTop = document.getElementById('scroll-top');
@@ -1440,64 +1744,22 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
         });
       }
 
-      // تأثيرات النقر على الأزرار
-      document.querySelectorAll('.btn-view-details, .btn-view-all-products, .btn-primary-products, .filter-btn-product').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-          const ripple = document.createElement('span');
-          const rect = this.getBoundingClientRect();
-          const size = Math.max(rect.width, rect.height);
-          const x = e.clientX - rect.left - size / 2;
-          const y = e.clientY - rect.top - size / 2;
-          
-          ripple.style.cssText = `
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.7);
-            transform: scale(0);
-            animation: ripple-animation 0.8s linear;
-            width: ${size}px;
-            height: ${size}px;
-            top: ${y}px;
-            left: ${x}px;
-            pointer-events: none;
-          `;
-          
-          this.style.position = 'relative';
-          this.style.overflow = 'hidden';
-          this.appendChild(ripple);
-          
-          setTimeout(() => {
-            if (ripple.parentNode === this) {
-              this.removeChild(ripple);
+      // Smooth scrolling for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+          if (this.getAttribute('href') !== '#') {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+              target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+              });
             }
-          }, 800);
-        });
-      });
-
-      // إضافة CSS للـ ripple effect
-      const style = document.createElement('style');
-      style.textContent = `
-        @keyframes ripple-animation {
-          to {
-            transform: scale(4);
-            opacity: 0;
           }
-        }
-      `;
-      document.head.appendChild(style);
-
-      // تأثيرات hover للمنتجات
-      const productCards = document.querySelectorAll('.product-card');
-      productCards.forEach(card => {
-        card.addEventListener('mouseenter', function() {
-          this.style.transform = 'translateY(-25px) scale(1.03)';
-        });
-        
-        card.addEventListener('mouseleave', function() {
-          this.style.transform = 'translateY(0) scale(1)';
         });
       });
-
+      
       // Floating Particles Animation
       function animateParticles() {
         const particles = document.querySelectorAll('.floating-particles .particle');
@@ -1519,21 +1781,204 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       animateParticles();
     });
 
-    // Smooth scrolling for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        if (this.getAttribute('href') !== '#') {
-          e.preventDefault();
-          const target = document.querySelector(this.getAttribute('href'));
-          if (target) {
-            target.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start'
-            });
+    // AJAX Filter System
+    let currentCategory = 'all';
+    let currentSearch = '';
+    let currentSort = 'newest';
+    let searchTimeout;
+    
+    // دالة لتعيين الفئة
+    function setCategory(categoryId) {
+      currentCategory = categoryId;
+      document.getElementById('categorySelect').value = categoryId;
+      
+      // تحديث الأزرار النشطة
+      document.querySelectorAll('.filter-btn-product').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      if (categoryId === 'all') {
+        document.querySelector('.filter-btn-product[onclick="setCategory(\'all\')"]').classList.add('active');
+      } else {
+        document.querySelector(`.filter-btn-product[onclick="setCategory(${categoryId})"]`).classList.add('active');
+      }
+      
+      applyFilters();
+    }
+    
+    // دالة لتطبيق الفلاتر
+    function applyFilters() {
+      currentSearch = document.getElementById('searchInput').value;
+      currentCategory = document.getElementById('categorySelect').value;
+      currentSort = document.getElementById('sortSelect').value;
+      
+      // إظهار loading
+      const filterLoading = document.getElementById('filterLoading');
+      const productsContainer = document.getElementById('products-container');
+      
+      filterLoading.classList.add('active');
+      productsContainer.classList.add('updating');
+      
+      // إرسال طلب AJAX
+      const formData = new FormData();
+      formData.append('ajax_filter', '1');
+      formData.append('search', currentSearch);
+      formData.append('category', currentCategory);
+      formData.append('sort', currentSort);
+      
+      fetch(window.location.href, {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // تحديث المنتجات
+          productsContainer.innerHTML = data.html;
+          productsContainer.style.display = 'flex';
+          
+          // تحديث معلومات النتائج
+          updateResultsInfo(data.count);
+          
+          // إعادة تهيئة AOS للمنتجات الجديدة
+          if (typeof AOS !== 'undefined') {
+            AOS.refresh();
           }
         }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      })
+      .finally(() => {
+        filterLoading.classList.remove('active');
+        productsContainer.classList.remove('updating');
       });
+    }
+    
+    // دالة لتحديث معلومات النتائج
+    function updateResultsInfo(count) {
+      const resultsInfo = document.getElementById('resultsInfo');
+      const resultsCount = document.getElementById('resultsCount');
+      const activeFilters = document.getElementById('activeFilters');
+      
+      resultsCount.textContent = count;
+      
+      // بناء الفلاتر النشطة
+      let activeFiltersHtml = '';
+      const categories = <?php echo json_encode($category_names); ?>;
+      const lang = document.documentElement.lang;
+      
+      if (currentSearch) {
+        activeFiltersHtml += `
+          <div class="filter-tag">
+            ${lang === 'ar' ? 'بحث:' : 'Search:'} "${escapeHtml(currentSearch)}"
+            <button type="button" class="remove-filter" onclick="removeFilter('search')">
+              <i class="bi bi-x"></i>
+            </button>
+          </div>
+        `;
+      }
+      
+      if (currentCategory !== 'all') {
+        const categoryName = categories[currentCategory] || (lang === 'ar' ? 'غير مصنف' : 'Uncategorized');
+        activeFiltersHtml += `
+          <div class="filter-tag">
+            ${lang === 'ar' ? 'الفئة:' : 'Category:'} ${escapeHtml(categoryName)}
+            <button type="button" class="remove-filter" onclick="removeFilter('category')">
+              <i class="bi bi-x"></i>
+            </button>
+          </div>
+        `;
+      }
+      
+      if (currentSort !== 'newest') {
+        const sortTexts = {
+          'newest': lang === 'ar' ? 'الأحدث' : 'Newest',
+          'price_low': lang === 'ar' ? 'السعر: منخفض-عالي' : 'Price: Low-High',
+          'price_high': lang === 'ar' ? 'السعر: عالي-منخفض' : 'Price: High-Low',
+          'name_asc': lang === 'ar' ? 'الاسم: أ-ي' : 'Name: A-Z',
+          'name_desc': lang === 'ar' ? 'الاسم: ي-أ' : 'Name: Z-A'
+        };
+        
+        activeFiltersHtml += `
+          <div class="filter-tag">
+            ${lang === 'ar' ? 'الترتيب:' : 'Sort:'} ${sortTexts[currentSort] || ''}
+            <button type="button" class="remove-filter" onclick="removeFilter('sort')">
+              <i class="bi bi-x"></i>
+            </button>
+          </div>
+        `;
+      }
+      
+      activeFilters.innerHTML = activeFiltersHtml;
+      
+      // إظهار أو إخفاء قسم النتائج
+      if (currentSearch || currentCategory !== 'all' || currentSort !== 'newest') {
+        resultsInfo.style.display = 'flex';
+      } else {
+        resultsInfo.style.display = 'none';
+      }
+    }
+    
+    // دالة لإزالة فلتر محدد
+    function removeFilter(filterType) {
+      if (filterType === 'search') {
+        document.getElementById('searchInput').value = '';
+        currentSearch = '';
+      } else if (filterType === 'category') {
+        document.getElementById('categorySelect').value = 'all';
+        currentCategory = 'all';
+        
+        // تحديث أزرار الفئات
+        document.querySelectorAll('.filter-btn-product').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        document.querySelector('.filter-btn-product[onclick="setCategory(\'all\')"]').classList.add('active');
+      } else if (filterType === 'sort') {
+        document.getElementById('sortSelect').value = 'newest';
+        currentSort = 'newest';
+      }
+      
+      applyFilters();
+    }
+    
+    // دالة لإعادة تعيين جميع الفلاتر
+    function resetFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('categorySelect').value = 'all';
+      document.getElementById('sortSelect').value = 'newest';
+      
+      // تحديث أزرار الفئات
+      document.querySelectorAll('.filter-btn-product').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      document.querySelector('.filter-btn-product[onclick="setCategory(\'all\')"]').classList.add('active');
+      
+      currentSearch = '';
+      currentCategory = 'all';
+      currentSort = 'newest';
+      
+      applyFilters();
+    }
+    
+    // دالة لتهريب النصوص HTML
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    // Auto-apply filters when search input changes (with delay)
+    document.getElementById('searchInput').addEventListener('input', function() {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        applyFilters();
+      }, 500);
     });
+    
+    // Auto-apply filters when select changes
+    document.getElementById('categorySelect').addEventListener('change', applyFilters);
+    document.getElementById('sortSelect').addEventListener('change', applyFilters);
     
     // إضافة event listener لتحميل الصفحة بالكامل
     window.addEventListener('load', function() {

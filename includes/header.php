@@ -1140,8 +1140,8 @@ $has_location = !empty($location_address);
      /* Scroll to Top */
     .scroll-top {
       position: fixed;
-      bottom: 20px;
-      left: 40px;
+      bottom: 15px;
+      left: 20px;
       width: 60px;
       height: 60px;
       border-radius: 50%;
