@@ -91,49 +91,59 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
     }
 
     /* Loading Animation */
-   .loading-screen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: var(--dark-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 99999;
-  transition: opacity 0.5s, visibility 0.5s;
-}
+    .loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--dark-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      transition: opacity 0.5s, visibility 0.5s;
+    }
 
-.loader {
-  width: 120px;
-  height: 120px;
-  position: relative;
-  text-align : center ;
-}
+    .loader {
+      width: 120px;
+      height: 120px;
+      position: relative;
+      text-align: center;
+    }
 
-.loader-diamond {
-  width: 100%;
-  height: 100%;
-  background: var(--gradient-primary);
-  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-  animation: loader-spin 2s infinite linear;
-  filter: drop-shadow(0 0 20px rgba(231, 106, 4, 0.5));
-}
-.loader h3{
-  font-size: 1.5rem;
-  margin-top: 1rem;
-  text-transform: uppercase;
-  background: linear-gradient(135deg, #ffffff 0%, #e76a04 50%, #e76a04 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  animation: title-glow 3s infinite alternate;
-  position: relative;
-  line-height : 1.5;
-  
-}
+    .loader-diamond {
+      width: 100%;
+      height: 100%;
+      background: var(--gradient-primary);
+      clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+      animation: loader-spin 2s infinite linear;
+      filter: drop-shadow(0 0 20px rgba(231, 106, 4, 0.5));
+    }
+    
+    @keyframes loader-spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .loader h3{
+      font-size: 1.5rem;
+      margin-top: 1rem;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #ffffff 0%, #e76a04 50%, #e76a04 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      animation: title-glow 3s infinite alternate;
+      position: relative;
+      line-height: 1.5;
+    }
+    
+    @keyframes title-glow {
+      0% { filter: brightness(1); }
+      100% { filter: brightness(1.3); }
+    }
 
     /* Floating Particles Background */
     .floating-particles {
@@ -189,7 +199,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       text-align: center;
       color: var(--white);
       padding: 0 20px;
-      margin-top : 3.5rem;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -200,6 +209,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       font-size: 4rem;
       font-weight: 900;
       margin-bottom: 25px;
+      margin-top : 50px ;
       text-transform: uppercase;
       letter-spacing: 3px;
       background: var(--gradient-primary);
@@ -226,6 +236,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       margin-right: auto;
       opacity: 0.9;
       line-height: 1.8;
+      color: rgba(255, 255, 255, 0.9);
     }
 
     /* Filters Section */
@@ -268,6 +279,8 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       position: relative;
       overflow: hidden;
       z-index: 1;
+      border: none;
+      outline: none;
     }
 
     .filter-btn-product::before {
@@ -960,12 +973,18 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       .cta-title-products {
         font-size: 2.2rem;
       }
+      
+      .products-hero-section {
+        margin-top: 70px;
+        height: 35vh;
+        min-height: 250px;
+      }
     }
 
     @media (max-width: 576px) {
       .products-hero-section {
         height: 30vh;
-        min-height: 250px;
+        min-height: 220px;
       }
       
       .products-hero-title {
@@ -988,6 +1007,13 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       .cta-title-products {
         font-size: 1.8rem;
       }
+      
+      .scroll-top {
+        left: 20px;
+        bottom: 20px;
+        width: 50px;
+        height: 50px;
+      }
     }
 
     /* Canvas styles */
@@ -1003,14 +1029,58 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
 
     /* Animation for product items */
     .product-item {
-      animation: fadeInUp 0.5s ease forwards;
       opacity: 0;
       transform: translateY(20px);
+      transition: all 0.4s ease;
     }
 
     .product-item.show {
       opacity: 1;
       transform: translateY(0);
+    }
+
+    /* CTA Buttons Container */
+    .cta-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .cta-buttons a {
+      margin: 5px 0;
+    }
+
+    /* تحسينات للفلترة */
+    .product-filtered {
+      display: block !important;
+    }
+
+    .product-hidden {
+      display: none !important;
+    }
+
+    /* تنسيق لغة RTL */
+    html[dir="rtl"] .scroll-top {
+      left: auto;
+      right: 40px;
+    }
+    
+    html[dir="rtl"] .product-badge {
+      right: auto;
+      left: 20px;
+    }
+    
+    html[dir="rtl"] .section-title::after {
+      left: auto;
+      right: 50%;
+      transform: translateX(50%);
+    }
+
+    @media (max-width: 576px) {
+      html[dir="rtl"] .scroll-top {
+        right: 20px;
+      }
     }
   </style>
 </head>
@@ -1104,7 +1174,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       <div id="particles-js-products-grid"></div>
       
       <div class="container">
-
         <div class="row" id="products-container">
           <?php if (!empty($products)): ?>
             <?php foreach ($products as $index => $product): ?>
@@ -1121,7 +1190,8 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
                 $category_names[$product['category_id']] : ($lang == 'ar' ? 'غير مصنف' : 'Uncategorized');
               ?>
               
-              <div class="col-xl-3 col-lg-4 col-md-6 mb-4 product-item all category-<?php echo $product['category_id']; ?>" 
+              <div class="col-xl-3 col-lg-4 col-md-6 mb-4 product-item" 
+                   data-category="category-<?php echo $product['category_id']; ?>"
                    data-aos="fade-up" data-aos-delay="<?php echo ($index % 4) * 100; ?>">
                 <div class="product-card">
                   <div class="product-image-container">
@@ -1167,7 +1237,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       </div>
     </section>
 
-
     <!-- CTA Section -->
     <section class="cta-section-products">
       <div id="particles-js-cta-products"></div>
@@ -1183,7 +1252,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
               <i class="bi bi-telephone"></i>
               <?php echo ($lang == 'ar') ? 'تواصل معنا الآن' : 'Contact Us Now'; ?>
             </a>
-            <a href="services.php" class="btn-primary-products" style="margin-left: 20px;">
+            <a href="services.php" class="btn-primary-products">
               <i class="bi bi-gear"></i>
               <?php echo ($lang == 'ar') ? 'استكشف خدماتنا' : 'Explore Our Services'; ?>
             </a>
@@ -1212,15 +1281,18 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
 
   <script>
     // Initialize when page loads
-    window.addEventListener('DOMContentLoaded', (event) => {
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('صفحة المنتجات جاهزة!');
+      
       // Remove loading screen
       setTimeout(() => {
-        document.querySelector('.loading-screen').style.opacity = '0';
-        document.querySelector('.loading-screen').style.visibility = 'hidden';
+        const loadingScreen = document.querySelector('.loading-screen');
+        if (loadingScreen) {
+          loadingScreen.style.opacity = '0';
+          loadingScreen.style.visibility = 'hidden';
+        }
       }, 1500);
-    }); 
-    
-    document.addEventListener('DOMContentLoaded', function() {
+      
       // تهيئة AOS
       if (typeof AOS !== 'undefined') {
         AOS.init({
@@ -1231,385 +1303,38 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
         });
       }
 
-      // تهيئة PureCounter
-      if (typeof PureCounter !== 'undefined') {
-        new PureCounter();
-      }
-
       // تأثيرات الجسيمات
       if (typeof particlesJS !== 'undefined') {
-        // Hero Section Particles
         particlesJS('particles-js-products', {
           particles: {
-            number: {
-              value: 80,
-              density: {
-                enable: true,
-                value_area: 800
-              }
-            },
-            color: {
-              value: ["#e76a04", "#f3d417", "#ffffff"]
-            },
-            shape: {
-              type: ["circle", "triangle"],
-              stroke: {
-                width: 0,
-                color: "#000000"
-              }
-            },
-            opacity: {
-              value: 0.5,
-              random: true,
-              anim: {
-                enable: true,
-                speed: 1,
-                opacity_min: 0.1,
-                sync: false
-              }
-            },
-            size: {
-              value: 3,
-              random: true,
-              anim: {
-                enable: true,
-                speed: 2,
-                size_min: 0.1,
-                sync: false
-              }
-            },
-            line_linked: {
-              enable: false,
-              distance: 150,
-              color: "#e76a04",
-              opacity: 0.4,
-              width: 1
-            },
-            move: {
-              enable: true,
-              speed: 1,
-              direction: "none",
-              random: true,
-              straight: false,
-              out_mode: "out",
-              bounce: false,
-              attract: {
-                enable: false,
-                rotateX: 600,
-                rotateY: 1200
-              }
-            }
-          },
-          interactivity: {
-            detect_on: "canvas",
-            events: {
-              onhover: {
-                enable: true,
-                mode: "grab"
-              },
-              onclick: {
-                enable: true,
-                mode: "push"
-              },
-              resize: true
-            },
-            modes: {
-              grab: {
-                distance: 140,
-                line_linked: {
-                  opacity: 1
-                }
-              },
-              push: {
-                particles_nb: 4
-              }
-            }
-          },
-          retina_detect: true
+            number: { value: 80 },
+            color: { value: ["#e76a04", "#f3d417", "#ffffff"] },
+            shape: { type: "circle" },
+            opacity: { value: 0.5, random: true },
+            size: { value: 3, random: true },
+            move: { enable: true, speed: 1 }
+          }
         });
-
-        // Filters Section Particles
+        
         particlesJS('particles-js-filters', {
           particles: {
-            number: {
-              value: 60,
-              density: {
-                enable: true,
-                value_area: 800
-              }
-            },
-            color: {
-              value: "#144734"
-            },
-            shape: {
-              type: "circle",
-              stroke: {
-                width: 0,
-                color: "#144734"
-              }
-            },
-            opacity: {
-              value: 0.2,
-              random: true,
-              anim: {
-                enable: false
-              }
-            },
-            size: {
-              value: 4,
-              random: true,
-              anim: {
-                enable: false
-              }
-            },
-            line_linked: {
-              enable: false,
-              distance: 150,
-              color: "#144734",
-              opacity: 0.2,
-              width: 1
-            },
-            move: {
-              enable: true,
-              speed: 1,
-              direction: "none",
-              random: true,
-              straight: false,
-              out_mode: "out",
-              bounce: false
-            }
-          },
-          interactivity: {
-            detect_on: "canvas",
-            events: {
-              onhover: {
-                enable: true,
-                mode: "grab"
-              },
-              onclick: {
-                enable: false
-              }
-            }
-          },
-          retina_detect: true
+            number: { value: 60 },
+            color: { value: "#144734" },
+            opacity: { value: 0.2 },
+            size: { value: 4 },
+            move: { enable: true, speed: 1 }
+          }
         });
-
-        // Products Grid Particles
+        
         particlesJS('particles-js-products-grid', {
           particles: {
-            number: {
-              value: 80,
-              density: {
-                enable: true,
-                value_area: 800
-              }
-            },
-            color: {
-              value: "#e76a04"
-            },
-            shape: {
-              type: "circle"
-            },
-            opacity: {
-              value: 0.3,
-              random: true
-            },
-            size: {
-              value: 3,
-              random: true
-            },
-            line_linked: {
-              enable: true,
-              distance: 150,
-              color: "#e76a04",
-              opacity: 0.2,
-              width: 1
-            },
-            move: {
-              enable: true,
-              speed: 2,
-              direction: "none",
-              random: false,
-              straight: false,
-              out_mode: "out",
-              bounce: false
-            }
-          },
-          interactivity: {
-            detect_on: "canvas",
-            events: {
-              onhover: {
-                enable: true,
-                mode: "bubble"
-              },
-              onclick: {
-                enable: false
-              }
-            },
-            modes: {
-              bubble: {
-                distance: 200,
-                size: 6,
-                duration: 2,
-                opacity: 0.8
-              }
-            }
-          },
-          retina_detect: true
-        });
-
-        // Stats Section Particles
-        particlesJS('particles-js-stats-products', {
-          particles: {
-            number: {
-              value: 80,
-              density: {
-                enable: true,
-                value_area: 800
-              }
-            },
-            color: {
-              value: "#ffffff"
-            },
-            shape: {
-              type: "circle"
-            },
-            opacity: {
-              value: 0.3,
-              random: true
-            },
-            size: {
-              value: 3,
-              random: true
-            },
-            line_linked: {
-              enable: false,
-              distance: 150,
-              color: "#ffffff",
-              opacity: 0.2,
-              width: 1
-            },
-            move: {
-              enable: true,
-              speed: 2,
-              direction: "none",
-              random: false,
-              straight: false,
-              out_mode: "out",
-              bounce: false
-            }
-          },
-          interactivity: {
-            detect_on: "canvas",
-            events: {
-              onhover: {
-                enable: true,
-                mode: "bubble"
-              },
-              onclick: {
-                enable: false
-              }
-            },
-            modes: {
-              bubble: {
-                distance: 200,
-                size: 6,
-                duration: 2,
-                opacity: 0.8
-              }
-            }
-          },
-          retina_detect: true
-        });
-
-        // CTA Section Particles
-        particlesJS('particles-js-cta-products', {
-          particles: {
-            number: {
-              value: 100,
-              density: {
-                enable: true,
-                value_area: 800
-              }
-            },
-            color: {
-              value: ["#e76a04", "#f3d417", "#ffffff"]
-            },
-            shape: {
-              type: ["circle", "triangle", "polygon"],
-              stroke: {
-                width: 0,
-                color: "#000000"
-              }
-            },
-            opacity: {
-              value: 0.6,
-              random: true,
-              anim: {
-                enable: true,
-                speed: 1,
-                opacity_min: 0.1,
-                sync: false
-              }
-            },
-            size: {
-              value: 4,
-              random: true,
-              anim: {
-                enable: true,
-                speed: 2,
-                size_min: 0.1,
-                sync: false
-              }
-            },
-            line_linked: {
-              enable: false,
-              distance: 150,
-              color: "#e76a04",
-              opacity: 0.4,
-              width: 1
-            },
-            move: {
-              enable: true,
-              speed: 2,
-              direction: "none",
-              random: true,
-              straight: false,
-              out_mode: "out",
-              bounce: false,
-              attract: {
-                enable: false,
-                rotateX: 600,
-                rotateY: 1200
-              }
-            }
-          },
-          interactivity: {
-            detect_on: "canvas",
-            events: {
-              onhover: {
-                enable: true,
-                mode: "grab"
-              },
-              onclick: {
-                enable: true,
-                mode: "push"
-              },
-              resize: true
-            },
-            modes: {
-              grab: {
-                distance: 140,
-                line_linked: {
-                  opacity: 1
-                }
-              },
-              push: {
-                particles_nb: 4
-              }
-            }
-          },
-          retina_detect: true
+            number: { value: 80 },
+            color: { value: "#e76a04" },
+            opacity: { value: 0.3 },
+            size: { value: 3 },
+            line_linked: { enable: true, distance: 150, opacity: 0.2 },
+            move: { enable: true, speed: 2 }
+          }
         });
       }
 
@@ -1620,85 +1345,78 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
           cursor.style.left = e.clientX + 'px';
           cursor.style.top = e.clientY + 'px';
         });
-
-        document.querySelectorAll('a, button, .filter-btn-product, .product-card, .stats-card-products').forEach(el => {
-          el.addEventListener('mouseenter', () => {
-            cursor.style.transform = 'scale(2)';
-            cursor.style.background = 'radial-gradient(circle, rgba(231,106,4,0.5), transparent)';
-          });
-          el.addEventListener('mouseleave', () => {
-            cursor.style.transform = 'scale(1)';
-            cursor.style.background = 'radial-gradient(circle, var(--primary-color), transparent)';
-          });
-        });
       }
 
-      // فلترة المنتجات
+      // فلترة المنتجات - الكود المصحح بشكل نهائي
       const filterButtons = document.querySelectorAll('.filter-btn-product');
       const productItems = document.querySelectorAll('.product-item');
       
-      // إظهار جميع المنتجات في البداية
-      setTimeout(() => {
-        productItems.forEach(item => {
-          item.classList.add('show');
-        });
-      }, 100);
+      console.log('عدد أزرار الفلترة:', filterButtons.length);
+      console.log('عدد المنتجات:', productItems.length);
+      
+      // إضافة show class لجميع المنتجات في البداية
+      productItems.forEach(item => {
+        item.classList.add('show');
+        item.style.opacity = '1';
+        item.style.transform = 'translateY(0)';
+      });
 
+      // دالة الفلترة
+      function filterProducts(filterValue) {
+        console.log('التصفية حسب:', filterValue);
+        
+        productItems.forEach(item => {
+          const itemCategory = item.getAttribute('data-category');
+          
+          if (filterValue === 'all' || filterValue === itemCategory) {
+            // إظهار المنتج
+            item.style.display = 'block';
+            setTimeout(() => {
+              item.classList.add('show');
+              item.classList.remove('product-hidden');
+              item.classList.add('product-filtered');
+              item.style.opacity = '1';
+              item.style.transform = 'translateY(0)';
+            }, 10);
+          } else {
+            // إخفاء المنتج
+            item.classList.remove('show');
+            item.classList.add('product-hidden');
+            item.classList.remove('product-filtered');
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+              item.style.display = 'none';
+            }, 400);
+          }
+        });
+        
+        // إعادة تنشيط AOS بعد الفلترة
+        setTimeout(() => {
+          if (typeof AOS !== 'undefined') {
+            AOS.refresh();
+          }
+        }, 500);
+      }
+
+      // إضافة event listeners لأزرار الفلترة
       filterButtons.forEach(button => {
         button.addEventListener('click', function() {
-          // إزالة الصفة النشطة من جميع الأزرار
+          console.log('تم النقر على زر الفلترة');
+          
+          // إزالة active من جميع الأزرار
           filterButtons.forEach(btn => {
             btn.classList.remove('active');
-            btn.style.transform = 'scale(1)';
           });
           
-          // إضافة الصفة النشطة للزر المحدد
+          // إضافة active للزر المحدد
           this.classList.add('active');
-          this.style.transform = 'scale(1.05)';
           
           // الحصول على قيمة التصفية
           const filterValue = this.getAttribute('data-filter');
           
-          // تصفية المنتجات مع تأثير سلس
-          productItems.forEach(item => {
-            item.style.opacity = '0.5';
-            item.style.transition = 'opacity 0.3s ease';
-            
-            setTimeout(() => {
-              if (filterValue === 'all') {
-                item.style.display = 'block';
-                setTimeout(() => {
-                  item.classList.add('show');
-                  item.style.opacity = '1';
-                }, 50);
-              } else {
-                if (item.classList.contains(filterValue)) {
-                  item.style.display = 'block';
-                  setTimeout(() => {
-                    item.classList.add('show');
-                    item.style.opacity = '1';
-                  }, 50);
-                } else {
-                  item.classList.remove('show');
-                  setTimeout(() => {
-                    item.style.display = 'none';
-                  }, 300);
-                }
-              }
-            }, 50);
-          });
-        });
-      });
-
-      // تأثيرات hover للمنتجات
-      const productCards = document.querySelectorAll('.product-card');
-      productCards.forEach(card => {
-        card.addEventListener('mouseenter', function() {
-          this.style.transform = 'translateY(-25px) scale(1.03)';
-        });
-        
-        card.addEventListener('mouseleave', function() {
-          this.style.transform = 'translateY(0) scale(1)';
+          // تطبيق الفلترة
+          filterProducts(filterValue);
         });
       });
 
@@ -1723,7 +1441,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       }
 
       // تأثيرات النقر على الأزرار
-      document.querySelectorAll('.btn-view-details, .btn-view-all-products, .btn-primary-products').forEach(btn => {
+      document.querySelectorAll('.btn-view-details, .btn-view-all-products, .btn-primary-products, .filter-btn-product').forEach(btn => {
         btn.addEventListener('click', function(e) {
           const ripple = document.createElement('span');
           const rect = this.getBoundingClientRect();
@@ -1744,10 +1462,14 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
             pointer-events: none;
           `;
           
+          this.style.position = 'relative';
+          this.style.overflow = 'hidden';
           this.appendChild(ripple);
           
           setTimeout(() => {
-            ripple.remove();
+            if (ripple.parentNode === this) {
+              this.removeChild(ripple);
+            }
           }, 800);
         });
       });
@@ -1764,11 +1486,33 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       `;
       document.head.appendChild(style);
 
+      // تأثيرات hover للمنتجات
+      const productCards = document.querySelectorAll('.product-card');
+      productCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+          this.style.transform = 'translateY(-25px) scale(1.03)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+          this.style.transform = 'translateY(0) scale(1)';
+        });
+      });
+
       // Floating Particles Animation
       function animateParticles() {
-        const particles = document.querySelectorAll('.particle');
+        const particles = document.querySelectorAll('.floating-particles .particle');
         particles.forEach((particle, index) => {
-          particle.style.animationDelay = `${index * 0.5}s`;
+          const size = Math.random() * 20 + 5;
+          const left = Math.random() * 100;
+          const top = Math.random() * 100;
+          const delay = index * 0.5;
+          
+          particle.style.width = `${size}px`;
+          particle.style.height = `${size}px`;
+          particle.style.left = `${left}%`;
+          particle.style.top = `${top}%`;
+          particle.style.animationDelay = `${delay}s`;
+          particle.style.opacity = Math.random() * 0.3 + 0.1;
         });
       }
 
@@ -1778,15 +1522,27 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
     // Smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-          target.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
+        if (this.getAttribute('href') !== '#') {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            target.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+          }
         }
       });
+    });
+    
+    // إضافة event listener لتحميل الصفحة بالكامل
+    window.addEventListener('load', function() {
+      console.log('تم تحميل الصفحة بالكامل');
+      
+      // إعادة تهيئة AOS بعد تحميل الصفحة
+      if (typeof AOS !== 'undefined') {
+        AOS.refresh();
+      }
     });
   </script>
 </body>

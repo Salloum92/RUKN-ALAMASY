@@ -281,31 +281,31 @@ if (!empty($google_maps_url) && empty($location_address)) {
                     
                     <div class="alx-social-grid">
                         <?php if (isset($contactData[0]['twitter']) && !empty($contactData[0]['twitter'])): ?>
-                            <a href="https://x.com/<?= $contactData[0]['twitter'] ?>" class="alx-social-btn alx-twitter" target="_blank" title="Twitter">
+                            <a href="<?= $contactData[0]['twitter'] ?>" class="alx-social-btn alx-twitter" target="_blank" title="Twitter">
                                 <i class="bi bi-twitter-x"></i>
                                 <span>Twitter</span>
                             </a>
                         <?php endif; ?>
                         <?php if (isset($contactData[0]['facebook']) && !empty($contactData[0]['facebook'])): ?>
-                            <a href="https://facebook.com/<?= $contactData[0]['facebook'] ?>" class="alx-social-btn alx-facebook" target="_blank" title="Facebook">
+                            <a href="<?= $contactData[0]['facebook'] ?>" class="alx-social-btn alx-facebook" target="_blank" title="Facebook">
                                 <i class="bi bi-facebook"></i>
                                 <span>Facebook</span>
                             </a>
                         <?php endif; ?>
                         <?php if (isset($contactData[0]['instagram']) && !empty($contactData[0]['instagram'])): ?>
-                            <a href="https://instagram.com/<?= $contactData[0]['instagram'] ?>" class="alx-social-btn alx-instagram" target="_blank" title="Instagram">
+                            <a href="<?= $contactData[0]['instagram'] ?>" class="alx-social-btn alx-instagram" target="_blank" title="Instagram">
                                 <i class="bi bi-instagram"></i>
                                 <span>Instagram</span>
                             </a>
                         <?php endif; ?>
                         <?php if (isset($contactData[0]['linkedin']) && !empty($contactData[0]['linkedin'])): ?>
-                            <a href="https://linkedin.com/in/<?= $contactData[0]['linkedin'] ?>" class="alx-social-btn alx-linkedin" target="_blank" title="LinkedIn">
+                            <a href="<?= $contactData[0]['linkedin'] ?>" class="alx-social-btn alx-linkedin" target="_blank" title="LinkedIn">
                                 <i class="bi bi-linkedin"></i>
                                 <span>LinkedIn</span>
                             </a>
                         <?php endif; ?>
                         <?php if (isset($contactData[0]['youtube']) && !empty($contactData[0]['youtube'])): ?>
-                            <a href="https://www.youtube.com/<?= $contactData[0]['youtube'] ?>" class="alx-social-btn alx-youtube" target="_blank" title="YouTube">
+                            <a href="<?= $contactData[0]['youtube'] ?>" class="alx-social-btn alx-youtube" target="_blank" title="YouTube">
                                 <i class="bi bi-youtube"></i>
                                 <span>YouTube</span>
                             </a>

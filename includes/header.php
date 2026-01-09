@@ -1367,6 +1367,9 @@ $has_location = !empty($location_address);
         .nav-actions{
             width: auto;
         }
+        .mobile-nav{
+            gap : 0;
+        }
 
         .logo-image img {
             width: 75px !important;
@@ -1382,9 +1385,12 @@ $has_location = !empty($location_address);
         }
 
         .mobile-menu {
-            width: 100%;
+            width: 80%;
+            
         }
-
+        .mobile-menu.active .brand-tagline{
+            display : none;
+        }
         .search-modal-content {
             margin: 20px;
             padding: 25px;
