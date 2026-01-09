@@ -348,6 +348,7 @@ $has_location = !empty($location_address);
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         display: flex;
         align-items: center;
+        
     }
 
     .main-nav.scrolled {
@@ -447,7 +448,7 @@ $has_location = !empty($location_address);
     }
 
     .brand-tagline {
-        color: var(--text-light);
+        color : #144734ff;
         font-size: 0.6rem;
         font-weight: 400;
         margin-top: 1px;
@@ -523,8 +524,10 @@ $has_location = !empty($location_address);
     /* Navigation Actions */
     .nav-actions {
         display: flex;
-        align-items: center;
-        gap: 10px;
+    align-items: center;
+    gap: 10px;
+    justify-content: space-between;
+    width: 75%;
     }
 
     .nav-menu {
@@ -1361,10 +1364,12 @@ $has_location = !empty($location_address);
             display: flex;
             align-items: center;
         }
+        .nav-actions{
+            width: auto;
+        }
 
         .logo-image img {
-            width: 25px !important;
-            height: 25px !important;
+            width: 75px !important;
         }
 
         .brand-name {
@@ -1372,7 +1377,8 @@ $has_location = !empty($location_address);
         }
 
         .brand-tagline {
-            display: none;
+            font-size: 10px !important;
+            color : #144734ff;
         }
 
         .mobile-menu {
@@ -1388,6 +1394,7 @@ $has_location = !empty($location_address);
     @media (max-width: 480px) {
         .mobile-menu-toggle {
             height: 40px;
+            justify-content : space-between;
         }
     }
 
@@ -1573,25 +1580,7 @@ $has_location = !empty($location_address);
                     </a>
                 </div>
 
-                <!-- Search Section -->
-                <div class="search-section">
-                    <!-- Desktop Search -->
-                    <div class="desktop-search">
-                        <form class="search-form" action="search.php" method="GET">
-                            <div class="search-box">
-                                <input type="text"
-                                       class="search-input"
-                                       name="q"
-                                       placeholder="<?= $t['search'] ?>"
-                                       value="<?= isset($_GET['q']) ? htmlspecialchars($_GET['q']) : '' ?>">
-                                <button class="search-btn" type="submit">
-                                    <i class="bi bi-search"></i>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
+               
                 <!-- Navigation & Actions -->
                 <div class="nav-actions">
                     <!-- Main Navigation -->
@@ -1702,6 +1691,7 @@ $has_location = !empty($location_address);
             <div class="mobile-logo">
                 <img src="assets/img/logo.png" alt="Rukn Alamasy" class="mobile-logo-img">
                 <span class="mobile-brand">Rukn Alamasy</span>
+                <span class="brand-tagline"><?= $t['description'] ?></span>
             </div>
             <button class="mobile-menu-close">
                 <i class="bi bi-x-lg"></i>
@@ -1709,21 +1699,7 @@ $has_location = !empty($location_address);
         </div>
 
         <div class="mobile-menu-content">
-            <!-- Mobile Search -->
-            <div class="mobile-search-container">
-                <form class="mobile-nav-search-form" action="search.php" method="GET">
-                    <div class="mobile-nav-search-box">
-                        <input type="text"
-                               class="mobile-nav-search-input"
-                               name="q"
-                               placeholder="<?= $t['search'] ?>..."
-                               value="<?= isset($_GET['q']) ? htmlspecialchars($_GET['q']) : '' ?>">
-                        <button class="mobile-nav-search-btn" type="submit">
-                            <i class="bi bi-search"></i>
-                        </button>
-                    </div>
-                </form>
-            </div>
+           
 
             <!-- Mobile Navigation -->
             <nav class="mobile-nav">
