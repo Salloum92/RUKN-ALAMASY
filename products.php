@@ -151,9 +151,24 @@ if (isset($_POST['ajax_filter'])) {
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title><?php echo ($lang == 'ar') ? 'منتجاتنا - ركن الأماسي' : 'Our Products - Rukn Alamasy'; ?></title>
+  <!-- Open Graph / Facebook / WhatsApp -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rukn-alamasy.com.sa/products.php">
+<meta property="og:title" content="<?php echo ($lang == 'ar') ? 'ركن الأماسي - منتجات وخدمات متميزة' : 'Rukn Alamasy - Premium Products & Services'; ?>">
+<meta property="og:description" content="<?php echo ($lang == 'ar') ? 'اكتشف منتجات وخدمات استثنائية مع ركن الأماسي' : 'Discover exceptional products and services with Rukn Alamasy'; ?>">
+<meta property="og:image" content="https://drive.google.com/uc?export=view&id=1Hy5LOgYkjmZc7VJUkHDZO5InrXN52VVl">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="<?php echo ($lang == 'ar') ? 'ركن الأماسي - منتجات وخدمات متميزة' : 'Rukn Alamasy - Premium Products & Services'; ?>">
+<meta name="twitter:description" content="<?php echo ($lang == 'ar') ? 'اكتشف منتجات وخدمات استثنائية مع ركن الأماسي' : 'Discover exceptional products and services with Rukn Alamasy'; ?>">
+<meta name="twitter:image" content="https://drive.google.com/uc?export=view&id=1Hy5LOgYkjmZc7VJUkHDZO5InrXN52VVl">
+
   <meta name="description" content="<?php echo ($lang == 'ar') ? 'اكتشف مجموعتنا المتميزة من منتجات الأمن والسلامة عالية الجودة' : 'Discover our premium collection of high-quality safety and security products'; ?>">
   <meta name="keywords" content="<?php echo ($lang == 'ar') ? 'منتجات، أمن، سلامة، معدات حماية، تجهيزات' : 'products, security, safety, protection equipment, supplies'; ?>">
-  <link href="favicon.ico" rel="icon">
+  <link href="assets/img/logo.png" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
   <link href="https://fonts.googleapis.com" rel="preconnect">
   <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
@@ -1098,36 +1113,7 @@ if (isset($_POST['ajax_filter'])) {
       50% { transform: translateY(-25px) rotate(5deg); }
     }
 
-    .scroll-top {
-      position: fixed;
-      bottom: 40px;
-      left: 40px;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: var(--gradient-primary);
-      color: white;
-      text-decoration: none;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.8rem;
-      box-shadow: 0 15px 40px rgba(231, 106, 4, 0.4);
-      z-index: 999;
-      transition: all 0.4s ease;
-      animation: bounce 2s infinite;
-    }
-
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-
-    .scroll-top:hover {
-      transform: translateY(-5px) scale(1.1);
-      box-shadow: 0 25px 50px rgba(231, 106, 4, 0.6);
-    }
-
+   
     .fade-in-up {
       animation: fadeInUp 1.2s ease forwards;
     }
@@ -1300,12 +1286,7 @@ if (isset($_POST['ajax_filter'])) {
         font-size: 1.8rem;
       }
       
-      .scroll-top {
-        left: 20px;
-        bottom: 20px;
-        width: 50px;
-        height: 50px;
-      }
+      
     }
 
     #particles-js-products canvas,
@@ -1348,11 +1329,7 @@ if (isset($_POST['ajax_filter'])) {
       display: none !important;
     }
 
-    html[dir="rtl"] .scroll-top {
-      left: auto;
-      right: 40px;
-    }
-    
+   
     html[dir="rtl"] .product-badge {
       right: auto;
       left: 20px;
@@ -1364,11 +1341,7 @@ if (isset($_POST['ajax_filter'])) {
       transform: translateX(50%);
     }
 
-    @media (max-width: 576px) {
-      html[dir="rtl"] .scroll-top {
-        right: 20px;
-      }
-    }
+   
     
     #products-container {
       transition: opacity 0.3s ease;
@@ -1621,9 +1594,6 @@ if (isset($_POST['ajax_filter'])) {
 
   <?php include 'includes/footer.php'; ?>
 
-    <a href="#" class="scroll-top" id="scroll-top">
-    <i class="bi bi-arrow-up"></i>
-  </a>
   
   <!-- مكتبات JavaScript -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
@@ -1664,10 +1634,13 @@ if (isset($_POST['ajax_filter'])) {
         particlesJS('particles-js-products', {
           particles: {
             number: { value: 80 },
-            color: { value: ["#e76a04", "#f3d417", "#ffffff"] },
+            color: {
+              value: ["#e76a04"]
+            },
             shape: { type: "circle" },
             opacity: { value: 0.5, random: true },
             size: { value: 3, random: true },
+            line_linked: { enable: true, distance: 150, opacity: 0.5 ,color: "#e76a04" },
             move: { enable: true, speed: 1 }
           }
         });
@@ -1675,9 +1648,12 @@ if (isset($_POST['ajax_filter'])) {
         particlesJS('particles-js-filters', {
           particles: {
             number: { value: 60 },
-            color: { value: "#144734" },
+           color: {
+              value: ["#e76a04"]
+            },
             opacity: { value: 0.2 },
             size: { value: 4 },
+            line_linked: { enable: true, distance: 150, opacity: 0.1 ,color: "#e76a04" },
             move: { enable: true, speed: 1 }
           }
         });
@@ -1685,10 +1661,12 @@ if (isset($_POST['ajax_filter'])) {
         particlesJS('particles-js-products-grid', {
           particles: {
             number: { value: 80 },
-            color: { value: "#e76a04" },
+            color: {
+              value: ["#e76a04"]
+            },
             opacity: { value: 0.3 },
             size: { value: 3 },
-            line_linked: { enable: true, distance: 150, opacity: 0.2 },
+            line_linked: { enable: true, distance: 150, opacity: 0.1 ,color: "#e76a04" },
             move: { enable: true, speed: 2 }
           }
         });
@@ -1696,9 +1674,12 @@ if (isset($_POST['ajax_filter'])) {
         particlesJS('particles-js-stats-products', {
           particles: {
             number: { value: 50 },
-            color: { value: "#ffffff" },
+            color: {
+              value: ["#e76a04"]
+            },
             opacity: { value: 0.1 },
             size: { value: 4 },
+            line_linked: { enable: true, distance: 150, opacity: 0.1 ,color: "#e76a04" },
             move: { enable: true, speed: 1 }
           }
         });
@@ -1706,10 +1687,12 @@ if (isset($_POST['ajax_filter'])) {
         particlesJS('particles-js-cta-products', {
           particles: {
             number: { value: 70 },
-            color: { value: ["#ffffff", "#f3d417"] },
+            color: {
+              value: ["#e76a04"]
+            },
             opacity: { value: 0.3 },
             size: { value: 4 },
-            line_linked: { enable: true, distance: 150, opacity: 0.1 },
+            line_linked: { enable: true, distance: 150, opacity: 0.1 ,color: "#e76a04" },
             move: { enable: true, speed: 1.5 }
           }
         });

@@ -51,6 +51,21 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
   <meta http-equiv="Cache-Control" content="max-age=3600, must-revalidate">
 
   <title><?php echo ($lang == 'ar') ? 'ركن الأماسي - منتجات وخدمات متميزة' : 'Rukn Alamasy - Premium Products & Services'; ?></title>
+  <!-- Open Graph / Facebook / WhatsApp -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rukn-alamasy.com.sa/index.php">
+<meta property="og:title" content="<?php echo ($lang == 'ar') ? 'ركن الأماسي - منتجات وخدمات متميزة' : 'Rukn Alamasy - Premium Products & Services'; ?>">
+<meta property="og:description" content="<?php echo ($lang == 'ar') ? 'اكتشف منتجات وخدمات استثنائية مع ركن الأماسي' : 'Discover exceptional products and services with Rukn Alamasy'; ?>">
+<meta property="og:image" content="https://drive.google.com/uc?export=view&id=1Hy5LOgYkjmZc7VJUkHDZO5InrXN52VVl">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="<?php echo ($lang == 'ar') ? 'ركن الأماسي - منتجات وخدمات متميزة' : 'Rukn Alamasy - Premium Products & Services'; ?>">
+<meta name="twitter:description" content="<?php echo ($lang == 'ar') ? 'اكتشف منتجات وخدمات استثنائية مع ركن الأماسي' : 'Discover exceptional products and services with Rukn Alamasy'; ?>">
+<meta name="twitter:image" content="https://drive.google.com/uc?export=view&id=1Hy5LOgYkjmZc7VJUkHDZO5InrXN52VVl">
+
   <meta name="description" content="<?php echo ($lang == 'ar') ? 'اكتشف منتجات وخدمات استثنائية مع ركن الأماسي' : 'Discover exceptional products and services with Rukn Alamasy'; ?>">
   <meta name="keywords" content="<?php echo ($lang == 'ar') ? 'منتجات متميزة، خدمات عالية الجودة، حلول أعمال' : 'premium products, quality services, business solutions'; ?>">
   <link href="assets/img/logo.png" rel="icon">

@@ -45,9 +45,24 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title><?php echo ($lang == 'ar') ? 'من نحن - ركن الأماسي' : 'About Us - Rukn Alamasy'; ?></title>
+  <!-- Open Graph / Facebook / WhatsApp -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rukn-alamasy.com.sa/about.php">
+<meta property="og:title" content="<?php echo ($lang == 'ar') ? 'ركن الأماسي - منتجات وخدمات متميزة' : 'Rukn Alamasy - Premium Products & Services'; ?>">
+<meta property="og:description" content="<?php echo ($lang == 'ar') ? 'اكتشف منتجات وخدمات استثنائية مع ركن الأماسي' : 'Discover exceptional products and services with Rukn Alamasy'; ?>">
+<meta property="og:image" content="https://drive.google.com/uc?export=view&id=1Hy5LOgYkjmZc7VJUkHDZO5InrXN52VVl">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="<?php echo ($lang == 'ar') ? 'ركن الأماسي - منتجات وخدمات متميزة' : 'Rukn Alamasy - Premium Products & Services'; ?>">
+<meta name="twitter:description" content="<?php echo ($lang == 'ar') ? 'اكتشف منتجات وخدمات استثنائية مع ركن الأماسي' : 'Discover exceptional products and services with Rukn Alamasy'; ?>">
+<meta name="twitter:image" content="https://drive.google.com/uc?export=view&id=1Hy5LOgYkjmZc7VJUkHDZO5InrXN52VVl">
+
   <meta name="description" content="<?php echo ($lang == 'ar') ? 'تعرف على ركن الأماسي، شركة رائدة في توفير حلول الأمن والسلامة المتكاملة' : 'Learn about Rukn Alamasy, a leading company in providing integrated safety and security solutions'; ?>">
   <meta name="keywords" content="<?php echo ($lang == 'ar') ? 'من نحن، ركن الأماسي، أمن، سلامة، معدات حماية' : 'about us, Rukn Alamasy, security, safety, protection equipment'; ?>">
-  <link href="favicon.ico" rel="icon">
+  <link href="assets/img/logo.png" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
   <link href="https://fonts.googleapis.com" rel="preconnect">
   <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
@@ -1185,37 +1200,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       50% { transform: translateY(-25px) rotate(5deg); }
     }
 
-    /* Scroll to Top */
-    .scroll-top {
-      position: fixed;
-      bottom: 40px;
-      left: 40px;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: var(--gradient-primary);
-      color: white;
-      text-decoration: none;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.8rem;
-      box-shadow: 0 15px 40px rgba(231, 106, 4, 0.4);
-      z-index: 999;
-      transition: all 0.4s ease;
-      animation: bounce 2s infinite;
-    }
-
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-
-    .scroll-top:hover {
-      transform: translateY(-5px) scale(1.1);
-      box-shadow: 0 25px 50px rgba(231, 106, 4, 0.6);
-    }
-
+    
     /* Animations */
     .fade-in-up {
       animation: fadeInUp 1.2s ease forwards;
@@ -1917,10 +1902,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
 
   <?php include 'includes/footer.php'; ?>
 
-  <a href="#" class="scroll-top" id="scroll-top">
-    <i class="bi bi-arrow-up"></i>
-  </a>
-  
+
   <!-- مكتبات JavaScript -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
   <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
@@ -2000,7 +1982,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
               }
             },
             line_linked: {
-              enable: false,
+              enable: true,
               distance: 150,
               color: "#e76a04",
               opacity: 0.4,

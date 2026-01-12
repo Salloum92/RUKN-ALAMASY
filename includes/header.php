@@ -1,25 +1,8 @@
 <?php
-
-// استيراد الملفات المطلوبة
+// تضمين ملفات النظام الأساسية
 require_once 'config.php';
-require_once 'lang.php';
 
-// استيراد ملف الدوال مع التحقق من عدم تكرار التضمين
-if (!function_exists('getContactInfo')) {
-    require_once 'contact_functions.php';
-}
-
-// استعلامات قاعدة البيانات
-$query = new Database();
-$contact_boxData = getContactInfo('box');
-$contactData = getContactInfo('social');
-
-// تحديد اللغة الافتراضية
-if (!isset($_SESSION['lang'])) {
-    $_SESSION['lang'] = 'ar';
-}
-
-// ملفات الترجمة
+// نظام الترجمة
 $translations = [
     'ar' => [
         'home' => 'الرئيسية',
@@ -29,18 +12,8 @@ $translations = [
         'contact' => 'اتصل بنا',
         'arabic' => 'العربية',
         'english' => 'الإنجليزية',
-        'welcome' => 'مرحباً بكم',
         'description' => 'أفضل المنتجات والخدمات',
-        'call_us' => 'اتصل بنا',
-        'email_us' => 'راسلنا',
-        'open_hours' => 'أوقات العمل',
-        'get_quote' => 'اطلب عرض سعر',
-        'login' => 'تسجيل الدخول',
-        'register' => 'إنشاء حساب',
-        'search' => 'ابحث عن منتج',
-        'cart' => 'عربة التسوق',
-        'profile' => 'الملف الشخصي',
-        'logout' => 'تسجيل الخروج'
+        'search_placeholder' => 'ابحث هنا...'
     ],
     'en' => [
         'home' => 'Home',
@@ -50,151 +23,128 @@ $translations = [
         'contact' => 'Contact',
         'arabic' => 'Arabic',
         'english' => 'English',
-        'welcome' => 'Welcome',
         'description' => 'Premium Products & Services',
-        'call_us' => 'Call Us',
-        'email_us' => 'Email Us',
-        'open_hours' => 'Open Hours',
-        'get_quote' => 'Get Quote',
-        'login' => 'Login',
-        'register' => 'Register',
-        'search' => 'Search here...',
-        'cart' => 'Shopping Cart',
-        'profile' => 'Profile',
-        'logout' => 'Logout'
+        'search_placeholder' => 'Search here...'
     ]
 ];
 
-// دالة لاستخراج معلومات التواصل
-function extractContactInfo($contact_boxData, $contactData) {
-    $contact_info = [
-        'google_maps_url' => '',
-        'google_maps_label' => '',
-        'location_address' => '',
-        'phone_number' => '',
-        'email_address' => '',
-        'whatsapp_number' => '',
-        'social_media' => []
-    ];
-    
-    // البحث عن رابط خرائط جوجل
-    $google_maps_item = null;
-    foreach ($contact_boxData as $item) {
-        if (isset($item['type']) && $item['type'] === 'google_maps' && !empty($item['value'])) {
-            $google_maps_item = $item;
-            break;
-        }
-    }
-    
-    if ($google_maps_item) {
-        $contact_info['google_maps_url'] = $google_maps_item['value'];
-        $contact_info['google_maps_label'] = $google_maps_item['label'] ?? 'الموقع على خرائط جوجل';
-    }
-    
-    // البحث عن العنوان
-    foreach ($contact_boxData as $item) {
-        if (isset($item['type']) && $item['type'] === 'location' && !empty($item['value'])) {
-            $contact_info['location_address'] = $item['value'];
-            break;
-        }
-        // دعم الهياكل القديمة
-        if (isset($item['title']) && stripos($item['title'], 'موقع') !== false && !empty($item['value'])) {
-            $contact_info['location_address'] = $item['value'];
-            break;
-        }
-    }
-    
-    // إذا لم نجد رابط خرائط، استخدم العنوان لإنشاء رابط
-    if (empty($contact_info['google_maps_url']) && !empty($contact_info['location_address'])) {
-        $encoded_address = urlencode($contact_info['location_address']);
-        $contact_info['google_maps_url'] = "https://www.google.com/maps/search/?api=1&query=" . $encoded_address;
-        $contact_info['google_maps_label'] = 'الموقع على خرائط جوجل';
-    }
-    
-    // إذا لم يتم العثور على عنوان في contact_box، ابحث في جدول contact
-    if (empty($contact_info['location_address']) && isset($contactData['location'])) {
-        $contact_info['location_address'] = $contactData['location'];
-        $encoded_address = urlencode($contact_info['location_address']);
-        $contact_info['google_maps_url'] = "https://www.google.com/maps/search/?api=1&query=" . $encoded_address;
-    }
-    
-    // الحصول على معلومات الاتصال الأخرى
-    foreach ($contact_boxData as $contact) {
-        if (isset($contact['type']) && $contact['type'] === 'phone' && !empty($contact['value'])) {
-            $contact_info['phone_number'] = $contact['value'];
-        } elseif (isset($contact['title']) && stripos($contact['title'], 'هاتف') !== false && !empty($contact['value'])) {
-            $contact_info['phone_number'] = $contact['value'];
-        }
-        
-        if (isset($contact['type']) && $contact['type'] === 'email' && !empty($contact['value'])) {
-            $contact_info['email_address'] = $contact['value'];
-        } elseif (isset($contact['title']) && (stripos($contact['title'], 'بريد') !== false || stripos($contact['title'], 'email') !== false) && !empty($contact['value'])) {
-            $contact_info['email_address'] = $contact['value'];
-        }
-    }
-    
-    // إذا لم يتم العثور على البريد في contact_box، ابحث في جدول contact
-    if (empty($contact_info['email_address']) && isset($contactData['email'])) {
-        $contact_info['email_address'] = $contactData['email'];
-    }
-    
-    // تنظيف رقم الهاتف من المسافات والرموز
-    $clean_phone = preg_replace('/[^0-9]/', '', $contact_info['phone_number']);
-    
-    // الحصول على رقم الواتساب
-    if (isset($contactData['whatsapp']) && !empty($contactData['whatsapp'])) {
-        $contact_info['whatsapp_number'] = $contactData['whatsapp'];
-    } elseif (!empty($clean_phone)) {
-        $contact_info['whatsapp_number'] = $clean_phone;
-    }
-    
-    // الحصول على وسائل التواصل الاجتماعي
-    $social_fields = ['twitter', 'facebook', 'instagram', 'linkedin', 'youtube', 'whatsapp', 'telegram'];
-    foreach ($social_fields as $field) {
-        if (isset($contactData[$field]) && !empty($contactData[$field])) {
-            $contact_info['social_media'][$field] = $contactData[$field];
-        }
-    }
-    
-    return $contact_info;
-}
-
-// استخدام الدالة لاستخراج المعلومات
-$contact_info = extractContactInfo($contact_boxData, $contactData);
-
-$lang = $_SESSION['lang'];
+// تحديد اللغة
+$lang = $_SESSION['lang'] ?? 'ar';
 $t = $translations[$lang];
 
+// استعلامات قاعدة البيانات - بنفس طريقة الفوتر
+$query = new Database();
+$contact_boxData = $query->select('contact_box');
+$contactData = $query->select('contact');
+
+// البحث عن بيانات الاتصال بنفس طريقة الفوتر
+$footer_contact_data = [
+    'location' => ['value' => '', 'icon' => 'bi bi-geo-alt', 'type' => 'location'],
+    'phone' => ['value' => '', 'icon' => 'bi bi-telephone', 'type' => 'phone'],
+    'email' => ['value' => '', 'icon' => 'bi bi-envelope', 'type' => 'email'],
+    'working_hours' => ['value' => '', 'icon' => 'bi bi-clock', 'type' => 'working_hours']
+];
+
+foreach ($contact_boxData as $item) {
+    if (isset($item['type'])) {
+        $type = $item['type'];
+        if (isset($footer_contact_data[$type]) && !empty($item['value'])) {
+            $footer_contact_data[$type]['value'] = $item['value'];
+            if (!empty($item['icon'])) {
+                $footer_contact_data[$type]['icon'] = $item['icon'];
+            }
+        }
+    }
+    
+    if (isset($item['title']) && isset($item['value']) && !empty($item['value'])) {
+        $title = strtolower($item['title']);
+        
+        if (strpos($title, 'موقع') !== false || strpos($title, 'location') !== false) {
+            $footer_contact_data['location']['value'] = $item['value'];
+        } elseif (strpos($title, 'هاتف') !== false || strpos($title, 'phone') !== false || strpos($title, 'tel') !== false) {
+            $footer_contact_data['phone']['value'] = $item['value'];
+        } elseif (strpos($title, 'بريد') !== false || strpos($title, 'email') !== false || strpos($title, 'mail') !== false) {
+            $footer_contact_data['email']['value'] = $item['value'];
+        } elseif (strpos($title, 'ساعات') !== false || strpos($title, 'working') !== false || strpos($title, 'hours') !== false) {
+            $footer_contact_data['working_hours']['value'] = $item['value'];
+        }
+    }
+}
+
+// استخدام بيانات الاتصال من جدول contact إذا لم توجد في contact_box
+if (empty($footer_contact_data['phone']['value']) && isset($contactData[0]['phone'])) {
+    $footer_contact_data['phone']['value'] = $contactData[0]['phone'];
+}
+
+if (empty($footer_contact_data['email']['value']) && isset($contactData[0]['email'])) {
+    $footer_contact_data['email']['value'] = $contactData[0]['email'];
+}
+
+// استرجاع بيانات الموقع والرابط - بنفس طريقة الفوتر
+$google_maps_url = '';
+$location_address = '';
+
+$google_maps_item = $query->select('contact_box', '*', "WHERE id = 1")[0] ?? null;
+
+if ($google_maps_item && !empty($google_maps_item['value'])) {
+    $google_maps_url = $google_maps_item['value'];
+    $location_address = $google_maps_item['label'] ?? ($lang == 'ar' ? 'احصل على الاتجاهات' : 'Get Directions');
+} else {
+    foreach ($contact_boxData as $item) {
+        if (isset($item['type']) && $item['type'] === 'google_maps' && !empty($item['value'])) {
+            $google_maps_url = $item['value'];
+            $location_address = $item['label'] ?? ($lang == 'ar' ? 'احصل على الاتجاهات' : 'Get Directions');
+            break;
+        }
+    }
+}
+
+if (empty($google_maps_url)) {
+    foreach ($contact_boxData as $item) {
+        if (isset($item['type']) && $item['type'] === 'location' && !empty($item['value'])) {
+            $location_address = $item['value'];
+            break;
+        }
+        if (isset($item['title']) && stripos($item['title'], 'موقع') !== false && !empty($item['value'])) {
+            $location_address = $item['value'];
+            break;
+        }
+    }
+    
+    if (empty($location_address) && isset($contactData[0]['location'])) {
+        $location_address = $contactData[0]['location'];
+    }
+    
+    if (!empty($location_address)) {
+        $encoded_address = urlencode($location_address);
+        $google_maps_url = "https://www.google.com/maps/search/?api=1&query=" . $encoded_address;
+    }
+}
+
+if (!empty($google_maps_url) && empty($location_address)) {
+    $location_address = $lang == 'ar' ? 'احصل على الاتجاهات' : 'Get Directions';
+}
+
+// تعيين المتغيرات للاستخدام في HTML
+$phone_number = $footer_contact_data['phone']['value'];
+$email_address = $footer_contact_data['email']['value'];
+$display_location = !empty($location_address) ? $location_address : ($lang == 'ar' ? 'الرياض' : 'Riyadh');
+
+// تحديد الصفحة الحالية
 $current_page = basename($_SERVER['PHP_SELF']);
-$is_logged_in = isset($_SESSION['user_id']);
-$user_name = $is_logged_in ? $_SESSION['username'] : '';
-
-// الآن يمكنك استخدام $contact_info في كل مكان
-$google_maps_url = $contact_info['google_maps_url'];
-$google_maps_label = $contact_info['google_maps_label'];
-$location_address = $contact_info['location_address'];
-$phone_number = $contact_info['phone_number'];
-$email_address = $contact_info['email_address'];
-$whatsapp_number = $contact_info['whatsapp_number'];
-$social_media = $contact_info['social_media'];
-
-// التحقق من وجود عنوان
-$has_location = !empty($location_address);
 ?>
 
 <!DOCTYPE html>
 <html lang="<?= $lang ?>" dir="<?= ($lang == 'ar') ? 'rtl' : 'ltr' ?>">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rukn Alamasy</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
-    /* ===== VARIABLES ===== */
     :root {
         --primary-color: #e76a04;
-        --primary-dark: #e76a04;
+        --primary-dark: #cc5f03;
         --secondary-color: #e76a04;
         --secondary-dark: #e76a04;
         --dark-color: #144734ff;
@@ -215,7 +165,6 @@ $has_location = !empty($location_address);
         --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.15);
     }
 
-    /* ===== RESET & BASE ===== */
     * {
         margin: 0;
         padding: 0;
@@ -238,7 +187,6 @@ $has_location = !empty($location_address);
         z-index: 5;
     }
 
-    /* ===== TOP BAR ===== */
     .top-bar {
         background: linear-gradient(135deg, var(--dark-color), var(--dark-light));
         color: var(--light-color);
@@ -249,8 +197,7 @@ $has_location = !empty($location_address);
         z-index: 100;
         display: flex;
         align-items: center;
-        height : 60px !important;
-
+        height: 60px;
     }
 
     .top-bar-content {
@@ -303,12 +250,6 @@ $has_location = !empty($location_address);
         transform: scale(1.1);
     }
 
-    /* تنسيق خاص لرابط الموقع */
-    .location-contact-item {
-        cursor: pointer;
-    }
-
-    /* Social Links */
     .social-links {
         display: flex;
         gap: 12px;
@@ -336,11 +277,10 @@ $has_location = !empty($location_address);
         box-shadow: 0 4px 12px rgba(231, 106, 4, 0.3);
     }
 
-    /* ===== MAIN NAVIGATION ===== */
     .main-nav {
         position: relative;
         width: 100%;
-        height : 80px !important;
+        height: 80px;
         min-height: 80px;
         z-index: 1000;
         background: #ffffff;
@@ -348,7 +288,6 @@ $has_location = !empty($location_address);
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         display: flex;
         align-items: center;
-        
     }
 
     .main-nav.scrolled {
@@ -371,28 +310,8 @@ $has_location = !empty($location_address);
         background: linear-gradient(90deg, #144734, #e76a04);
     }
 
-    .main-nav.scrolled .nav-link {
-        font-size: 0.95rem;
-        color: var(--dark-color);
-    }
-
-    @keyframes slideInDown {
-        from { transform: translateY(-100%); }
-        to { transform: translateY(0); }
-    }
-
     body.nav-fixed-active {
         padding-top: 80px;
-    }
-
-    .main-nav.scrolled .nav-container {
-        padding: 10px 0;
-    }
-
-    .main-nav:not(.scrolled) .logo-text .brand-tagline {
-        opacity: 1;
-        height: auto;
-        transition: opacity 0.3s ease;
     }
 
     .nav-container {
@@ -404,7 +323,6 @@ $has_location = !empty($location_address);
         transition: padding 0.3s ease;
     }
 
-    /* Logo Section */
     .logo-section {
         flex-shrink: 0;
     }
@@ -423,12 +341,11 @@ $has_location = !empty($location_address);
         object-fit: cover;
         box-shadow: none !important;
         transition: var(--transition);
-        border : none !important ;
+        border: none !important;
     }
 
     .logo:hover .logo-image img {
         transform: scale(1.05);
-        box-shadow: 0 6px 20px rgba(231, 106, 4, 0.3);
     }
 
     .logo-text {
@@ -448,14 +365,13 @@ $has_location = !empty($location_address);
     }
 
     .brand-tagline {
-        color : #144734ff;
+        color: #144734ff;
         font-size: 0.6rem;
         font-weight: 400;
         margin-top: 1px;
         text-align: center;
     }
 
-    /* Search Section */
     .search-section {
         flex: 1;
         max-width: 500px;
@@ -521,13 +437,12 @@ $has_location = !empty($location_address);
         transform: translateY(-50%) scale(1.05);
     }
 
-    /* Navigation Actions */
     .nav-actions {
         display: flex;
-    align-items: center;
-    gap: 10px;
-    justify-content: space-between;
-    width: 75%;
+        align-items: center;
+        gap: 10px;
+        justify-content: space-between;
+        width: 75%;
     }
 
     .nav-menu {
@@ -595,7 +510,6 @@ $has_location = !empty($location_address);
         color: white;
     }
 
-    /* Dropdown Menu */
     .dropdown-menu {
         position: absolute;
         top: 100%;
@@ -635,7 +549,6 @@ $has_location = !empty($location_address);
         transform: translateX(5px);
     }
 
-    /* Language Selector */
     .language-selector {
         position: relative;
     }
@@ -721,7 +634,6 @@ $has_location = !empty($location_address);
         color: var(--primary-color);
     }
 
-    /* Mobile Menu Toggle */
     .mobile-menu-toggle {
         display: none;
         flex-direction: column;
@@ -750,106 +662,6 @@ $has_location = !empty($location_address);
         transform: scale(1.1);
     }
 
-    /* ===== MOBILE SEARCH MODAL ===== */
-    .mobile-search-modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        backdrop-filter: blur(5px);
-        z-index: 9999;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-
-    .mobile-search-modal.active {
-        display: flex;
-        opacity: 1;
-    }
-
-    .search-modal-content {
-        background: var(--bg-white);
-        border-radius: var(--border-radius-lg);
-        padding: 30px;
-        width: 90%;
-        max-width: 500px;
-        transform: scale(0.9);
-        transition: transform 0.3s ease;
-    }
-
-    .mobile-search-modal.active .search-modal-content {
-        transform: scale(1);
-    }
-
-    .search-modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-
-    .search-modal-header h3 {
-        color: var(--text-dark);
-        margin: 0;
-        font-size: 1.5rem;
-    }
-
-    .close-search-modal {
-        background: none;
-        border: none;
-        color: var(--text-light);
-        font-size: 1.5rem;
-        cursor: pointer;
-        transition: var(--transition-fast);
-    }
-
-    .close-search-modal:hover {
-        color: var(--primary-color);
-        transform: scale(1.1);
-    }
-
-    .search-input-group {
-        display: flex;
-        background: var(--bg-light);
-        border-radius: 50px;
-        border: 2px solid transparent;
-        transition: var(--transition);
-        overflow: hidden;
-    }
-
-    .search-input-group:focus-within {
-        border-color: var(--primary-color);
-        background: var(--bg-white);
-    }
-
-    .mobile-search-input {
-        flex: 1;
-        border: none;
-        background: none;
-        padding: 15px 20px;
-        font-size: 1rem;
-        outline: none;
-    }
-
-    .mobile-search-btn {
-        background: var(--primary-color);
-        border: none;
-        color: white;
-        padding: 0 25px;
-        cursor: pointer;
-        transition: var(--transition);
-    }
-
-    .mobile-search-btn:hover {
-        background: var(--primary-dark);
-    }
-
-    /* ===== MOBILE MENU ===== */
     .mobile-menu {
         position: fixed;
         top: 0;
@@ -921,47 +733,6 @@ $has_location = !empty($location_address);
         margin-bottom: 50px;
     }
 
-    /* Mobile Search in Menu */
-    .mobile-search-container {
-        margin-bottom: 10px;
-    }
-
-    .mobile-nav-search-box {
-        display: flex;
-        background: white;
-        border-radius: 25px;
-        border: 2px solid var(--primary-color);
-        transition: var(--transition);
-        overflow: hidden;
-    }
-
-    .mobile-nav-search-box:focus-within {
-        border-color: var(--primary-color);
-    }
-
-    .mobile-nav-search-input {
-        flex: 1;
-        border: none;
-        background: white;
-        padding: 12px 16px;
-        font-size: 0.9rem;
-        outline: none;
-    }
-
-    .mobile-nav-search-btn {
-        background: var(--primary-color);
-        border: none;
-        color: white;
-        padding: 0 16px;
-        cursor: pointer;
-        transition: var(--transition);
-    }
-
-    .mobile-nav-search-btn:hover {
-        background: var(--primary-dark);
-    }
-
-    /* Mobile Navigation */
     .mobile-nav {
         display: flex;
         flex-direction: column;
@@ -999,7 +770,6 @@ $has_location = !empty($location_address);
         text-align: center;
     }
 
-    /* Mobile Contact Section */
     .mobile-contact-section {
         background: rgba(255, 255, 255, 0.1);
         padding: 20px;
@@ -1045,17 +815,7 @@ $has_location = !empty($location_address);
     .mobile-contact-item:hover i {
         transform: scale(1.1);
     }
-   
-    /* تنسيق خاص لرابط الموقع في الموبايل */
-    .mobile-location-item {
-        cursor: pointer;
-    }
 
-    .mobile-location-item:hover i {
-        transform: scale(1.1);
-    }
-
-    /* Mobile Language Selector Container */
     .mobile-language-selector {
         display: flex;
         gap: 10px;
@@ -1102,13 +862,6 @@ $has_location = !empty($location_address);
         background: rgba(255, 255, 255, 0.1);
     }
 
-    .mobile-lang-option:focus,
-    .mobile-lang-option:active {
-        text-decoration: none;
-        outline: none;
-    }
-
-    /* ===== FLOATING BUTTONS ===== */
     .floating-whatsapp {
         position: fixed;
         bottom: 25px;
@@ -1137,74 +890,37 @@ $has_location = !empty($location_address);
         box-shadow: 0 6px 25px rgba(37, 211, 102, 0.6);
         animation: none;
     }
-     /* Scroll to Top */
+
     .scroll-top {
-      position: fixed;
-      bottom: 15px;
-      left: 20px;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: var(--gradient-primary);
-      color: white;
-      text-decoration: none;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.8rem;
-      box-shadow: 0 15px 40px rgba(231, 106, 4, 0.4);
-      z-index: 999;
-      transition: all 0.4s ease;
-      animation: bounce 2s infinite;
+        position: fixed;
+        bottom: 15px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        color: white;
+        text-decoration: none;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        box-shadow: 0 15px 40px rgba(231, 106, 4, 0.4);
+        z-index: 999;
+        transition: all 0.4s ease;
+        animation: bounce 2s infinite;
     }
 
     @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
     }
 
     .scroll-top:hover {
-      transform: translateY(-5px) scale(1.1);
-      box-shadow: 0 25px 50px rgba(231, 106, 4, 0.6);
+        transform: translateY(-5px) scale(1.1);
+        box-shadow: 0 25px 50px rgba(231, 106, 4, 0.6);
     }
 
-    .scroll-to-top {
-        position: fixed;
-        bottom: 25px;
-        right: 25px;
-        z-index: 1000;
-    }
-
-    .scroll-top-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 50px;
-        height: 50px;
-        background: var(--primary-color);
-        color: white;
-        border: none;
-        border-radius: 50%;
-        font-size: 1.2rem;
-        box-shadow: var(--shadow);
-        transition: var(--transition);
-        cursor: pointer;
-        opacity: 0;
-        visibility: hidden;
-    }
-
-    .scroll-top-btn.show {
-        opacity: 1;
-        visibility: visible;
-    }
-
-    .scroll-top-btn:hover {
-        background: var(--primary-dark);
-        transform: translateY(-3px);
-        box-shadow: var(--shadow-lg);
-    }
-
-    /* ===== OVERLAY ===== */
     .mobile-overlay {
         position: fixed;
         top: 0;
@@ -1221,7 +937,6 @@ $has_location = !empty($location_address);
         display: block;
     }
 
-    /* ===== ANIMATIONS ===== */
     @keyframes pulse {
         0% {
             box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
@@ -1231,48 +946,6 @@ $has_location = !empty($location_address);
         }
         100% {
             box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
-        }
-    }
-
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateX(-20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-        }
-        to {
-            opacity: 1;
-        }
-    }
-
-    @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        25% { transform: translateX(-5px); }
-        75% { transform: translateX(5px); }
-    }
-
-    /* ===== RESPONSIVE DESIGN ===== */
-    @media (max-width: 1200px) {
-        .nav-container {
-            gap: 20px;
-        }
-
-        .nav-link {
-            padding: 10px 15px;
-            font-size: 0.9rem;
-        }
-
-        .search-section {
-            max-width: 400px;
         }
     }
 
@@ -1314,10 +987,6 @@ $has_location = !empty($location_address);
             gap: 15px;
         }
 
-        .logo {
-            gap: 10px;
-        }
-
         .logo-image img {
             width: 80px;
             height: 80px;
@@ -1336,23 +1005,12 @@ $has_location = !empty($location_address);
             left: 20px;
         }
 
-        .scroll-to-top {
-            bottom: 20px;
-            right: 20px;
-        }
-
         .whatsapp-float {
             width: 55px;
             height: 55px;
             font-size: 1.6rem;
         }
-
-        .scroll-top-btn {
-            width: 45px;
-            height: 45px;
-            font-size: 1.1rem;
-        }
-    }
+        
 
     @media (max-width: 576px) {
         .main-nav {
@@ -1364,11 +1022,13 @@ $has_location = !empty($location_address);
             display: flex;
             align-items: center;
         }
-        .nav-actions{
+        
+        .nav-actions {
             width: auto;
         }
-        .mobile-nav{
-            gap : 0;
+        
+        .mobile-nav {
+            gap: 0;
         }
 
         .logo-image img {
@@ -1381,30 +1041,18 @@ $has_location = !empty($location_address);
 
         .brand-tagline {
             font-size: 10px !important;
-            color : #144734ff;
+            color: #144734ff;
         }
 
         .mobile-menu {
             width: 80%;
-            
         }
-        .mobile-menu.active .brand-tagline{
-            display : none;
-        }
-        .search-modal-content {
-            margin: 20px;
-            padding: 25px;
+        
+        .mobile-menu.active .brand-tagline {
+            display: none;
         }
     }
 
-    @media (max-width: 480px) {
-        .mobile-menu-toggle {
-            height: 40px;
-            justify-content : space-between;
-        }
-    }
-
-    /* ===== RTL SUPPORT ===== */
     [dir="rtl"] .logo {
         flex-direction: row-reverse;
     }
@@ -1438,33 +1086,11 @@ $has_location = !empty($location_address);
         right: 25px;
     }
 
-    [dir="rtl"] .scroll-to-top {
+    [dir="rtl"] .scroll-top {
         right: auto;
-        left: 25px;
+        left: 20px;
     }
-
-    /* ===== ACCESSIBILITY ===== */
-    @media (prefers-reduced-motion: reduce) {
-        * {
-            animation-duration: 0.01ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: 0.01ms !important;
-        }
-    }
-
-    /* Focus styles */
-    .nav-link:focus,
-    .search-btn:focus,
-    .lang-toggle:focus,
-    .mobile-menu-toggle:focus,
-    .mobile-nav-item:focus,
-    .whatsapp-float:focus,
-    .scroll-top-btn:focus {
-        outline: 2px solid var(--primary-color);
-        outline-offset: 2px;
-    }
-
-    /* منع التمرير عندما تكون القائمة مفتوحة */
+   
     body.menu-open {
         overflow: hidden;
     }
@@ -1474,26 +1100,25 @@ $has_location = !empty($location_address);
 <body>
 <header id="header" class="header">
     <!-- Top Bar -->
-     <div class="top-bar">
+    <div class="top-bar">
         <div class="container-fluid">
             <div class="top-bar-content">
                 <!-- Contact Info -->
                 <div class="contact-info">
                     <?php if (!empty($google_maps_url)): ?>
-                    <div class="contact-item google-maps-icon" onclick="window.open('<?= htmlspecialchars($google_maps_url) ?>', '_blank')" title="<?= htmlspecialchars($google_maps_label) ?>">
+                    <div class="contact-item google-maps-icon" onclick="window.open('<?= htmlspecialchars($google_maps_url) ?>', '_blank')" title="<?= htmlspecialchars($location_address) ?>">
                         <i class="bi bi-geo-alt-fill"></i>
-                        <span>RIYAD</span>
+                        <span><?= htmlspecialchars($display_location) ?></span>
                     </div>
-                    <?php elseif ($has_location): ?>
-                    <div class="contact-item google-maps-icon" onclick="window.open('https://www.google.com/maps/search/?api=1&query=<?= urlencode($location_address) ?>', '_blank')" title="عرض الموقع على خرائط جوجل">
-                        
-                    <i class="bi bi-geo-alt-fill"></i>
-                        <span>خرائط جوجل</span>
+                    <?php elseif (!empty($location_address)): ?>
+                    <div class="contact-item google-maps-icon" onclick="window.open('https://www.google.com/maps/search/?api=1&query=<?= urlencode($location_address) ?>', '_blank')" title="<?= htmlspecialchars($location_address) ?>">
+                        <i class="bi bi-geo-alt-fill"></i>
+                        <span><?= htmlspecialchars($display_location) ?></span>
                     </div>
                     <?php else: ?>
                     <div class="contact-item">
-                        <i class="bi bi-geo-alt"></i>
-                        <span>إضافة موقع من صفحة معلومات الاتصال</span>
+                        <i class="bi bi-geo-alt-fill"></i>
+                        <span><?= $lang == 'ar' ? 'الرياض' : 'Riyadh' ?></span>
                     </div>
                     <?php endif; ?>
 
@@ -1507,7 +1132,7 @@ $has_location = !empty($location_address);
                     <?php else: ?>
                     <div class="contact-item">
                         <i class="bi bi-envelope"></i>
-                        <span>البريد غير متوفر</span>
+                        <span><?= $lang == 'ar' ? 'البريد غير متوفر' : 'Email not available' ?></span>
                     </div>
                     <?php endif; ?>
 
@@ -1521,45 +1146,45 @@ $has_location = !empty($location_address);
                     <?php else: ?>
                     <div class="contact-item">
                         <i class="bi bi-phone"></i>
-                        <span>الهاتف غير متوفر</span>
+                        <span><?= $lang == 'ar' ? 'الهاتف غير متوفر' : 'Phone not available' ?></span>
                     </div>
                     <?php endif; ?>
                 </div>
 
                 <!-- Social Links -->
                 <div class="social-links">
-                    <?php if (isset($contactData['twitter']) && !empty($contactData['twitter'])): ?>
-                        <a href="https://x.com/<?= $contactData['twitter'] ?>" class="social-link twitter" target="_blank" title="Twitter">
+                    <?php if (isset($contactData[0]['twitter']) && !empty($contactData[0]['twitter'])): ?>
+                        <a href="<?= $contactData[0]['twitter'] ?>" class="social-link twitter" target="_blank" title="Twitter">
                             <i class="bi bi-twitter-x"></i>
                         </a>
                     <?php endif; ?>
-                    <?php if (isset($contactData['facebook']) && !empty($contactData['facebook'])): ?>
-                        <a href="https://facebook.com/<?= $contactData['facebook'] ?>" class="social-link facebook" target="_blank" title="Facebook">
+                    <?php if (isset($contactData[0]['facebook']) && !empty($contactData[0]['facebook'])): ?>
+                        <a href="<?= $contactData[0]['facebook'] ?>" class="social-link facebook" target="_blank" title="Facebook">
                             <i class="bi bi-facebook"></i>
                         </a>
                     <?php endif; ?>
-                    <?php if (isset($contactData['instagram']) && !empty($contactData['instagram'])): ?>
-                        <a href="https://instagram.com/<?= $contactData['instagram'] ?>" class="social-link instagram" target="_blank" title="Instagram">
+                    <?php if (isset($contactData[0]['instagram']) && !empty($contactData[0]['instagram'])): ?>
+                        <a href="<?= $contactData[0]['instagram'] ?>" class="social-link instagram" target="_blank" title="Instagram">
                             <i class="bi bi-instagram"></i>
                         </a>
                     <?php endif; ?>
-                    <?php if (isset($contactData['linkedin']) && !empty($contactData['linkedin'])): ?>
-                        <a href="https://linkedin.com/in/<?= $contactData['linkedin'] ?>" class="social-link linkedin" target="_blank" title="LinkedIn">
+                    <?php if (isset($contactData[0]['linkedin']) && !empty($contactData[0]['linkedin'])): ?>
+                        <a href="<?= $contactData[0]['linkedin'] ?>" class="social-link linkedin" target="_blank" title="LinkedIn">
                             <i class="bi bi-linkedin"></i>
                         </a>
                     <?php endif; ?>
-                    <?php if (isset($contactData['youtube']) && !empty($contactData['youtube'])): ?>
-                        <a href="https://www.youtube.com/<?= $contactData['youtube'] ?>" class="social-link youtube" target="_blank" title="YouTube">
+                    <?php if (isset($contactData[0]['youtube']) && !empty($contactData[0]['youtube'])): ?>
+                        <a href="<?= $contactData[0]['youtube'] ?>" class="social-link youtube" target="_blank" title="YouTube">
                             <i class="bi bi-youtube"></i>
                         </a>
                     <?php endif; ?>
-                    <?php if (isset($contactData['whatsapp']) && !empty($contactData['whatsapp'])): ?>
-                        <a href="<?= $contactData['whatsapp'] ?>" class="social-link whatsapp" target="_blank" title="WhatsApp">
+                    <?php if (isset($contactData[0]['whatsapp']) && !empty($contactData[0]['whatsapp'])): ?>
+                        <a href="<?= $contactData[0]['whatsapp'] ?>" class="social-link whatsapp" target="_blank" title="WhatsApp">
                             <i class="bi bi-whatsapp"></i>
                         </a>
                     <?php endif; ?>
-                    <?php if (isset($contactData['telegram']) && !empty($contactData['telegram'])): ?>
-                        <a href="https://t.me/<?= $contactData['telegram'] ?>" class="social-link telegram" target="_blank" title="Telegram">
+                    <?php if (isset($contactData[0]['telegram']) && !empty($contactData[0]['telegram'])): ?>
+                        <a href="<?= $contactData[0]['telegram'] ?>" class="social-link telegram" target="_blank" title="Telegram">
                             <i class="bi bi-telegram"></i>
                         </a>
                     <?php endif; ?>
@@ -1586,7 +1211,6 @@ $has_location = !empty($location_address);
                     </a>
                 </div>
 
-               
                 <!-- Navigation & Actions -->
                 <div class="nav-actions">
                     <!-- Main Navigation -->
@@ -1608,7 +1232,6 @@ $has_location = !empty($location_address);
                                 <i class="bi bi-gear"></i>
                                 <span><?= $t['services'] ?></span>
                             </a>
-                            
                         </li>
                         <li class="nav-item">
                             <a href="products.php" class="nav-link <?= ($current_page == 'products.php') ? 'active' : '' ?>">
@@ -1705,8 +1328,6 @@ $has_location = !empty($location_address);
         </div>
 
         <div class="mobile-menu-content">
-           
-
             <!-- Mobile Navigation -->
             <nav class="mobile-nav">
                 <a href="./" class="mobile-nav-item <?= ($current_page == 'index.php' || $current_page == '' || $current_page == '/') ? 'active' : '' ?>">
@@ -1735,19 +1356,19 @@ $has_location = !empty($location_address);
             <div class="mobile-contact-section">
                 <div class="mobile-contact-info">
                     <?php if (!empty($google_maps_url)): ?>
-                    <div class="mobile-contact-item google-maps-icon" onclick="window.open('<?= htmlspecialchars($google_maps_url) ?>', '_blank')" title="<?= htmlspecialchars($google_maps_label) ?>">
+                    <div class="mobile-contact-item google-maps-icon" onclick="window.open('<?= htmlspecialchars($google_maps_url) ?>', '_blank')" title="<?= htmlspecialchars($location_address) ?>">
                         <i class="bi bi-geo-alt-fill"></i>
-                        <span>RIYAD</span>
+                        <span><?= htmlspecialchars($display_location) ?></span>
                     </div>
-                    <?php elseif ($has_location): ?>
-                    <div class="mobile-contact-item google-maps-icon" onclick="window.open('https://www.google.com/maps/search/?api=1&query=<?= urlencode($location_address) ?>', '_blank')" title="عرض الموقع على خرائط جوجل">
+                    <?php elseif (!empty($location_address)): ?>
+                    <div class="mobile-contact-item google-maps-icon" onclick="window.open('https://www.google.com/maps/search/?api=1&query=<?= urlencode($location_address) ?>', '_blank')" title="<?= htmlspecialchars($location_address) ?>">
                         <i class="bi bi-geo-alt-fill"></i>
-                        <span>خرائط جوجل</span>
+                        <span><?= htmlspecialchars($display_location) ?></span>
                     </div>
                     <?php else: ?>
                     <div class="mobile-contact-item">
-                        <i class="bi bi-geo-alt"></i>
-                        <span>العنوان غير متوفر</span>
+                        <i class="bi bi-geo-alt-fill"></i>
+                        <span><?= $lang == 'ar' ? 'الرياض' : 'Riyadh' ?></span>
                     </div>
                     <?php endif; ?>
 
@@ -1761,7 +1382,7 @@ $has_location = !empty($location_address);
                     <?php else: ?>
                     <div class="mobile-contact-item">
                         <i class="bi bi-envelope"></i>
-                        <span>البريد غير متوفر</span>
+                        <span><?= $lang == 'ar' ? 'البريد غير متوفر' : 'Email not available' ?></span>
                     </div>
                     <?php endif; ?>
 
@@ -1775,7 +1396,7 @@ $has_location = !empty($location_address);
                     <?php else: ?>
                     <div class="mobile-contact-item">
                         <i class="bi bi-phone"></i>
-                        <span>الهاتف غير متوفر</span>
+                        <span><?= $lang == 'ar' ? 'الهاتف غير متوفر' : 'Phone not available' ?></span>
                     </div>
                     <?php endif; ?>
                 </div>
@@ -1793,16 +1414,20 @@ $has_location = !empty($location_address);
                 <a href="?lang=en" class="mobile-lang-option <?= ($lang == 'en') ? 'active' : '' ?>">
                     <svg class="flag-icon" width="20" height="15" viewBox="0 0 24 18">
                         <rect width="24" height="1.38" fill="#B22234" y="0"/>
-                        <rect width="24" height="1.38" fill="#B22234" y="2.76"/>
-                        <rect width="24" height="1.38" fill="#B22234" y="5.52"/>
-                        <rect width="24" height="1.38" fill="#B22234" y="8.28"/>
-                        <rect width="24" height="1.38" fill="#B22234" y="11.04"/>
-                        <rect width="24" height="1.38" fill="#B22234" y="13.8"/>
-                        <rect width="24" height="1.38" fill="#B22234" y="16.56"/>
-                        <rect width="9.6" height="9.66" fill="#3C3B6E"/>
-                    </svg>
-                    <span>English</span>
-                </a>
+                                        <rect width="24" height="1.38" fill="#B22234" y="2.76"/>
+                                        <rect width="24" height="1.38" fill="#B22234" y="5.52"/>
+                                        <rect width="24" height="1.38" fill="#B22234" y="8.28"/>
+                                        <rect width="24" height="1.38" fill="#B22234" y="11.04"/>
+                                        <rect width="24" height="1.38" fill="#B22234" y="13.8"/>
+                                        <rect width="24" height="1.38" fill="#B22234" y="16.56"/>
+                                        <rect width="9.6" height="9.66" fill="#3C3B6E"/>
+                                    </svg>
+                                    <span>English</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1812,18 +1437,18 @@ $has_location = !empty($location_address);
 <div class="mobile-overlay"></div>
 
 <!-- Floating WhatsApp Button -->
-<?php if (!empty($whatsapp_number)): ?>
+<?php if (isset($contactData[0]['whatsapp']) && !empty($contactData[0]['whatsapp'])): ?>
 <div class="floating-whatsapp">
-    
-     <a href="<?= $contactData['whatsapp'] ?>" class="whatsapp-float" target="_blank" title="WhatsApp">
+    <a href="<?= $contactData[0]['whatsapp'] ?>" class="whatsapp-float" target="_blank" title="WhatsApp">
         <i class="bi bi-whatsapp"></i>
     </a>
 </div>
 <?php endif; ?>
 
-     <a href="#" class="scroll-top" id="scroll-top">
+<!-- Scroll to Top Button -->
+<a href="#" class="scroll-top" id="scroll-top">
     <i class="bi bi-arrow-up"></i>
-  </a> 
+</a>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -1832,7 +1457,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const mobileMenu = document.querySelector('.mobile-menu');
     const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
     const mobileMenuClose = document.querySelector('.mobile-menu-close');
-    const scrollTopBtn = document.querySelector('.scroll-top-btn');
+    const scrollTopBtn = document.getElementById('scroll-top');
     const mobileOverlay = document.querySelector('.mobile-overlay');
     const googleMapsIcons = document.querySelectorAll('.google-maps-icon');
     const contactItems = document.querySelectorAll('.contact-item, .mobile-contact-item');
@@ -1900,16 +1525,21 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('scroll', function() {
         if (window.scrollY > 300) {
             mainNav.classList.add('scrolled');
-            scrollTopBtn.classList.add('show');
+            if (scrollTopBtn) {
+                scrollTopBtn.style.display = 'flex';
+            }
         } else {
             mainNav.classList.remove('scrolled');
-            scrollTopBtn.classList.remove('show');
+            if (scrollTopBtn) {
+                scrollTopBtn.style.display = 'none';
+            }
         }
     });
 
     // Scroll to top functionality
     if (scrollTopBtn) {
-        scrollTopBtn.addEventListener('click', function() {
+        scrollTopBtn.addEventListener('click', function(e) {
+            e.preventDefault();
             window.scrollTo({
                 top: 0,
                 behavior: 'smooth'
@@ -1917,19 +1547,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Search form validation
-    const searchForms = document.querySelectorAll('.search-form, .mobile-nav-search-form');
-    searchForms.forEach(form => {
-        form.addEventListener('submit', function(e) {
-            const searchInput = this.querySelector('input[name="q"]');
-            if (!searchInput.value.trim()) {
-                e.preventDefault();
-                searchInput.focus();
-                searchInput.style.animation = 'shake 0.5s ease-in-out';
-                setTimeout(() => {
-                    searchInput.style.animation = '';
-                }, 500);
-            }
+    // إضافة تأثير النقر على أيقونات خرائط جوجل
+    googleMapsIcons.forEach(icon => {
+        icon.addEventListener('click', function() {
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = '';
+            }, 200);
         });
     });
 

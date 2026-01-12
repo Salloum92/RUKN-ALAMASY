@@ -48,10 +48,24 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title><?php echo ($lang == 'ar') ? 'خدماتنا - ركن الأماسي' : 'Our Services - Rukn Alamasy'; ?></title>
+  <!-- Open Graph / Facebook / WhatsApp -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rukn-alamasy.com.sa/services.php">
+<meta property="og:title" content="<?php echo ($lang == 'ar') ? 'ركن الأماسي - منتجات وخدمات متميزة' : 'Rukn Alamasy - Premium Products & Services'; ?>">
+<meta property="og:description" content="<?php echo ($lang == 'ar') ? 'اكتشف منتجات وخدمات استثنائية مع ركن الأماسي' : 'Discover exceptional products and services with Rukn Alamasy'; ?>">
+<meta property="og:image" content="https://drive.google.com/uc?export=view&id=1Hy5LOgYkjmZc7VJUkHDZO5InrXN52VVl">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="<?php echo ($lang == 'ar') ? 'ركن الأماسي - منتجات وخدمات متميزة' : 'Rukn Alamasy - Premium Products & Services'; ?>">
+<meta name="twitter:description" content="<?php echo ($lang == 'ar') ? 'اكتشف منتجات وخدمات استثنائية مع ركن الأماسي' : 'Discover exceptional products and services with Rukn Alamasy'; ?>">
+<meta name="twitter:image" content="https://drive.google.com/uc?export=view&id=1Hy5LOgYkjmZc7VJUkHDZO5InrXN52VVl">
+
   <meta name="description" content="<?php echo ($lang == 'ar') ? 'اكتشف خدماتنا المتميزة وحلولنا الشاملة لأمن وسلامة منشآتك' : 'Discover our premium services and comprehensive solutions for your facility security and safety'; ?>">
   <meta name="keywords" content="<?php echo ($lang == 'ar') ? 'خدمات، حلول، أمن، سلامة، معدات حماية' : 'services, solutions, security, safety, protection equipment'; ?>">
-  <link href="favicon.ico" rel="icon">
-  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+<link href="assets/img/logo.png" rel="icon">  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
   <link href="https://fonts.googleapis.com" rel="preconnect">
   <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
@@ -808,36 +822,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       50% { transform: translateY(-25px) rotate(5deg); }
     }
 
-    /* Scroll to Top */
-    .scroll-top {
-      position: fixed;
-      bottom: 40px;
-      left: 40px;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: var(--gradient-primary);
-      color: white;
-      text-decoration: none;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.8rem;
-      box-shadow: 0 15px 40px rgba(231, 106, 4, 0.4);
-      z-index: 999;
-      transition: all 0.4s ease;
-      animation: bounce 2s infinite;
-    }
-
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-
-    .scroll-top:hover {
-      transform: translateY(-5px) scale(1.1);
-      box-shadow: 0 25px 50px rgba(231, 106, 4, 0.6);
-    }
+   
 
     /* قسم "لماذا تختارنا" الاحترافي */
     .why-choose-professional {
@@ -1777,10 +1762,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
 
   <?php include 'includes/footer.php'; ?>
 
-  <a href="#" class="scroll-top" id="scroll-top">
-    <i class="bi bi-arrow-up"></i>
-  </a>
-  
+ 
   <!-- مكتبات JavaScript -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
   <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
@@ -1830,7 +1812,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
               }
             },
             color: {
-              value: ["#e76a04", "#f3d417", "#ffffff"]
+              value: ["#e76a04"]
             },
             shape: {
               type: ["circle", "triangle"],
@@ -1860,7 +1842,7 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
               }
             },
             line_linked: {
-              enable: false,
+              enable: true,
               distance: 150,
               color: "#e76a04",
               opacity: 0.4,
