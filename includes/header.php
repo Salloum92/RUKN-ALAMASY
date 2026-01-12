@@ -12,7 +12,7 @@ $translations = [
         'contact' => 'اتصل بنا',
         'arabic' => 'العربية',
         'english' => 'الإنجليزية',
-        'description' => 'أفضل منتجات الأمن و السلام',
+        'description' => 'أفضل منتجات الأمن و السلامة',
         'search_placeholder' => 'ابحث هنا...'
     ],
     'en' => [
