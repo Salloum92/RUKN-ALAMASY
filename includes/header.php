@@ -12,7 +12,7 @@ $translations = [
         'contact' => 'اتصل بنا',
         'arabic' => 'العربية',
         'english' => 'الإنجليزية',
-        'description' => 'أفضل المنتجات والخدمات',
+        'description' => 'أفضل منتجات الأمن و السلام',
         'search_placeholder' => 'ابحث هنا...'
     ],
     'en' => [
@@ -1010,7 +1010,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             height: 55px;
             font-size: 1.6rem;
         }
-        
+    }
 
     @media (max-width: 576px) {
         .main-nav {
@@ -1082,13 +1082,26 @@ $current_page = basename($_SERVER['PHP_SELF']);
     }
 
     [dir="rtl"] .floating-whatsapp {
+       
+         right: auto;
+        left: 20px;
+    }
+
+    [dir="rtl"] .scroll-top {
         left: auto;
         right: 25px;
     }
 
-    [dir="rtl"] .scroll-top {
+    /* إضافة قسم لـ LTR (اللغة الإنجليزية) */
+    [dir="ltr"] .floating-whatsapp {
+        
+        right: 20px;
+        left: auto;
+    }
+    
+    [dir="ltr"] .scroll-top {
+        left: 25px;
         right: auto;
-        left: 20px;
     }
    
     body.menu-open {

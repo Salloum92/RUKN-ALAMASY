@@ -497,14 +497,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       gap: 10px;
     }
 
-    .product-price {
-      font-size: 3rem;
-      font-weight: 900;
-      color: var(--primary-color);
-      margin-bottom: 30px;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
     .product-description {
       color: var(--text-light);
       font-size: 1.15rem;
@@ -874,10 +866,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       .product-title {
         font-size: 2.2rem;
       }
-      
-      .product-price {
-        font-size: 2.5rem;
-      }
     }
 
     @media (max-width: 992px) {
@@ -915,10 +903,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
         font-size: 1.8rem;
       }
       
-      .product-price {
-        font-size: 2rem;
-      }
-      
       .main-image img {
         height: 300px;
       }
@@ -940,10 +924,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
       
       .product-title {
         font-size: 1.6rem;
-      }
-      
-      .product-price {
-        font-size: 1.8rem;
       }
       
       .thumbnail {
@@ -1059,10 +1039,6 @@ $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ar';
                 <div class="product-category">
                   <i class="bi bi-tags"></i>
                   <span><?php echo htmlspecialchars($category_name); ?></span>
-                </div>
-
-                <div class="product-price">
-                  <?php echo ($lang == 'ar') ? 'ر.س ' : 'SAR '; ?><?php echo number_format($product['price'], 0, '', ' '); ?>
                 </div>
 
                 <div class="product-description">

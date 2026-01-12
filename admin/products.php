@@ -58,14 +58,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($_POST['action'] === 'update' && isset($_POST['edit_id'])) {
         $edit_id = intval($_POST['edit_id']);
         $product_name = trim($_POST['product_name']);
-        $price = floatval($_POST['price']);
         $description = trim($_POST['description']);
         $category_id = intval($_POST['category_id']);
 
         try {
-            // تحديث بيانات المنتج
-            $query->eQuery('UPDATE products SET product_name = ?, price = ?, description = ?, category_id = ? WHERE id = ?', 
-                          [$product_name, $price, $description, $category_id, $edit_id]);
+            // تحديث بيانات المنتج (تم إزالة price)
+            $query->eQuery('UPDATE products SET product_name = ?, description = ?, category_id = ? WHERE id = ?', 
+                          [$product_name, $description, $category_id, $edit_id]);
 
             // التعامل مع تحديث الصور إذا تم رفع صور جديدة
             if (!empty($_FILES['image']['name'][0])) {
@@ -118,7 +117,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 // معالجة إضافة منتج جديد
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'add') {
     $product_name = trim($_POST['product_name']);
-    $price = floatval($_POST['price']);
     $description = trim($_POST['description']);
     $category_id = intval($_POST['category_id']);
 
@@ -142,9 +140,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             }
 
             if (!empty($uploadedImages)) {
-                // إضافة المنتج
-                $query->eQuery('INSERT INTO products (product_name, description, price, category_id) VALUES (?, ?, ?, ?)', 
-                              [$product_name, $description, $price, $category_id]);
+                // إضافة المنتج (تم إزالة price)
+                $query->eQuery('INSERT INTO products (product_name, description, category_id) VALUES (?, ?, ?)', 
+                              [$product_name, $description, $category_id]);
 
                 $product_id = $query->lastInsertId();
 
@@ -347,20 +345,6 @@ if (isset($_GET['edit_id'])) {
             overflow: hidden;
         }
         
-        .product-price {
-            color: var(--primary-color);
-            font-size: 1.4rem;
-            font-weight: 800;
-            margin-bottom: 15px;
-        }
-        
-        .product-price::before {
-            content: 'ريال ';
-            font-size: 0.9rem;
-            color: #666;
-            font-weight: normal;
-        }
-        
         .product-actions {
             display: flex;
             gap: 10px;
@@ -561,10 +545,6 @@ if (isset($_GET['edit_id'])) {
             
             .product-title {
                 font-size: 1.2rem;
-            }
-            
-            .product-price {
-                font-size: 1.3rem;
             }
             
             .btn-add-product {
@@ -840,14 +820,14 @@ if (isset($_GET['edit_id'])) {
                 <p class="text-muted mb-0">إدارة وإضافة وتعديل منتجات المتجر</p>
             </div>
             <button type="button" class="btn btn-primary d-none d-md-flex" onclick="openAddProductModal()">
-    <i class="bi bi-plus-circle me-2"></i>
-    إضافة منتج جديد
-</button>
+                <i class="bi bi-plus-circle me-2"></i>
+                إضافة منتج جديد
+            </button>
         </div>
 
         <!-- إحصائيات -->
         <div class="row stagger-animation">
-            <div class="col-xl-3 col-lg-6 mb-4">
+            <div class="col-xl-4 col-lg-6 mb-4">
                 <div class="stats-card floating-element">
                     <div class="stats-number"><?php echo count($products); ?></div>
                     <div class="stats-label">المنتجات</div>
@@ -855,7 +835,7 @@ if (isset($_GET['edit_id'])) {
                 </div>
             </div>
             
-            <div class="col-xl-3 col-lg-6 mb-4">
+            <div class="col-xl-4 col-lg-6 mb-4">
                 <div class="stats-card floating-element" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));">
                     <div class="stats-number"><?php echo count($categories); ?></div>
                     <div class="stats-label">الأقسام</div>
@@ -863,24 +843,7 @@ if (isset($_GET['edit_id'])) {
                 </div>
             </div>
             
-            <div class="col-xl-3 col-lg-6 mb-4">
-                <div class="stats-card floating-element" style="background: linear-gradient(135deg, var(--secondary-color), #e6b800);">
-                    <div class="stats-number">
-                        <?php 
-                        if (count($products) > 0) {
-                            $total = array_sum(array_column($products, 'price'));
-                            echo number_format($total / count($products), 0);
-                        } else {
-                            echo '0';
-                        }
-                        ?>
-                    </div>
-                    <div class="stats-label">متوسط السعر</div>
-                    <i class="bi bi-currency-exchange display-4 opacity-25 position-absolute" style="bottom: 10px; left: 20px;"></i>
-                </div>
-            </div>
-            
-            <div class="col-xl-3 col-lg-6 mb-4">
+            <div class="col-xl-4 col-lg-6 mb-4">
                 <div class="stats-card floating-element" style="background: linear-gradient(135deg, var(--success-color), #1e7e34);">
                     <div class="stats-number"><?php echo count($products); ?></div>
                     <div class="stats-label">نشطة</div>
@@ -930,8 +893,6 @@ if (isset($_GET['edit_id'])) {
                                 <?php echo htmlspecialchars($product['description']); ?>
                             </p>
                             
-                            <div class="product-price"><?php echo number_format($product['price'], 2); ?></div>
-                            
                             <div class="product-actions">
                                 <button type="button" class="btn-action btn-edit" onclick="editProduct(<?php echo $productid; ?>)">
                                     <i class="bi bi-pencil"></i>
@@ -951,8 +912,8 @@ if (isset($_GET['edit_id'])) {
 
     <!-- زر إضافة منتج عائم -->
     <button type="button" class="btn-add-product" onclick="openAddProductModal()">
-    <i class="bi bi-plus-lg"></i>
-</button>
+        <i class="bi bi-plus-lg"></i>
+    </button>
 
     <!-- مكتبات JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
@@ -1150,170 +1111,350 @@ if (isset($_GET['edit_id'])) {
     </script>
 
     <!-- مودال إضافة/تعديل المنتج -->
-<div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="productModalLabel">
-                    <i class="bi <?php echo $edit_product ? 'bi-pencil' : 'bi-plus-circle'; ?> me-2"></i>
-                    <?php echo $edit_product ? 'تعديل المنتج' : 'إضافة منتج جديد'; ?>
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form method="POST" enctype="multipart/form-data" id="productForm">
-                <input type="hidden" name="action" value="<?php echo $edit_product ? 'update' : 'add'; ?>">
-                <?php if ($edit_product): ?>
-                    <input type="hidden" name="edit_id" value="<?php echo $edit_product['id']; ?>">
-                <?php endif; ?>
-                
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="product_name" class="form-label">اسم المنتج *</label>
-                            <input type="text" class="form-control" name="product_name"
-                                id="productName"
-                                value="<?php echo $edit_product ? htmlspecialchars($edit_product['product_name']) : ''; ?>" 
-                                required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="price" class="form-label">السعر (ريال) *</label>
-                            <input type="number" class="form-control" name="price"
-                                id="productPrice"
-                                value="<?php echo $edit_product ? htmlspecialchars($edit_product['price']) : ''; ?>" 
-                                step="0.01" min="0" required>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="description" class="form-label">الوصف *</label>
-                        <textarea class="form-control" name="description" id="productDescription" 
-                                  rows="3" required><?php echo $edit_product ? htmlspecialchars($edit_product['description']) : ''; ?></textarea>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="category_id" class="form-label">القسم *</label>
-                        <select class="form-control" name="category_id" id="categorySelect" required>
-                            <option value="">اختر القسم</option>
-                            <?php foreach ($categories as $category): ?>
-                                <option value="<?php echo $category['id']; ?>"
-                                    <?php echo ($edit_product && $edit_product['category_id'] == $category['id']) ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($category['category_name']); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="productImages" class="form-label">صور المنتج *</label>
-                        <input type="file" class="form-control" name="image[]" id="productImages"
-                            accept="image/*" multiple <?php echo !$edit_product ? 'required' : ''; ?>>
-                        <small class="text-muted">
-                            يمكنك رفع حتى 10 صور. الصيغ المدعومة: JPG, PNG, GIF
-                            <?php if ($edit_product): ?>
-                                اتركه فارغاً للحفاظ على الصور الحالية.
-                            <?php endif; ?>
-                        </small>
-                    </div>
-                    
+    <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="productModalLabel">
+                        <i class="bi <?php echo $edit_product ? 'bi-pencil' : 'bi-plus-circle'; ?> me-2"></i>
+                        <?php echo $edit_product ? 'تعديل المنتج' : 'إضافة منتج جديد'; ?>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST" enctype="multipart/form-data" id="productForm">
+                    <input type="hidden" name="action" value="<?php echo $edit_product ? 'update' : 'add'; ?>">
                     <?php if ($edit_product): ?>
-                        <div class="mb-3">
-                            <label class="form-label">الصور الحالية</label>
-                            <div class="d-flex flex-wrap gap-2" id="currentImages">
-                                <?php 
-                                $current_images = $query->select('product_images', '*', "WHERE product_id = " . $edit_product['id']);
-                                if (!empty($current_images)): 
-                                ?>
-                                    <?php foreach ($current_images as $img): ?>
-                                        <div class="position-relative">
-                                            <img src="../assets/img/product/<?php echo $img['image_url']; ?>" 
-                                                 class="img-thumbnail" 
-                                                 style="width: 80px; height: 80px; object-fit: cover;"
-                                                 onerror="this.src='../assets/img/default-product.jpg'">
-                                            <button type="button" class="btn btn-sm btn-danger position-absolute top-0 start-0" 
-                                                    style="transform: translate(-30%, -30%);"
-                                                    onclick="removeCurrentImage(<?php echo $img['id']; ?>, this)">
-                                                <i class="bi bi-x"></i>
-                                            </button>
-                                        </div>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <span class="text-muted">لا توجد صور</span>
-                                <?php endif; ?>
-                            </div>
-                            <input type="hidden" name="keep_images" value="1">
-                        </div>
+                        <input type="hidden" name="edit_id" value="<?php echo $edit_product['id']; ?>">
                     <?php endif; ?>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                    <button type="submit" class="btn btn-primary">
-                        <?php echo $edit_product ? 'تحديث المنتج' : 'إضافة المنتج'; ?>
-                    </button>
-                </div>
-            </form>
+                    
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="product_name" class="form-label">اسم المنتج *</label>
+                                <input type="text" class="form-control" name="product_name"
+                                    id="productName"
+                                    value="<?php echo $edit_product ? htmlspecialchars($edit_product['product_name']) : ''; ?>" 
+                                    required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">الوصف *</label>
+                            <textarea class="form-control" name="description" id="productDescription" 
+                                      rows="3" required><?php echo $edit_product ? htmlspecialchars($edit_product['description']) : ''; ?></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="category_id" class="form-label">القسم *</label>
+                            <select class="form-control" name="category_id" id="categorySelect" required>
+                                <option value="">اختر القسم</option>
+                                <?php foreach ($categories as $category): ?>
+                                    <option value="<?php echo $category['id']; ?>"
+                                        <?php echo ($edit_product && $edit_product['category_id'] == $category['id']) ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($category['category_name']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="productImages" class="form-label">صور المنتج *</label>
+                            <input type="file" class="form-control" name="image[]" id="productImages"
+                                accept="image/*" multiple <?php echo !$edit_product ? 'required' : ''; ?>>
+                            <small class="text-muted">
+                                يمكنك رفع حتى 10 صور. الصيغ المدعومة: JPG, PNG, GIF
+                                <?php if ($edit_product): ?>
+                                    اتركه فارغاً للحفاظ على الصور الحالية.
+                                <?php endif; ?>
+                            </small>
+                        </div>
+                        
+                        <?php if ($edit_product): ?>
+                            <div class="mb-3">
+                                <label class="form-label">الصور الحالية</label>
+                                <div class="d-flex flex-wrap gap-2" id="currentImages">
+                                    <?php 
+                                    $current_images = $query->select('product_images', '*', "WHERE product_id = " . $edit_product['id']);
+                                    if (!empty($current_images)): 
+                                    ?>
+                                        <?php foreach ($current_images as $img): ?>
+                                            <div class="position-relative">
+                                                <img src="../assets/img/product/<?php echo $img['image_url']; ?>" 
+                                                     class="img-thumbnail" 
+                                                     style="width: 80px; height: 80px; object-fit: cover;"
+                                                     onerror="this.src='../assets/img/default-product.jpg'">
+                                                <button type="button" class="btn btn-sm btn-danger position-absolute top-0 start-0" 
+                                                        style="transform: translate(-30%, -30%);"
+                                                        onclick="removeCurrentImage(<?php echo $img['id']; ?>, this)">
+                                                    <i class="bi bi-x"></i>
+                                                </button>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <span class="text-muted">لا توجد صور</span>
+                                    <?php endif; ?>
+                                </div>
+                                <input type="hidden" name="keep_images" value="1">
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                        <button type="submit" class="btn btn-primary">
+                            <?php echo $edit_product ? 'تحديث المنتج' : 'إضافة المنتج'; ?>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
-<script>
-// عند فتح المودال، تنظيف الحقول إذا كان إضافة جديدة
-document.addEventListener('DOMContentLoaded', function() {
-    const productModal = document.getElementById('productModal');
-    const modalTitle = document.getElementById('productModalLabel');
-    const modalForm = document.getElementById('productForm');
-    
-    // إذا لم يكن هناك edit_id في الرابط
-    const urlParams = new URLSearchParams(window.location.search);
-    const editId = urlParams.get('edit_id');
-    
-    // إذا لم يكن هناك تعديل، تنظيف المودال عند الفتح
-    if (!editId) {
-        // عند فتح المودال للإضافة الجديدة
-        productModal.addEventListener('show.bs.modal', function() {
-            // تغيير العنوان
-            const titleIcon = modalTitle.querySelector('i');
-            titleIcon.className = 'bi bi-plus-circle me-2';
-            modalTitle.innerHTML = '<i class="bi bi-plus-circle me-2"></i>إضافة منتج جديد';
+    <script>
+    // عند فتح المودال، تنظيف الحقول إذا كان إضافة جديدة
+    document.addEventListener('DOMContentLoaded', function() {
+        const productModal = document.getElementById('productModal');
+        const modalTitle = document.getElementById('productModalLabel');
+        const modalForm = document.getElementById('productForm');
+        
+        // إذا لم يكن هناك edit_id في الرابط
+        const urlParams = new URLSearchParams(window.location.search);
+        const editId = urlParams.get('edit_id');
+        
+        // إذا لم يكن هناك تعديل، تنظيف المودال عند الفتح
+        if (!editId) {
+            // عند فتح المودال للإضافة الجديدة
+            productModal.addEventListener('show.bs.modal', function() {
+                // تغيير العنوان
+                const titleIcon = modalTitle.querySelector('i');
+                titleIcon.className = 'bi bi-plus-circle me-2';
+                modalTitle.innerHTML = '<i class="bi bi-plus-circle me-2"></i>إضافة منتج جديد';
+                
+                // تنظيف الحقول
+                document.getElementById('productName').value = '';
+                document.getElementById('productDescription').value = '';
+                document.getElementById('categorySelect').selectedIndex = 0;
+                document.getElementById('productImages').value = '';
+                
+                // تغيير إجراء النموذج
+                const actionInput = modalForm.querySelector('input[name="action"]');
+                if (actionInput) actionInput.value = 'add';
+                
+                // إزالة حقل edit_id إذا كان موجوداً
+                const editIdInput = modalForm.querySelector('input[name="edit_id"]');
+                if (editIdInput) editIdInput.remove();
+                
+                // إضافة required لحقل الصور
+                const imageInput = document.getElementById('productImages');
+                imageInput.required = true;
+            });
+        } else {
+            // عند فتح المودال للتعديل
+            productModal.addEventListener('show.bs.modal', function() {
+                // تغيير العنوان
+                const titleIcon = modalTitle.querySelector('i');
+                titleIcon.className = 'bi bi-pencil me-2';
+                modalTitle.innerHTML = '<i class="bi bi-pencil me-2"></i>تعديل المنتج';
+                
+                // تغيير إجراء النموذج
+                const actionInput = modalForm.querySelector('input[name="action"]');
+                if (actionInput) actionInput.value = 'update';
+                
+                // إزالة required من حقل الصور للتعديل
+                const imageInput = document.getElementById('productImages');
+                imageInput.required = false;
+            });
+        }
+        
+        // عند إغلاق المودال، تنظيف الرابط
+        productModal.addEventListener('hidden.bs.modal', function() {
+            // إزالة edit_id من الرابط إذا كان موجوداً
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('edit_id')) {
+                urlParams.delete('edit_id');
+                const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+                window.history.replaceState({}, '', newUrl);
+            }
             
-            // تنظيف الحقول
-            document.getElementById('productName').value = '';
-            document.getElementById('productPrice').value = '';
-            document.getElementById('productDescription').value = '';
-            document.getElementById('categorySelect').selectedIndex = 0;
-            document.getElementById('productImages').value = '';
-            
-            // تغيير إجراء النموذج
-            const actionInput = modalForm.querySelector('input[name="action"]');
-            if (actionInput) actionInput.value = 'add';
-            
-            // إزالة حقل edit_id إذا كان موجوداً
-            const editIdInput = modalForm.querySelector('input[name="edit_id"]');
-            if (editIdInput) editIdInput.remove();
-            
-            // إضافة required لحقل الصور
-            const imageInput = document.getElementById('productImages');
-            imageInput.required = true;
+            // تنظيف المودال تماماً
+            setTimeout(() => {
+                document.getElementById('productName').value = '';
+                document.getElementById('productDescription').value = '';
+                document.getElementById('categorySelect').selectedIndex = 0;
+                document.getElementById('productImages').value = '';
+                
+                // إعادة العنوان للإضافة
+                modalTitle.innerHTML = '<i class="bi bi-plus-circle me-2"></i>إضافة منتج جديد';
+                
+                // تغيير إجراء النموذج
+                const actionInput = modalForm.querySelector('input[name="action"]');
+                if (actionInput) actionInput.value = 'add';
+                
+                // إزالة حقل edit_id إذا كان موجوداً
+                const editIdInput = modalForm.querySelector('input[name="edit_id"]');
+                if (editIdInput) editIdInput.remove();
+                
+                // إضافة required لحقل الصور
+                const imageInput = document.getElementById('productImages');
+                imageInput.required = true;
+            }, 300);
         });
-    } else {
-        // عند فتح المودال للتعديل
-        productModal.addEventListener('show.bs.modal', function() {
-            // تغيير العنوان
-            const titleIcon = modalTitle.querySelector('i');
-            titleIcon.className = 'bi bi-pencil me-2';
-            modalTitle.innerHTML = '<i class="bi bi-pencil me-2"></i>تعديل المنتج';
-            
-            // تغيير إجراء النموذج
-            const actionInput = modalForm.querySelector('input[name="action"]');
-            if (actionInput) actionInput.value = 'update';
-            
-            // إزالة required من حقل الصور للتعديل
+        
+        // فتح المودال تلقائياً إذا كان هناك edit_id
+        if (editId) {
+            const modal = new bootstrap.Modal(productModal);
+            modal.show();
+        }
+        
+        // التحقق من الصور عند الإرسال
+        modalForm.addEventListener('submit', function(e) {
+            const isEditMode = this.querySelector('input[name="action"]').value === 'update';
             const imageInput = document.getElementById('productImages');
-            imageInput.required = false;
+            
+            // إذا كان وضع الإضافة ولم يتم اختيار صور
+            if (!isEditMode && imageInput.files.length === 0) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'خطأ',
+                    text: 'يرجى اختيار صورة واحدة على الأقل للمنتج',
+                    icon: 'error',
+                    confirmButtonText: 'حسناً'
+                });
+                return false;
+            }
+            
+            // التحقق من عدد الصور
+            if (imageInput.files.length > 10) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'خطأ',
+                    text: 'يمكنك رفع حتى 10 صور فقط',
+                    icon: 'error',
+                    confirmButtonText: 'حسناً'
+                });
+                return false;
+            }
+            
+            // التحقق من حجم الصور (5MB كحد أقصى)
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            for (let file of imageInput.files) {
+                if (file.size > maxSize) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'خطأ',
+                        text: `الصورة ${file.name} حجمها كبير جداً. الحد الأقصى 5MB`,
+                        icon: 'error',
+                        confirmButtonText: 'حسناً'
+                    });
+                    return false;
+                }
+            }
+            
+            return true;
+        });
+        
+        // عرض معاينة للصور المختارة
+        document.getElementById('productImages').addEventListener('change', function(e) {
+            const files = e.target.files;
+            const previewContainer = document.getElementById('imagePreviewContainer') || createImagePreviewContainer();
+            
+            // تنظيف المعاينة السابقة
+            previewContainer.innerHTML = '';
+            
+            if (files.length > 0) {
+                for (let i = 0; i < Math.min(files.length, 10); i++) {
+                    const file = files[i];
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        const imgContainer = document.createElement('div');
+                        imgContainer.className = 'position-relative';
+                        imgContainer.style.cssText = 'width: 80px; height: 80px; margin: 5px;';
+                        
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'img-thumbnail';
+                        img.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
+                        
+                        const removeBtn = document.createElement('button');
+                        removeBtn.type = 'button';
+                        removeBtn.className = 'btn btn-sm btn-danger position-absolute top-0 start-0';
+                        removeBtn.style.cssText = 'transform: translate(-30%, -30%); padding: 0.15rem 0.3rem;';
+                        removeBtn.innerHTML = '<i class="bi bi-x"></i>';
+                        removeBtn.onclick = function() {
+                            // إزالة الصورة من input files
+                            const dt = new DataTransfer();
+                            const input = document.getElementById('productImages');
+                            
+                            for (let j = 0; j < input.files.length; j++) {
+                                if (j !== i) {
+                                    dt.items.add(input.files[j]);
+                                }
+                            }
+                            
+                            input.files = dt.files;
+                            imgContainer.remove();
+                        };
+                        
+                        imgContainer.appendChild(img);
+                        imgContainer.appendChild(removeBtn);
+                        previewContainer.appendChild(imgContainer);
+                    };
+                    
+                    reader.readAsDataURL(file);
+                }
+            }
+        });
+        
+        function createImagePreviewContainer() {
+            const container = document.createElement('div');
+            container.id = 'imagePreviewContainer';
+            container.className = 'd-flex flex-wrap mt-2';
+            document.getElementById('productImages').parentNode.appendChild(container);
+            return container;
+        }
+    });
+
+    // إزالة الصورة الحالية
+    function removeCurrentImage(imageId, button) {
+        Swal.fire({
+            title: 'هل أنت متأكد؟',
+            text: 'هل تريد حذف هذه الصورة؟',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'نعم، احذفها',
+            cancelButtonText: 'إلغاء'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // إرسال طلب AJAX لحذف الصورة
+                fetch('delete_product_image.php?id=' + imageId)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // إزالة الصورة من الواجهة
+                            button.parentElement.remove();
+                            
+                            // التحقق إذا لم تبقى صور
+                            const imagesContainer = document.getElementById('currentImages');
+                            if (imagesContainer.querySelectorAll('img').length === 0) {
+                                imagesContainer.innerHTML = '<span class="text-muted">لا توجد صور</span>';
+                            }
+                            
+                            Swal.fire('تم الحذف!', 'تم حذف الصورة بنجاح', 'success');
+                        } else {
+                            Swal.fire('خطأ!', 'فشل في حذف الصورة', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire('خطأ!', 'حدث خطأ أثناء الحذف', 'error');
+                    });
+            }
         });
     }
-    
-    // عند إغلاق المودال، تنظيف الرابط
-    productModal.addEventListener('hidden.bs.modal', function() {
-        // إزالة edit_id من الرابط إذا كان موجوداً
+
+    // فتح المودال للإضافة الجديدة
+    function openAddProductModal() {
+        // تنظيف أي edit_id في الرابط
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('edit_id')) {
             urlParams.delete('edit_id');
@@ -1321,200 +1462,11 @@ document.addEventListener('DOMContentLoaded', function() {
             window.history.replaceState({}, '', newUrl);
         }
         
-        // تنظيف المودال تماماً
-        setTimeout(() => {
-            document.getElementById('productName').value = '';
-            document.getElementById('productPrice').value = '';
-            document.getElementById('productDescription').value = '';
-            document.getElementById('categorySelect').selectedIndex = 0;
-            document.getElementById('productImages').value = '';
-            
-            // إعادة العنوان للإضافة
-            modalTitle.innerHTML = '<i class="bi bi-plus-circle me-2"></i>إضافة منتج جديد';
-            
-            // تغيير إجراء النموذج
-            const actionInput = modalForm.querySelector('input[name="action"]');
-            if (actionInput) actionInput.value = 'add';
-            
-            // إزالة حقل edit_id إذا كان موجوداً
-            const editIdInput = modalForm.querySelector('input[name="edit_id"]');
-            if (editIdInput) editIdInput.remove();
-            
-            // إضافة required لحقل الصور
-            const imageInput = document.getElementById('productImages');
-            imageInput.required = true;
-        }, 300);
-    });
-    
-    // فتح المودال تلقائياً إذا كان هناك edit_id
-    if (editId) {
-        const modal = new bootstrap.Modal(productModal);
+        // فتح المودال
+        const modal = new bootstrap.Modal(document.getElementById('productModal'));
         modal.show();
     }
-    
-    // التحقق من الصور عند الإرسال
-    modalForm.addEventListener('submit', function(e) {
-        const isEditMode = this.querySelector('input[name="action"]').value === 'update';
-        const imageInput = document.getElementById('productImages');
-        
-        // إذا كان وضع الإضافة ولم يتم اختيار صور
-        if (!isEditMode && imageInput.files.length === 0) {
-            e.preventDefault();
-            Swal.fire({
-                title: 'خطأ',
-                text: 'يرجى اختيار صورة واحدة على الأقل للمنتج',
-                icon: 'error',
-                confirmButtonText: 'حسناً'
-            });
-            return false;
-        }
-        
-        // التحقق من عدد الصور
-        if (imageInput.files.length > 10) {
-            e.preventDefault();
-            Swal.fire({
-                title: 'خطأ',
-                text: 'يمكنك رفع حتى 10 صور فقط',
-                icon: 'error',
-                confirmButtonText: 'حسناً'
-            });
-            return false;
-        }
-        
-        // التحقق من حجم الصور (5MB كحد أقصى)
-        const maxSize = 5 * 1024 * 1024; // 5MB
-        for (let file of imageInput.files) {
-            if (file.size > maxSize) {
-                e.preventDefault();
-                Swal.fire({
-                    title: 'خطأ',
-                    text: `الصورة ${file.name} حجمها كبير جداً. الحد الأقصى 5MB`,
-                    icon: 'error',
-                    confirmButtonText: 'حسناً'
-                });
-                return false;
-            }
-        }
-        
-        return true;
-    });
-    
-    // عرض معاينة للصور المختارة
-    document.getElementById('productImages').addEventListener('change', function(e) {
-        const files = e.target.files;
-        const previewContainer = document.getElementById('imagePreviewContainer') || createImagePreviewContainer();
-        
-        // تنظيف المعاينة السابقة
-        previewContainer.innerHTML = '';
-        
-        if (files.length > 0) {
-            for (let i = 0; i < Math.min(files.length, 10); i++) {
-                const file = files[i];
-                const reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    const imgContainer = document.createElement('div');
-                    imgContainer.className = 'position-relative';
-                    imgContainer.style.cssText = 'width: 80px; height: 80px; margin: 5px;';
-                    
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.className = 'img-thumbnail';
-                    img.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
-                    
-                    const removeBtn = document.createElement('button');
-                    removeBtn.type = 'button';
-                    removeBtn.className = 'btn btn-sm btn-danger position-absolute top-0 start-0';
-                    removeBtn.style.cssText = 'transform: translate(-30%, -30%); padding: 0.15rem 0.3rem;';
-                    removeBtn.innerHTML = '<i class="bi bi-x"></i>';
-                    removeBtn.onclick = function() {
-                        // إزالة الصورة من input files
-                        const dt = new DataTransfer();
-                        const input = document.getElementById('productImages');
-                        
-                        for (let j = 0; j < input.files.length; j++) {
-                            if (j !== i) {
-                                dt.items.add(input.files[j]);
-                            }
-                        }
-                        
-                        input.files = dt.files;
-                        imgContainer.remove();
-                    };
-                    
-                    imgContainer.appendChild(img);
-                    imgContainer.appendChild(removeBtn);
-                    previewContainer.appendChild(imgContainer);
-                };
-                
-                reader.readAsDataURL(file);
-            }
-        }
-    });
-    
-    function createImagePreviewContainer() {
-        const container = document.createElement('div');
-        container.id = 'imagePreviewContainer';
-        container.className = 'd-flex flex-wrap mt-2';
-        document.getElementById('productImages').parentNode.appendChild(container);
-        return container;
-    }
-});
-
-// إزالة الصورة الحالية
-function removeCurrentImage(imageId, button) {
-    Swal.fire({
-        title: 'هل أنت متأكد؟',
-        text: 'هل تريد حذف هذه الصورة؟',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'نعم، احذفها',
-        cancelButtonText: 'إلغاء'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // إرسال طلب AJAX لحذف الصورة
-            fetch('delete_product_image.php?id=' + imageId)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // إزالة الصورة من الواجهة
-                        button.parentElement.remove();
-                        
-                        // التحقق إذا لم تبقى صور
-                        const imagesContainer = document.getElementById('currentImages');
-                        if (imagesContainer.querySelectorAll('img').length === 0) {
-                            imagesContainer.innerHTML = '<span class="text-muted">لا توجد صور</span>';
-                        }
-                        
-                        Swal.fire('تم الحذف!', 'تم حذف الصورة بنجاح', 'success');
-                    } else {
-                        Swal.fire('خطأ!', 'فشل في حذف الصورة', 'error');
-                    }
-                })
-                .catch(error => {
-                    Swal.fire('خطأ!', 'حدث خطأ أثناء الحذف', 'error');
-                });
-        }
-    });
-}
-
-// فتح المودال للإضافة الجديدة
-function openAddProductModal() {
-    // تنظيف أي edit_id في الرابط
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('edit_id')) {
-        urlParams.delete('edit_id');
-        const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
-        window.history.replaceState({}, '', newUrl);
-    }
-    
-    // فتح المودال
-    const modal = new bootstrap.Modal(document.getElementById('productModal'));
-    modal.show();
-}
-</script>
+    </script>
 
 </body>
 </html>

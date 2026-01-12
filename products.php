@@ -57,15 +57,7 @@ if (isset($_POST['ajax_filter'])) {
     $filtered_products = array_values($filtered_products);
     
     // ترتيب المنتجات
-    if ($sort_by === 'price_low') {
-        usort($filtered_products, function($a, $b) {
-            return floatval($a['price']) <=> floatval($b['price']);
-        });
-    } elseif ($sort_by === 'price_high') {
-        usort($filtered_products, function($a, $b) {
-            return floatval($b['price']) <=> floatval($a['price']);
-        });
-    } elseif ($sort_by === 'name_asc') {
+    if ($sort_by === 'name_asc') {
         usort($filtered_products, function($a, $b) {
             return strcmp($a['product_name'], $b['product_name']);
         });
@@ -118,9 +110,6 @@ if (isset($_POST['ajax_filter'])) {
                         <p class="product-description">
                             <?php echo htmlspecialchars(mb_substr($product['description'], 0, 80)) . (strlen($product['description']) > 80 ? '...' : ''); ?>
                         </p>
-                        <div class="product-price">
-                            <?php echo ($lang == 'ar') ? 'ر.س ' : 'SAR '; ?><?php echo number_format($product['price'], 0, '', ' '); ?>
-                        </div>
                         <div class="product-actions">
                             <a href="product-details.php?id=<?php echo $product['id']; ?>" class="btn-view-details">
                                 <i class="bi bi-eye"></i>
@@ -760,16 +749,10 @@ if (isset($_POST['ajax_filter'])) {
       min-height: 80px;
     }
 
-    .product-price {
-      font-size: 1.8rem;
-      font-weight: 900;
-      color: var(--primary-color);
-      margin-bottom: 25px;
-    }
-
     .product-actions {
       display: flex;
       gap: 15px;
+      margin-top: 20px;
     }
 
     .btn-view-details {
@@ -780,10 +763,11 @@ if (isset($_POST['ajax_filter'])) {
       gap: 10px;
       background: var(--gradient-primary);
       color: var(--white);
-      padding: 15px 25px;
+      padding: 15px 10px;
       border-radius: 15px;
       text-decoration: none;
-      font-weight: 700;
+      
+      font-weight: 600;
       transition: all 0.4s ease;
       border: none;
       position: relative;
@@ -1460,9 +1444,6 @@ if (isset($_POST['ajax_filter'])) {
                 <?php echo ($lang == 'ar') ? 'ترتيب حسب' : 'Sort By'; ?>
               </label>
               <select class="filter-select" id="sortSelect">
-                <option value="newest"><?php echo ($lang == 'ar') ? 'الأحدث' : 'Newest'; ?></option>
-                <option value="price_low"><?php echo ($lang == 'ar') ? 'السعر: منخفض-عالي' : 'Price: Low-High'; ?></option>
-                <option value="price_high"><?php echo ($lang == 'ar') ? 'السعر: عالي-منخفض' : 'Price: High-Low'; ?></option>
                 <option value="name_asc"><?php echo ($lang == 'ar') ? 'الاسم: أ-ي' : 'Name: A-Z'; ?></option>
                 <option value="name_desc"><?php echo ($lang == 'ar') ? 'الاسم: ي-أ' : 'Name: Z-A'; ?></option>
               </select>
@@ -1538,13 +1519,10 @@ if (isset($_POST['ajax_filter'])) {
                     <p class="product-description">
                       <?php echo htmlspecialchars(mb_substr($product['description'], 0, 80)) . (strlen($product['description']) > 80 ? '...' : ''); ?>
                     </p>
-                    <div class="product-price">
-                      <?php echo ($lang == 'ar') ? 'ر.س ' : 'SAR '; ?><?php echo number_format($product['price'], 0, '', ' '); ?>
-                    </div>
                     <div class="product-actions">
                       <a href="product-details.php?id=<?php echo $product['id']; ?>" class="btn-view-details">
                         <i class="bi bi-eye"></i>
-                        <?php echo ($lang == 'ar') ? 'عرض التفاصيل' : 'View Details'; ?>
+                        <?php echo ($lang == 'ar') ? 'عرض تفاصيل المنتج' : 'View Details'; ?>
                       </a>
                     </div>
                   </div>
@@ -1877,8 +1855,6 @@ if (isset($_POST['ajax_filter'])) {
       if (currentSort !== 'newest') {
         const sortTexts = {
           'newest': lang === 'ar' ? 'الأحدث' : 'Newest',
-          'price_low': lang === 'ar' ? 'السعر: منخفض-عالي' : 'Price: Low-High',
-          'price_high': lang === 'ar' ? 'السعر: عالي-منخفض' : 'Price: High-Low',
           'name_asc': lang === 'ar' ? 'الاسم: أ-ي' : 'Name: A-Z',
           'name_desc': lang === 'ar' ? 'الاسم: ي-أ' : 'Name: Z-A'
         };

@@ -1088,14 +1088,11 @@ body {
   margin-bottom: 20px;
 }
 
-.product-price {
-  font-size: 1.8rem;
-  font-weight: 900;
-  color: var(--primary-color);
-  margin-bottom: 25px;
+.product-actions {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  gap: 15px;
+  margin-top: 20px;
+  justify-content: center;
 }
 
 /* Features Section */
@@ -1945,13 +1942,11 @@ body {
                     <p class="product-description">
                       <?php echo htmlspecialchars(mb_substr($product['description'], 0, 100)) . (strlen($product['description']) > 100 ? '...' : ''); ?>
                     </p>
-                    <div class="product-price">
-                      <i class="bi bi-tag"></i>
-                      <?php echo ($lang == 'ar') ? 'ر.س' : 'SAR'; ?> <?php echo number_format($product['price'], 0, '', ' '); ?>
+                    <div class="product-actions">
+                      <a href="product-details.php?id=<?php echo $product['id']; ?>" class="btn-view-details">
+                        <i class="bi bi-eye"></i> <?php echo ($lang == 'ar') ? 'عرض التفاصيل' : 'View Details'; ?>
+                      </a>
                     </div>
-                    <a href="product-details.php?id=<?php echo $product['id']; ?>" class="btn-view-details">
-                      <i class="bi bi-eye"></i> <?php echo ($lang == 'ar') ? 'عرض التفاصيل' : 'View Details'; ?>
-                    </a>
                   </div>
                 </div>
               </div>
