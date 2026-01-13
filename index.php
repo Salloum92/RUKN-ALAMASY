@@ -1381,13 +1381,7 @@ body {
   box-shadow: 0 20px 40px rgba(231, 106, 4, 0.3);
 }
 
-.prev-arrow {
-  left: -100px;
-}
 
-.next-arrow {
-  right: -100px;
-}
 
 .slider-pagination {
   display: flex;
@@ -1462,20 +1456,44 @@ body {
   box-shadow: 0 25px 50px rgba(231, 106, 4, 0.6);
 }
 
-/* RTL Support */
-[dir="rtl"] .prev-arrow {
-  left: auto;
-  right: -100px;
+/* تموضع ثابت للأسهم */
+.reviews-slider-container {
+    position: relative;
 }
 
-[dir="rtl"] .next-arrow {
-  right: auto;
-  left: -100px;
+.reviews-slider-container .prev-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: -100px !important;
+    right: auto;
 }
 
-[dir="rtl"] .service-features li {
-  text-align: right;
+.reviews-slider-container .next-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: -100px;
+    left: auto;
 }
+
+/* لا حاجة لـ [dir="rtl"] أو [dir="ltr"] هنا */
+
+/* ريسبونسف */
+@media (max-width: 1200px) {
+    .reviews-slider-container .prev-arrow {
+        left: -50px;
+    }
+    
+    .reviews-slider-container .next-arrow {
+        right: -50px;
+    }
+}
+
+
+
+
+/* ريسبونسف */
 
 /* Responsive Design - الهيرو سكشن فقط */
 @media (max-width: 1200px) {
@@ -1609,13 +1627,7 @@ body {
     font-size: 3rem;
   }
 
-  .prev-arrow {
-    left: -50px;
-  }
-
-  .next-arrow {
-    right: -50px;
-  }
+ 
 }
 
 @media (max-width: 992px) {
@@ -1705,7 +1717,7 @@ body {
   </div>
 
   <!-- تأثيرات المؤشر -->
-  <div class="cursor-effect"></div>
+  
 
   <!-- تأثيرات الجسيمات -->
   <div id="particles-js"></div>
@@ -1778,10 +1790,10 @@ body {
         <?php endif; ?>
         
         <button class="hero-nav hero-prev">
-          <i class="bi bi-chevron-<?php echo ($lang == 'ar') ? 'right' : 'left'; ?>"></i>
+          <i class="bi bi-chevron-left"></i>
         </button>
         <button class="hero-nav hero-next">
-          <i class="bi bi-chevron-<?php echo ($lang == 'ar') ? 'left' : 'right'; ?>"></i>
+          <i class="bi bi-chevron-right"></i>
         </button>
         
         <div class="hero-controls">
@@ -2099,9 +2111,9 @@ body {
         </div>
 
         <div class="reviews-slider-container">
-          <button class="slider-arrow prev-arrow">
-            <i class="bi bi-chevron-<?php echo ($lang == 'ar') ? 'right' : 'left'; ?>"></i>
-          </button>
+           <button class="slider-arrow prev-arrow">
+        <i class="bi bi-chevron-left"></i> <!-- دائماً يشير لليسار -->
+    </button>
 
           <div class="swiper reviews-swiper">
             <div class="swiper-wrapper">
@@ -2214,10 +2226,10 @@ body {
               </div>
             </div>
           </div>
-
-          <button class="slider-arrow next-arrow">
-            <i class="bi bi-chevron-<?php echo ($lang == 'ar') ? 'left' : 'right'; ?>"></i>
-          </button>
+           
+           <button class="slider-arrow next-arrow">
+        <i class="bi bi-chevron-right"></i> <!-- دائماً يشير لليمين -->
+    </button>
         </div>
 
         <div class="slider-pagination"></div>
@@ -2516,35 +2528,35 @@ window.addEventListener('load', function() {
         new CinematicHeroSlider();
       }
 
-      // Reviews Slider
-      const reviewsSwiper = new Swiper('.reviews-swiper', {
-        slidesPerView: 1,
-        spaceBetween: 30,
-        loop: true,
-        autoplay: {
-          delay: 5000,
-          disableOnInteraction: false,
-        },
-        navigation: {
-          nextEl: '.next-arrow',
-          prevEl: '.prev-arrow',
-        },
-        pagination: {
-          el: '.slider-pagination',
-          clickable: true,
-          renderBullet: function (index, className) {
+    // Reviews Slider
+const reviewsSwiper = new Swiper('.reviews-swiper', {
+    slidesPerView: 1,
+    spaceBetween: 30,
+    loop: true,
+    autoplay: {
+        delay: 5000,
+        disableOnInteraction: false,
+    },
+    navigation: {
+        nextEl: '.next-arrow',
+        prevEl: '.prev-arrow',
+    },
+    pagination: {
+        el: '.slider-pagination',
+        clickable: true,
+        renderBullet: function (index, className) {
             return '<span class="swiper-pagination-bullet ' + className + '"></span>';
-          },
         },
-        breakpoints: {
-          768: {
+    },
+    breakpoints: {
+        768: {
             slidesPerView: 2,
-          },
-          1200: {
+        },
+        1200: {
             slidesPerView: 3,
-          }
         }
-      });
+    }
+});
 
       // تأثيرات hover للبطاقات
       const cards = document.querySelectorAll('.service-card, .review-card, .feature-card, .product-card-home, .stats-card');
@@ -2840,6 +2852,5 @@ particlesJS('particles-js-2', {
     "retina_detect": true
   });
   </script>
-<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 </body>
 </html>
