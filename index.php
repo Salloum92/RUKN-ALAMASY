@@ -466,6 +466,7 @@ body {
 }
 
 .hero-nav {
+  
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -500,10 +501,12 @@ body {
 
 .hero-prev {
   left: 30px;
+  display : none;
 }
 
 .hero-next {
   right: 30px;
+  display : none;
 }
 
 .hero-nav:hover {
@@ -1569,7 +1572,7 @@ body {
   }
 
   .btn-hero {
-    padding: 16px 30px;
+    padding: 15px 20px;
     font-size: 1rem;
   }
 
@@ -1811,10 +1814,7 @@ body {
       </div>
     </section>
 
-    <!-- ========================== -->
-    <!-- باقي الأقسام كما هي -->
-    <!-- ========================== -->
-
+  
     <!-- Services Section with Cards -->
    <section class="services-section bg-pattern" id="services">
     <div id="particles-js-2"></div>
@@ -2098,146 +2098,7 @@ body {
       </div>
     </section>
 
-    <!-- Client Reviews Section -->
-    <section class="reviews-section">
-      <div class="container">
-        <div class="section-header" data-aos="fade-up">
-          <div class="section-badge floating-element">
-            <i class="bi bi-chat-heart"></i>
-            <?php echo ($lang == 'ar') ? 'آراء العملاء' : 'Client Reviews'; ?>
-          </div>
-          <h2 class="section-title"><?php echo ($lang == 'ar') ? 'ماذا يقول عملاؤنا' : 'What Our Clients Say'; ?></h2>
-          <p class="section-subtitle"><?php echo ($lang == 'ar') ? 'ثقة عملائنا هي شهادتنا الحقيقية' : 'Our clients trust is our real certificate'; ?></p>
-        </div>
-
-        <div class="reviews-slider-container">
-           <button class="slider-arrow prev-arrow">
-        <i class="bi bi-chevron-left"></i> <!-- دائماً يشير لليسار -->
-    </button>
-
-          <div class="swiper reviews-swiper">
-            <div class="swiper-wrapper">
-              <!-- Review 1 -->
-              <div class="swiper-slide">
-                <div class="review-card" data-aos="fade-up" data-aos-delay="100">
-                  <div class="review-content">
-                    <div class="stars">
-                      <i class="bi bi-star-fill"></i>
-                      <i class="bi bi-star-fill"></i>
-                      <i class="bi bi-star-fill"></i>
-                      <i class="bi bi-star-fill"></i>
-                      <i class="bi bi-star-fill"></i>
-                    </div>
-                    <p class="review-text">
-                      "<?php echo ($lang == 'ar') ? 'جودة المنتجات وخدمة العملاء ممتازة. أنصح بالتعامل معهم' : 'Product quality and customer service are excellent. I recommend dealing with them'; ?>"
-                    </p>
-                  </div>
-                  <div class="review-author">
-                    <div class="author-avatar">
-                      <img src="assets/img/6952312cc0531-1766994220.jpg" alt="<?php echo ($lang == 'ar') ? 'أحمد محمد' : 'Ahmed Mohammed'; ?>">
-                    </div>
-                    <div class="author-info">
-                      <h4><?php echo ($lang == 'ar') ? 'أحمد محمد' : 'Ahmed Mohammed'; ?></h4>
-                      <p><?php echo ($lang == 'ar') ? 'مدير مشاريع' : 'Project Manager'; ?></p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Review 2 -->
-              <div class="swiper-slide">
-                <div class="review-card" data-aos="fade-up" data-aos-delay="200">
-                  <div class="review-content">
-                    <div class="stars">
-                      <i class="bi bi-star-fill"></i>
-                      <i class="bi bi-star-fill"></i>
-                      <i class="bi bi-star-fill"></i>
-                      <i class="bi bi-star-fill"></i>
-                      <i class="bi bi-star-half"></i>
-                    </div>
-                    <p class="review-text">
-                      "<?php echo ($lang == 'ar') ? 'خدمة محترفة وسريعة. فريق العمل متعاون جداً' : 'Professional and fast service. The team is very cooperative'; ?>"
-                    </p>
-                  </div>
-                  <div class="review-author">
-                    <div class="author-avatar">
-                      <img src="assets/img/6952312cc0531-1766994220.jpg" alt="<?php echo ($lang == 'ar') ? 'فاطمة عبدالله' : 'Fatima Abdullah'; ?>">
-                    </div>
-                    <div class="author-info">
-                      <h4><?php echo ($lang == 'ar') ? 'فاطمة عبدالله' : 'Fatima Abdullah'; ?></h4>
-                      <p><?php echo ($lang == 'ar') ? 'مسؤولة سلامة' : 'Safety Officer'; ?></p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Review 3 -->
-              <div class="swiper-slide">
-                <div class="review-card" data-aos="fade-up" data-aos-delay="300">
-                  <div class="review-content">
-                    <div class="stars">
-                      <i class="bi bi-star-fill"></i>
-                      <i class="bi bi-star-fill"></i>
-                      <i class="bi bi-star-fill"></i>
-                      <i class="bi bi-star-fill"></i>
-                      <i class="bi bi-star-fill"></i>
-                    </div>
-                    <p class="review-text">
-                      "<?php echo ($lang == 'ar') ? 'التزام بالمواعيد وجودة في التنفيذ. شكراً لكم' : 'Commitment to deadlines and quality in execution. Thank you'; ?>"
-                    </p>
-                  </div>
-                  <div class="review-author">
-                    <div class="author-avatar">
-                      <img src="assets/img/6952312cc0531-1766994220.jpg" alt="<?php echo ($lang == 'ar') ? 'خالد إبراهيم' : 'Khaled Ibrahim'; ?>">
-                    </div>
-                    <div class="author-info">
-                      <h4><?php echo ($lang == 'ar') ? 'خالد إبراهيم' : 'Khaled Ibrahim'; ?></h4>
-                      <p><?php echo ($lang == 'ar') ? 'مهندس معماري' : 'Architect'; ?></p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Review 4 -->
-              <div class="swiper-slide">
-                <div class="review-card" data-aos="fade-up" data-aos-delay="400">
-                  <div class="review-content">
-                    <div class="stars">
-                      <i class="bi bi-star-fill"></i>
-                      <i class="bi bi-star-fill"></i>
-                      <i class="bi bi-star-fill"></i>
-                      <i class="bi bi-star-fill"></i>
-                      <i class="bi bi-star-fill"></i>
-                    </div>
-                    <p class="review-text">
-                      "<?php echo ($lang == 'ar') ? 'الدعم الفني ممتاز والمنتجات عالية الجودة' : 'Technical support is excellent and products are high quality'; ?>"
-                    </p>
-                  </div>
-                  <div class="review-author">
-                    <div class="author-avatar">
-                      <img src="assets/img/6952312cc0531-1766994220.jpg" alt="<?php echo ($lang == 'ar') ? 'سارة القحطاني' : 'Sara Al-Qahtani'; ?>">
-                    </div>
-                    <div class="author-info">
-                      <h4><?php echo ($lang == 'ar') ? 'سارة القحطاني' : 'Sara Al-Qahtani'; ?></h4>
-                      <p><?php echo ($lang == 'ar') ? 'مديرة تشغيل' : 'Operations Manager'; ?></p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-           
-           <button class="slider-arrow next-arrow">
-        <i class="bi bi-chevron-right"></i> <!-- دائماً يشير لليمين -->
-    </button>
-        </div>
-
-        <div class="slider-pagination"></div>
-
-       
-      </div>
-    </section>
-
+ 
   </main>
 
   <?php include 'includes/footer.php'; ?>
