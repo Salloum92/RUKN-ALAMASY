@@ -397,8 +397,8 @@ body {
 }
 
 .hero-buttons {
+  position: relative;
   display: flex;
-  gap: 25px;
   justify-content: center;
   margin-top: 50px;
   flex-wrap: wrap;
@@ -1532,14 +1532,9 @@ body {
     font-size: 1.3rem;
   }
 
-  .hero-buttons {
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-  }
+
 
   .btn-hero {
-    width: 100%;
     max-width: 300px;
     justify-content: center;
   }
@@ -1568,13 +1563,10 @@ body {
 
   .hero-badge {
     font-size: 0.8rem;
-    padding: 10px 20px;
+    padding: 10px 20px !important;
   }
 
-  .btn-hero {
-    padding: 15px 20px;
-    font-size: 1rem;
-  }
+
 
   .hero-controls {
     bottom: 30px;
@@ -1621,6 +1613,13 @@ body {
   padding: 8px 20px;
   
  
+}
+.btn-hero {
+    padding: 15px 20px;
+    font-size: 1rem;
+  }
+  .hero-buttons {
+    padding: 15px 20px;
 }
 }
 
