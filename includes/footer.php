@@ -335,7 +335,7 @@ if (!empty($google_maps_url) && empty($location_address)) {
                 <div class="alx-developer">
                     <p>
                         <?= $lang == 'ar' ? 'تصميم وتطوير' : 'Designed & Developed by' ?>
-                        <a href="https://www.linkedin.com/in/ahmad-ghazi-salloum/" target="_blank" class="alx-dev-link">
+                        <a href="https://salloum92.github.io/Ahmad-Portfolio/" target="_blank" class="alx-dev-link">
                             <i class="bi bi-code-slash"></i> Ahmad Salloum
                         </a>
                     </p>
